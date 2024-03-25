@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -518,6 +518,17 @@ require('lazy').setup({
               callback = vim.lsp.buf.clear_references,
             })
           end
+
+          local bufnr = event.buf
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          require('lsp-inlayhints').on_attach(client, bufnr)
+          require('lsp_signature').on_attach(signature_setup, bufnr)
+
+          -- Open symbols outline :SymbolsOutline
+          require('symbols-outline').open_outline()
+          -- Need to get the focus back on the main window. This jumps an extra left while going to definitions
+          -- local code_previous_window = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
+          -- vim.api.nvim_feedkeys(code_previous_window .. 'h', 'n', false)
         end,
       })
 
@@ -538,7 +549,7 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {},
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -729,6 +740,89 @@ require('lazy').setup({
     end,
   },
 
+  -- Show inlay hints using LSP server. This shows the parameter name on the right which is helpful while reading.
+  {
+    'lvimuser/lsp-inlayhints.nvim',
+    opts = {},
+  },
+
+  -- Show signature of the method as you type the invocation. This is helpful while invoking the function.
+  {
+    'ray-x/lsp_signature.nvim',
+    event = 'VeryLazy',
+    opts = {},
+  },
+
+  -- Show recent buffers as tabs at the top
+  { 'akinsho/bufferline.nvim', version = '*', dependencies = 'nvim-tree/nvim-web-devicons', opts = {} },
+
+  -- File explorer on the left. Use :Neotree to open it
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = 'v3.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
+      'MunifTanjim/nui.nvim',
+      -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
+    },
+    lazy = false,
+    opts = {
+      close_if_last_window = true,
+      filesystem = {
+        filtered_items = {
+          hide_dotfiles = false,
+          hide_hidden = false,
+        },
+        bind_to_cwd = true,
+        follow_current_file = {
+          enabled = true,
+        },
+        hijack_netrw_behavior = 'disabled',
+        use_libuv_file_watcher = true,
+      },
+    },
+  },
+
+  -- Code folding based on syntax
+  {
+    'kevinhwang91/nvim-ufo',
+    dependencies = { 'kevinhwang91/promise-async' },
+    opts = {},
+    config = function()
+      -- https://github.com/kevinhwang91/nvim-ufo
+      vim.o.foldcolumn = '1' -- '0' is not bad
+      vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+      vim.o.foldlevelstart = 99
+      vim.o.foldenable = true
+
+      -- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+      vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+      vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
+
+      -- Option 2: nvim lsp as LSP client
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      }
+      local language_servers = require('lspconfig').util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
+      for _, ls in ipairs(language_servers) do
+        require('lspconfig')[ls].setup {
+          capabilities = capabilities,
+          -- you can add other fields for setting up lsp server in this table
+        }
+      end
+
+      require('ufo').setup()
+    end,
+  },
+
+  -- diff view
+  { 'sindrets/diffview.nvim', lazy = false, priority = 1000, opts = {} },
+
+  { 'simrat39/symbols-outline.nvim', lazy = false, opts = {} },
+
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
@@ -858,6 +952,30 @@ require('lazy').setup({
     },
   },
 })
+
+-- Open symbols outline on every file. This is not working. I have added this code to lsp config
+-- vim.cmd [[autocmd VimEnter * SymbolsOutline]]
+-- local code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
+-- vim.api.nvim_feedkeys(code_c_w .. 'h', 'n', true)
+
+-- Toggle Neotree on startup
+-- Auto-commands in Vim/Neovim are commands that execute automatically when certain events occur.
+-- VimEnter: This event is triggered when Vim/Neovim has finished starting up and is ready to use.
+-- *: This wildcard specifies that the auto-command applies to all files.
+vim.cmd [[autocmd VimEnter * Neotree]]
+
+-- The following is required to move the focus back to the window on the right once NeoTree is open
+-- nvim_replace_termcodes will replace keycodes with their terminal representation
+-- <C-w> is ctrl + w
+-- true: String should be escaped for use in a terminal.
+-- false: String should not be prefixed with the escape key.
+-- true: Keys should be treated atomically.
+local _code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
+-- nvim_feed_keys will feed keys into Neovim's input buffer
+-- .. is for concatenation. This effectively sends the key sequence Ctrl + w followed by the letter 'l'.
+-- 'n': Normal mode.
+-- true: Keys should be fed asynchronously
+vim.api.nvim_feedkeys(_code_c_w .. 'l', 'n', true)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
