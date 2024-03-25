@@ -248,13 +248,13 @@ require('lazy').setup({
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
-      signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
-      },
+      -- signs = {
+      --   add = { text = '+' },
+      --   change = { text = '~' },
+      --   delete = { text = '_' },
+      --   topdelete = { text = '‾' },
+      --   changedelete = { text = '~' },
+      -- },
     },
   },
 
@@ -381,7 +381,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
+          -- winblend = 10,
           previewer = false,
         })
       end, { desc = '[/] Fuzzily search in current buffer' })
@@ -822,6 +822,20 @@ require('lazy').setup({
   { 'sindrets/diffview.nvim', lazy = false, priority = 1000, opts = {} },
 
   { 'simrat39/symbols-outline.nvim', lazy = false, opts = {} },
+
+  -- Git related
+  {
+    'lewis6991/gitsigns.nvim',
+    config = function()
+      require('gitsigns').setup()
+      -- vim.keymap.set('n', '<leader>gp', ':Gitsigns preview_hunk<CR>', {})
+    end,
+    lazy = false,
+    opts = {},
+  },
+
+  -- For git blame gutter
+  { 'tpope/vim-fugitive', opts = {} },
 
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
