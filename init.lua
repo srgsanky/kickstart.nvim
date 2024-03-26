@@ -525,7 +525,9 @@ require('lazy').setup({
           require('lsp_signature').on_attach(signature_setup, bufnr)
 
           -- Open symbols outline :SymbolsOutline
-          require('symbols-outline').open_outline()
+          -- Disabling this as I couldn't figure out how to keep the focus on the main window. The change of focus is annoying.
+          -- require('symbols-outline').open_outline()
+
           -- Need to get the focus back on the main window. This jumps an extra left while going to definitions
           -- local code_previous_window = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
           -- vim.api.nvim_feedkeys(code_previous_window .. 'h', 'n', false)
@@ -823,6 +825,9 @@ require('lazy').setup({
 
   { 'simrat39/symbols-outline.nvim', lazy = false, opts = {} },
 
+  -- Show trailing whitespace
+  { 'ntpeters/vim-better-whitespace', opts = {}},
+
   -- Git related
   {
     'lewis6991/gitsigns.nvim',
@@ -982,8 +987,18 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
+
   -- Treesitter context for showing current method name as you scroll down
-  { 'nvim-treesitter/nvim-treesitter-context', opts = {} },
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    config = function()
+      require('treesitter-context').setup{
+       multiline_threshold = 2,
+       separator = '-'
+      }
+    end,
+    opts = {}
+  },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
