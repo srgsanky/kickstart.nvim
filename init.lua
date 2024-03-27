@@ -527,13 +527,8 @@ require('lazy').setup({
           require('lsp-inlayhints').on_attach(client, bufnr)
           require('lsp_signature').on_attach(signature_setup, bufnr)
 
-          -- Open symbols outline :SymbolsOutline
-          -- Disabling this as I couldn't figure out how to keep the focus on the main window. The change of focus is annoying.
-          -- require('symbols-outline').open_outline()
-
-          -- Need to get the focus back on the main window. This jumps an extra left while going to definitions
-          -- local code_previous_window = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
-          -- vim.api.nvim_feedkeys(code_previous_window .. 'h', 'n', false)
+          -- Open symbols outline :Outline! (! keeps the focus on the current buffer)
+          require('outline').open_outline { focus_on_open = false }
         end,
       })
 
@@ -844,7 +839,20 @@ require('lazy').setup({
   -- diff view
   { 'sindrets/diffview.nvim', lazy = false, priority = 1000, opts = {} },
 
-  { 'simrat39/symbols-outline.nvim', lazy = false, opts = {} },
+  -- Symbols outline's author has archived the repo due to lack of time
+  -- { 'simrat39/symbols-outline.nvim', lazy = false, opts = {} },
+
+  -- outline is a fork of symbols-outline that supports keeping the focus on current buffer
+  -- https://github.com/simrat39/symbols-outline.nvim/issues/143
+  {
+    'hedyhli/outline.nvim',
+    lazy = false,
+    cmd = { 'Outline', 'OutlineOpen' },
+    keys = { -- Example mapping to toggle outline
+      { '<leader>o', '<cmd>Outline<CR>', desc = 'Toggle outline' },
+    },
+    opts = {},
+  },
 
   -- Show trailing whitespace
   { 'ntpeters/vim-better-whitespace', opts = {} },
