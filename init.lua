@@ -952,7 +952,21 @@ require('lazy').setup({
   -- Show trailing whitespace
   -- Empty config function is required to avoid error while loading vim plugin
   -- https://www.reddit.com/r/AstroNvim/comments/17p224n/how_do_i_track_down_this_error_lua_module_not/
-  { 'ntpeters/vim-better-whitespace', config = function() end, opts = {} },
+  {
+    'ntpeters/vim-better-whitespace',
+    config = function()
+      vim.g.better_whitespace_enabled = 1
+
+      -- For this to work in Mac, make sure to install GNU diff using brew install diffutils
+      -- TODO: These two should be enabled in Mac only if diff command is from GNU.
+      vim.g.strip_whitespace_on_save = 1
+      vim.g.strip_only_modified_lines = 1
+
+      vim.g.strip_whitespace_confirm = 0
+      vim.g.strip_max_file_size = 0
+    end,
+    opts = {},
+  },
 
   -- Git related
   {
