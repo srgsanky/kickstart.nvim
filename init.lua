@@ -554,7 +554,6 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        clangd = {},
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -582,6 +581,12 @@ require('lazy').setup({
           },
         },
       }
+
+      -- clangd from mason is available only on Mac
+      if vim.loop.os_uname().sysname == 'Darwin' then
+        -- MacOS
+        servers.clangd = {}
+      end
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
