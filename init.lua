@@ -916,7 +916,9 @@ require('lazy').setup({
   },
 
   -- Show trailing whitespace
-  { 'ntpeters/vim-better-whitespace', opts = {} },
+  -- Empty config function is required to avoid error while loading vim plugin
+  -- https://www.reddit.com/r/AstroNvim/comments/17p224n/how_do_i_track_down_this_error_lua_module_not/
+  { 'ntpeters/vim-better-whitespace', config = function() end, opts = {} },
 
   -- Git related
   {
@@ -987,7 +989,9 @@ require('lazy').setup({
   },
 
   -- For git blame gutter
-  { 'tpope/vim-fugitive', opts = {} },
+  -- Empty config function is required to avoid error while loading vim plugin
+  -- https://www.reddit.com/r/AstroNvim/comments/17p224n/how_do_i_track_down_this_error_lua_module_not/
+  { 'tpope/vim-fugitive', config = function() end, opts = {} },
 
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
@@ -1082,6 +1086,7 @@ require('lazy').setup({
   },
 
   -- Treesitter context for showing current method name as you scroll down
+  -- If this gets annoying, you can turn it off using TSContextDisable
   {
     'nvim-treesitter/nvim-treesitter-context',
     config = function()
