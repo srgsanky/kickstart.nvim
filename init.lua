@@ -145,6 +145,11 @@ vim.opt.splitbelow = true
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
+vim.opt.expandtab = true -- In Insert mode, use the appropriate number of spaces to insert a tab.
+vim.opt.tabstop = 4 -- Num of spaces that a tab accounts to in the editor
+vim.opt.shiftwidth = 4 -- Num of spaces to use for each step of (auto)indent. Used for >>, << etc
+vim.opt.softtabstop = 2 -- Num of spaces that a tab accounts for while performing editing operations.
+
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
 
