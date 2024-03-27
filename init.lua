@@ -560,6 +560,7 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
+        marksman = {}, -- Markdown
 
         lua_ls = {
           -- cmd = {...},
@@ -946,6 +947,9 @@ require('lazy').setup({
     end,
   },
 
+  -- catppuccin theme
+  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000, opts = {} },
+
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -990,7 +994,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'markdown_inline', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1099,7 +1103,8 @@ local _code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
 -- true: Keys should be fed asynchronously
 vim.api.nvim_feedkeys(_code_c_w .. 'l', 'n', true)
 
-vim.cmd.colorscheme 'slate'
+-- slate does not color markdown well. So, I switched to catppuccin-mocha
+vim.cmd.colorscheme 'catppuccin-mocha'
 
 -- vim-ccls related config
 vim.keymap.set('n', '<leader>gh', ':CclsCallHierarchy<cr>', { desc = 'Show call hierarchy of symbol under cursor.' })
