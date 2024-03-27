@@ -216,6 +216,23 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+-- Convenience function to help dump table in Lua
+-- https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console
+local function dump(o)
+  if type(o) == 'table' then
+    local s = '{ '
+    for k, v in pairs(o) do
+      if type(k) ~= 'number' then
+        k = '"' .. k .. '"'
+      end
+      s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
+    end
+    return s .. '} '
+  else
+    return tostring(o)
+  end
+end
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -529,6 +546,49 @@ require('lazy').setup({
 
           -- Open symbols outline :Outline! (! keeps the focus on the current buffer)
           require('outline').open_outline { focus_on_open = false }
+
+          -- Close outline before current buffer is removed from the window
+          vim.api.nvim_create_autocmd('BufWinLeave', {
+            buffer = bufnr,
+            callback = function(e)
+              local outline = require 'outline'
+              if not outline.is_open() then
+                -- exit early if outline is not open
+                return
+              end
+
+              local buf_being_closed = e.buf
+
+              local function traverse_layout(layout)
+                if layout[1] == 'row' or layout[1] == 'col' then
+                  -- This will have one or more windows. Traverse recursively
+                  local count = 0
+                  for i, _ in ipairs(layout[2]) do
+                    count = count + traverse_layout(layout[2][i])
+                  end
+                  return count
+                elseif layout[1] == 'leaf' then
+                  -- Leaf window
+                  local buf_handle = vim.api.nvim_win_get_buf(layout[2])
+                  local buf_number = vim.api.nvim_buf_get_number(buf_handle)
+                  if buf_number ~= buf_being_closed then
+                    local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
+                    if filetype ~= 'neo-tree' and filetype ~= 'Outline' then -- You may want to make this extendible to add more in the future
+                      return 1
+                    end
+                  end
+                end
+                return 0
+              end
+
+              local layout = vim.api.nvim_call_function('winlayout', {})
+              local other_windows = traverse_layout(layout)
+
+              if other_windows == 0 then
+                outline.close_outline()
+              end
+            end,
+          })
         end,
       })
 
