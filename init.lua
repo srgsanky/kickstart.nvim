@@ -422,6 +422,30 @@ require('lazy').setup({
     end,
   },
 
+  -- For winbar (top) and status line (bottom)
+  {
+    'nvim-lualine/lualine.nvim',
+    config = function()
+      require('lualine').setup {
+        winbar = { -- configuring only the winbar
+          lualine_c = {
+            'navic',
+            color_correction = nil,
+            navic_opts = nil,
+          },
+        },
+      }
+    end,
+    opts = {},
+  },
+
+  -- Breadcrumbs
+  {
+    'SmiteshP/nvim-navic',
+    requires = 'neovim/nvim-lspconfig',
+    opts = {},
+  },
+
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -543,6 +567,11 @@ require('lazy').setup({
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           require('lsp-inlayhints').on_attach(client, bufnr)
           require('lsp_signature').on_attach(signature_setup, bufnr)
+
+          -- Attach lsp based breadcrumb
+          if client.server_capabilities.documentSymbolProvider then
+            require('nvim-navic').attach(client, bufnr)
+          end
 
           -- Open symbols outline :Outline! (! keeps the focus on the current buffer)
           require('outline').open_outline { focus_on_open = false }
