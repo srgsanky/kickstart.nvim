@@ -805,21 +805,34 @@ require('lazy').setup({
       vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
       vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 
-      -- Option 2: nvim lsp as LSP client
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities.textDocument.foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true,
-      }
-      local language_servers = require('lspconfig').util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
-      for _, ls in ipairs(language_servers) do
-        require('lspconfig')[ls].setup {
-          capabilities = capabilities,
-          -- you can add other fields for setting up lsp server in this table
-        }
-      end
+      -- Option 2: nvim lsp as LSP client.
+      -- I disabled this option for the following 2 reasons. Option 3 solves both the problems.
+      -- 1. It created folds only for functions. It didn't create folds for blocks within a function.
+      -- 2. It didn't create folds for block comments.
+      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+      -- capabilities.textDocument.foldingRange = {
+      --   dynamicRegistration = false,
+      --   lineFoldingOnly = true,
+      -- }
+      -- local language_servers = require('lspconfig').util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
+      -- for _, ls in ipairs(language_servers) do
+      --   require('lspconfig')[ls].setup {
+      --     capabilities = capabilities,
+      --     -- you can add other fields for setting up lsp server in this table
+      --   }
+      -- end
 
-      require('ufo').setup()
+      -- require('ufo').setup()
+
+      -- Option 3: treesitter as a main provider instead
+      -- (Note: the `nvim-treesitter` plugin is *not* needed.)
+      -- ufo uses the same query files for folding (queries/<lang>/folds.scm)
+      -- performance and stability are better than `foldmethod=nvim_treesitter#foldexpr()`
+      require('ufo').setup {
+        provider_selector = function(bufnr, filetype, buftype)
+          return { 'treesitter', 'indent' }
+        end,
+      }
     end,
   },
 
@@ -829,7 +842,7 @@ require('lazy').setup({
   { 'simrat39/symbols-outline.nvim', lazy = false, opts = {} },
 
   -- Show trailing whitespace
-  { 'ntpeters/vim-better-whitespace', opts = {}},
+  { 'ntpeters/vim-better-whitespace', opts = {} },
 
   -- Git related
   {
@@ -867,27 +880,27 @@ require('lazy').setup({
           end, { expr = true })
 
           -- Actions
-          map('n', '<leader>hs', gs.stage_hunk)
-          map('n', '<leader>hr', gs.reset_hunk)
+          map('n', '<leader>hs', gs.stage_hunk, { desc = 'Stage hunk' })
+          map('n', '<leader>hr', gs.reset_hunk, { desc = 'Reset hunk' })
           map('v', '<leader>hs', function()
             gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
           end)
           map('v', '<leader>hr', function()
             gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
           end)
-          map('n', '<leader>hS', gs.stage_buffer)
-          map('n', '<leader>hu', gs.undo_stage_hunk)
-          map('n', '<leader>hR', gs.reset_buffer)
-          map('n', '<leader>hp', gs.preview_hunk)
+          map('n', '<leader>hS', gs.stage_buffer, { desc = 'Stage buffer' })
+          map('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'Undo stage buffer' })
+          map('n', '<leader>hR', gs.reset_buffer, { desc = 'Reset buffer' })
+          map('n', '<leader>hp', gs.preview_hunk, { desc = 'Preview hunk' })
           map('n', '<leader>hb', function()
             gs.blame_line { full = true }
           end)
-          map('n', '<leader>tb', gs.toggle_current_line_blame)
-          map('n', '<leader>hd', gs.diffthis)
+          map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = 'Toggle blame for current line' })
+          map('n', '<leader>hd', gs.diffthis, { desc = 'Diff this' })
           map('n', '<leader>hD', function()
             gs.diffthis '~'
           end)
-          map('n', '<leader>td', gs.toggle_deleted)
+          map('n', '<leader>td', gs.toggle_deleted, { desc = 'Toggle deleted' })
 
           -- Text object
           map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
@@ -995,12 +1008,17 @@ require('lazy').setup({
   {
     'nvim-treesitter/nvim-treesitter-context',
     config = function()
-      require('treesitter-context').setup{
-       multiline_threshold = 2,
-       separator = '-'
+      require('treesitter-context').setup {
+        -- multiline_threshold = 2, -- Separator helps with the contrast, so not limiting multiline_threshold
+        separator = '-',
       }
     end,
-    opts = {}
+    opts = {},
+  },
+
+  -- Show call hierarchy
+  {
+    'm-pilia/vim-ccls',
   },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
@@ -1069,6 +1087,17 @@ local _code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
 vim.api.nvim_feedkeys(_code_c_w .. 'l', 'n', true)
 
 vim.cmd.colorscheme 'slate'
+
+-- vim-ccls related config
+vim.keymap.set('n', '<leader>gh', ':CclsCallHierarchy<cr>', { desc = 'Show call hierarchy of symbol under cursor.' })
+
+vim.api.nvim_set_var('ccls_float_width', 50)
+vim.api.nvim_set_var('ccls_float_height', 20)
+
+vim.api.nvim_set_var('ccls_levels', 5) -- levels doesn't seem to work
+vim.api.nvim_set_var('ccls_size', 50)
+vim.api.nvim_set_var('ccls_position', 'botright')
+-- vim.api.nvim_set_var("ccls_orientation", 'horizontal') -- Opens a horizontal split pane
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
