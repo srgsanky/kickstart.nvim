@@ -1169,7 +1169,8 @@ require('lazy').setup({
     'akinsho/toggleterm.nvim',
     opts = {},
     config = function()
-      vim.keymap.set('n', '<leader>tt', ':ToggleTerm', { desc = 'Toggle terminal' })
+      vim.keymap.set('n', '<leader>tt', ':ToggleTerm<CR>', { desc = 'Toggle terminal' })
+      require('toggleterm').setup()
     end,
   },
 
