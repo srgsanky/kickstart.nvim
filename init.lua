@@ -1209,24 +1209,22 @@ require('lazy').setup({
       'rcarriga/nvim-notify',
     },
     config = function()
-      -- whether to show symbols like : ? / or to show icons. false shows the symbols and true shows the icons
+      -- whether to show symbols like : ? /. false shows the symbols.
       local enable_conceal = false
 
       require('noice').setup {
         cmdline = {
           view = 'cmdline_popup', -- cmdline_popup, cmdline
           format = {
-            cmdline = { conceal = enable_conceal },
-            search_down = { conceal = enable_conceal },
-            search_up = { conceal = enable_conceal },
-            filter = { conceal = enable_conceal },
-            lua = { conceal = enable_conceal },
-            help = { conceal = enable_conceal },
-            input = { conceal = enable_conceal },
+            -- Disable icons by using empty string
+            cmdline = { conceal = enable_conceal, icon = '' },
+            search_down = { conceal = enable_conceal, icon = '' },
+            search_up = { conceal = enable_conceal, icon = '' },
+            filter = { conceal = enable_conceal, icon = '' },
+            lua = { conceal = enable_conceal, icon = '' },
+            help = { conceal = enable_conceal, icon = '' },
+            input = { conceal = enable_conceal, icon = '' },
           },
-        },
-        popupmenu = {
-          kind_icons = false, -- FIXME: Couldn't get this to hide icons
         },
         lsp = {
           -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
