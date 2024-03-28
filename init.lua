@@ -836,7 +836,13 @@ require('lazy').setup({
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
-          { name = 'nvim_lsp' },
+          {
+            name = 'nvim_lsp',
+            entry_filter = function(entry, _ctx)
+              -- Don't show text suggestions. These get in the way of thinking
+              return require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
+            end,
+          },
           { name = 'luasnip' },
           { name = 'path' },
         },
