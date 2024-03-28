@@ -806,7 +806,7 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<C-y>'] = cmp.mapping.confirm { select = true }, -- This is the key to insert the currently selected text in dropdown
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -1248,6 +1248,8 @@ require('lazy').setup({
       }
     end,
   },
+  -- No Neck pain - to center the buffer like Zen mode
+  { 'shortcuts/no-neck-pain.nvim', version = '*' },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
