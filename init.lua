@@ -1173,13 +1173,33 @@ require('lazy').setup({
     end,
   },
 
+  -- Notification - provide better notification view.
+  -- Messages open in a buffer which is easy to navigate
+  -- You can easily view the last errors using :NoiceErrors or :NoiceLast
+  {
+    'rcarriga/nvim-notify',
+    lazy = false,
+    opts = {
+      stages = 'static', -- fade_in_slide_out, fade, slide, static
+      render = 'wrapped-compact', -- default, minimal, simple, compact, wrapped-compact
+      timeout = 4000, -- ms
+      minimum_width = 50,
+      icons = { ERROR = '', WARN = '', INFO = '', DEBUG = '', TRACE = '✎' },
+      level = vim.log.levels.INFO,
+      fps = 20,
+      background_colour = '#000000',
+      on_open = function(win)
+        vim.api.nvim_win_set_config(win, { zindex = 100 })
+      end,
+      top_down = true, -- true: top to bottom, false: bottom to top
+    },
+  },
   -- Show command line at the center along with enhancements to notifications
+  -- Also shows [1/n] for each search match
   {
     'folke/noice.nvim',
     event = 'VeryLazy',
-    opts = {
-      -- add any options here
-    },
+    opts = {},
     dependencies = {
       -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       'MunifTanjim/nui.nvim',
@@ -1190,6 +1210,13 @@ require('lazy').setup({
     },
     config = function()
       require('noice').setup {
+        cmdline = {
+          view = 'cmdline_popup', -- cmdline_popup, cmdline
+        },
+        popupmenu = {
+          -- whether to show symbols like : ? / or to show icons. false shows the symbols and true shows the icons
+          kind_icons = false, -- FIXME: Couldn't get this to work
+        },
         lsp = {
           -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
           override = {
@@ -1205,9 +1232,6 @@ require('lazy').setup({
           long_message_to_split = true, -- long messages will be sent to a split
           inc_rename = false, -- enables an input dialog for inc-rename.nvim
           lsp_doc_border = false, -- add a border to hover docs and signature help
-        },
-        notify = {
-          enabled = true,
         },
       }
     end,
