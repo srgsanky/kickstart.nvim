@@ -468,6 +468,14 @@ require('lazy').setup({
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
       { 'folke/neodev.nvim', opts = {} },
+
+      -- Gray out code within undefined symbols in c and cpp
+      -- You also need to configure lspconfig.ccls.setup to turn on highlight.
+      {
+        'jackguo380/vim-lsp-cxx-highlight',
+        opts = {},
+        config = function() end, -- dummy config function for vimscript plugins
+      },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -724,7 +732,7 @@ require('lazy').setup({
         local lspconfig = require 'lspconfig'
         lspconfig.ccls.setup {
           -- The only way to set the log file location is via the command line argument
-          cmd = { 'ccls', '--log-file=~/ccls-log.log', '-v=1' },
+          cmd = { 'ccls', '--log-file=' .. vim.fn.expand '$HOME/ccls-log.log', '-v=1' },
           init_options = {
             index = {
               threads = 0,
@@ -1287,13 +1295,6 @@ require('lazy').setup({
   },
   -- No Neck pain - to center the buffer like Zen mode
   { 'shortcuts/no-neck-pain.nvim', version = '*' },
-
-  -- Gray out code within undefined symbols in c and cpp
-  -- You also need to configure lspconfig.ccls.setup to turn on highlight.
-  {
-    'jackguo380/vim-lsp-cxx-highlight',
-    opts = {},
-  },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
