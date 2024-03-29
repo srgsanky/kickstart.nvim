@@ -372,11 +372,13 @@ require('lazy').setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          -- Ignore files in specific paths from showing up in telescope
+          file_ignore_patterns = { 'build/private/' },
+          --   mappings = {
+          --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+          --   },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -706,6 +708,40 @@ require('lazy').setup({
           end,
         },
       }
+      -- Use ccls only in linux. clangd is available in Mac which makes things easier
+      if vim.loop.os_uname().sysname == 'Linux' then
+        local function find_path_to_file(filename)
+          -- -print -quit will quit on first match
+          for entry in io.popen('dirname $(find . -name "' .. filename .. '" -print -quit)'):lines() do
+            return entry
+          end
+          return ''
+        end
+
+        -- Automatically find the directory where compile_commands.json is located
+        local compile_commands_json_dir = find_path_to_file 'compile_commands.json'
+
+        local lspconfig = require 'lspconfig'
+        lspconfig.ccls.setup {
+          -- The only way to set the log file location is via the command line argument
+          cmd = { 'ccls', '--log-file=~/ccls-log.log', '-v=1' },
+          init_options = {
+            index = {
+              threads = 0,
+            },
+            cache = {
+              format = 'json', -- json, binary
+            },
+            clang = {
+              excludeArgs = { '-frounding-math' },
+            },
+            compilationDatabaseDirectory = compile_commands_json_dir,
+            highlight = {
+              lsRanges = true, -- Along with jackguo380/vim-lsp-cxx-highlight, helps dim code within undefined macros
+            },
+          },
+        }
+      end
     end,
   },
 
@@ -1251,6 +1287,13 @@ require('lazy').setup({
   },
   -- No Neck pain - to center the buffer like Zen mode
   { 'shortcuts/no-neck-pain.nvim', version = '*' },
+
+  -- Gray out code within undefined symbols in c and cpp
+  -- You also need to configure lspconfig.ccls.setup to turn on highlight.
+  {
+    'jackguo380/vim-lsp-cxx-highlight',
+    opts = {},
+  },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
