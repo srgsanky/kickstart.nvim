@@ -280,9 +280,9 @@ local use_clangd_in_mac = false
 -- Should open Neotree on startup?
 local open_neo_tree_on_startup = false
 
+-- These are aux windows from plugins that are meant to assist in editing your main file
+local aux_windows = { 'neo-tree', 'Outline', 'yggdrasil', 'noice', 'notify' }
 local function is_aux_window(name)
-  -- These are aux windows from plugins that are meant to assist in editing your main file
-  local aux_windows = { 'neo-tree', 'Outline', 'yggdrasil', 'noice', 'notify' }
   for i = 1, #aux_windows do
     if aux_windows[i] == name then
       return true
@@ -501,6 +501,52 @@ require('lazy').setup({
             'navic',
             color_correction = nil,
             navic_opts = nil,
+          },
+        },
+        options = {
+          disabled_filetypes = { -- Filetypes to disable lualine for.
+            statusline = aux_windows, -- statusline won't be drawn for these file types
+            winbar = aux_windows, -- winbar won't be drawn for these file types
+          },
+          ignore_focus = aux_windows, -- When you focus the aux windows, they will continue to show the status from previous window
+          globalstatus = true, -- Have a single status line across all windows instead of one per window
+        },
+        sections = {
+          lualine_b = { 'branch', 'diagnostics' }, -- 'branch', 'diff', 'diagnostics'
+          lualine_c = {
+            {
+              'filename',
+              file_status = true, -- Displays file status (readonly status, modified status)
+              newfile_status = false, -- Display new file status (new file means no write after created)
+              path = 1,
+              -- 0: Just the filename
+              -- 1: Relative path
+              -- 2: Absolute path
+              -- 3: Absolute path, with tilde as the home directory
+              -- 4: Filename and parent dir, with tilde as the home directory
+
+              shorting_target = 40, -- Shortens path to leave 40 spaces in the window
+
+              symbols = {
+                modified = '[*]', -- Text to show when the file is modified.
+                readonly = '[R]', -- Text to show when the file is non-modifiable or readonly.
+                unnamed = '[No Name]', -- Text to show for unnamed buffers.
+                newfile = '[New]', -- Text to show for newly created file before first write
+              },
+            },
+          },
+          lualine_x = {
+            {
+              'filename',
+              path = 0, -- Just the filename
+            },
+            -- 'encoding', -- UTF-8 etc. Not very useful. Removing to reduce noise
+            -- 'fileformat', -- shows unix, dos, mac
+            'filetype',
+          },
+          lualine_z = {
+            'location',
+            'selectioncount',
           },
         },
       }
