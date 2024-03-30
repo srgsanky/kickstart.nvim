@@ -222,6 +222,13 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Control behavior of window size when splitting and closing splits
+-- https://vimdoc.sourceforge.net/htmldoc/options.html#'equalalways'
+-- https://stackoverflow.com/questions/486027/close-a-split-window-in-vim-without-resizing-other-windows
+-- When equalalways is false, the size of windows other than the one being split is not affected.
+-- Similarly, when closing a window, the extra space is given to only one window, preventing a resize of other windows
+vim.opt.equalalways = false
+
 -- Remap quit to quit all - you can only remap uppercase commands, so, I am not able to remap q
 -- For convenience: When you press : and try to press q immediately, you might still be holding shift
 vim.api.nvim_create_user_command('Q', 'qa', { desc = 'Quit all' })
@@ -272,6 +279,26 @@ local use_clangd_in_mac = false
 
 -- Should open Neotree on startup?
 local open_neo_tree_on_startup = false
+
+local function is_aux_window(name)
+  -- These are aux windows from plugins that are meant to assist in editing your main file
+  local aux_windows = { 'neo-tree', 'Outline', 'yggdrasil', 'noice', 'notify' }
+  for i = 1, #aux_windows do
+    if aux_windows[i] == name then
+      return true
+    end
+  end
+  return false
+end
+
+local function is_buffer_visible(bufnr)
+  for _, winid in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_buf(winid) == bufnr then
+      return true
+    end
+  end
+  return false
+end
 
 -- [[ Configure and install plugins ]]
 --
@@ -633,17 +660,9 @@ require('lazy').setup({
           vim.api.nvim_create_autocmd('BufWinLeave', {
             buffer = bufnr,
             callback = function(e)
-              local call_hierarchy_buf_name = 'yggdrasil'
               local buf_being_closed = e.buf
-              local file_type_of_buf_being_closed = vim.api.nvim_get_option_value('filetype', { buf = buf_being_closed })
-              if file_type_of_buf_being_closed == call_hierarchy_buf_name then
-                -- exit early when trying to close the call hierarchy
-                return
-              end
 
               local function traverse_layout(layout)
-                local block_list = { 'neo-tree', 'Outline', call_hierarchy_buf_name, 'noice' }
-
                 if layout[1] == 'row' or layout[1] == 'col' then
                   -- This will have one or more windows. Traverse recursively
                   local count = 0
@@ -661,10 +680,8 @@ require('lazy').setup({
                     end
 
                     local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
-                    for i = 1, #block_list do
-                      if filetype == block_list[i] then
-                        return 0 -- discount block listed buffers
-                      end
+                    if is_aux_window(filetype) then
+                      return 0
                     end
                     return 1 -- Buf is an actual file of interest and we want to count it
                   end
@@ -675,40 +692,12 @@ require('lazy').setup({
               local layout = vim.api.nvim_call_function('winlayout', {})
               local num_other_windows = traverse_layout(layout)
 
-              -- When closing the last window, close Outline and call hierarchy
+              -- When closing the last window, close Outline
               if num_other_windows == 0 then
                 local outline = require 'outline'
                 if outline.is_open() then
                   outline.close_outline()
                 end
-
-                -- Untested code
-                -- local function close_call_hierarchies()
-                --   -- local buffers = vim.api.nvim_list_bufs()
-                --   local windows = vim.api.nvim_list_wins()
-                --   for x = 1, #windows do
-                --     local buf_handle = vim.api.nvim_win_get_buf(windows[x])
-                --     --local buf_handle = buffers[x]
-
-                --     local buf_number = vim.api.nvim_buf_get_number(buf_handle)
-                --     local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
-
-                --     if vim.api.nvim_buf_is_loaded(buf_handle) then
-                --       if filetype == call_hierarchy_buf_name then
-                --         -- vim.api.nvim_buf_delete(buf_number, { force = true })
-                --         vim.api.nvim_win_close(windows[x], true)
-                --       elseif buf_number ~= buf_being_closed then
-                --         -- vim.api.nvim_win_close(windows[x], false)
-                --       end
-                --     else
-                --       -- Close unloaded buffers if they are clean
-                --       -- vim.api.nvim_buf_delete(buf_number, { force = false })
-
-                --       -- vim.api.nvim_win_close(windows[x], false)
-                --     end
-                --   end
-                -- end
-                -- close_call_hierarchies()
               end
             end,
           })
@@ -1370,6 +1359,35 @@ require('lazy').setup({
 
           -- When existing window is closed, the newly open buffer can occupy 2x the size. Resize to keep it at 1x
           vim.api.nvim_win_set_height(vim.api.nvim_get_current_win(), size)
+        end,
+      })
+
+      -- Close if call hierarchy is the only buffer of interest
+      vim.api.nvim_create_autocmd('BufEnter', {
+        callback = function(e)
+          local buf_num = e.buf
+          local file_type = vim.api.nvim_get_option_value('filetype', { buf = buf_num })
+
+          if file_type == 'yggdrasil' then
+            -- We just focused on call hierarchy window
+            local bufs = vim.api.nvim_list_bufs()
+            local loaded_bufs = 0
+            for buf_idx = 1, #bufs do
+              if vim.api.nvim_buf_is_loaded(bufs[buf_idx]) then
+                local loaded_buf_number = vim.api.nvim_buf_get_number(bufs[buf_idx])
+                local loaded_buf_file_type = vim.api.nvim_get_option_value('filetype', { buf = loaded_buf_number })
+                if not is_aux_window(loaded_buf_file_type) then
+                  if is_buffer_visible(loaded_buf_number) then
+                    loaded_bufs = loaded_bufs + 1
+                  end
+                end
+              end
+            end
+
+            if loaded_bufs == 0 then
+              vim.cmd 'q'
+            end
+          end
         end,
       })
     end,
