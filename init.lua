@@ -146,9 +146,26 @@ vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 vim.opt.expandtab = true -- In Insert mode, use the appropriate number of spaces to insert a tab.
+-- vim.opt.smartindent = true
 vim.opt.tabstop = 4 -- Num of spaces that a tab accounts to in the editor
 vim.opt.shiftwidth = 4 -- Num of spaces to use for each step of (auto)indent. Used for >>, << etc
-vim.opt.softtabstop = 2 -- Num of spaces that a tab accounts for while performing editing operations.
+vim.opt.softtabstop = 4 -- Num of spaces that a tab accounts for while performing editing operations.
+
+-- Line length above which to break a line. Whether to break a line or not is controlled by formatoptions
+vim.opt.textwidth = 120
+
+-- default formatoptions (Use :set formatoptions? to find out)
+-- jcroql
+-- <https://neovim.io/doc/user/change.html#fo-table>
+-- j: Where it makes sense, remove a comment leader when joining lines
+-- c: Auto-wrap comments based on text-width
+-- r: Automatically insert the current comment leader after hitting <Enter> in Insert mode.
+-- o: Automatically insert the current comment leader after hitting 'o' or 'O' in Normal mode.
+-- q: Allow formatting of comments with "gq".
+-- l: Existing long lines are not broken when entering insert mode
+
+-- NOTE: Pro-tip: use :options to view all options in Neovim
+-- https://www.reddit.com/r/neovim/comments/12d075n/some_people_dont_know_this_options/
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -237,6 +254,10 @@ local function dump(o)
     return tostring(o)
   end
 end
+
+-- Should use clangd in Mac?
+-- Use true to use clangd, false to use ccls
+local use_clangd_in_mac = true
 
 -- [[ Configure and install plugins ]]
 --
@@ -683,7 +704,7 @@ require('lazy').setup({
       }
 
       -- clangd from mason is available only on Mac
-      if vim.loop.os_uname().sysname == 'Darwin' then
+      if vim.loop.os_uname().sysname == 'Darwin' and use_clangd_in_mac then
         -- MacOS
         servers.clangd = {}
       end
@@ -717,7 +738,7 @@ require('lazy').setup({
         },
       }
       -- Use ccls only in linux. clangd is available in Mac which makes things easier
-      if vim.loop.os_uname().sysname == 'Linux' then
+      if vim.loop.os_uname().sysname == 'Linux' or use_clangd_in_mac then
         local function find_path_to_file(filename)
           -- -print -quit will quit on first match
           for entry in io.popen('dirname $(find . -name "' .. filename .. '" -print -quit)'):lines() do
@@ -936,26 +957,6 @@ require('lazy').setup({
         use_libuv_file_watcher = true,
       },
     },
-    config = function()
-      -- Toggle Neotree on startup
-      -- Auto-commands in Vim/Neovim are commands that execute automatically when certain events occur.
-      -- VimEnter: This event is triggered when Vim/Neovim has finished starting up and is ready to use.
-      -- *: This wildcard specifies that the auto-command applies to all files.
-      vim.cmd [[autocmd VimEnter * Neotree]]
-
-      -- The following is required to move the focus back to the window on the right once NeoTree is open
-      -- nvim_replace_termcodes will replace keycodes with their terminal representation
-      -- <C-w> is ctrl + w
-      -- true: String should be escaped for use in a terminal.
-      -- false: String should not be prefixed with the escape key.
-      -- true: Keys should be treated atomically.
-      local _code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
-      -- nvim_feed_keys will feed keys into Neovim's input buffer
-      -- .. is for concatenation. This effectively sends the key sequence Ctrl + w followed by the letter 'l'.
-      -- 'n': Normal mode.
-      -- true: Keys should be fed asynchronously
-      vim.api.nvim_feedkeys(_code_c_w .. 'l', 'n', true)
-    end,
   },
 
   -- Code folding based on syntax
@@ -1226,7 +1227,7 @@ require('lazy').setup({
     opts = {},
     config = function()
       -- I am using ccls only in Linux.
-      if vim.loop.os_uname().sysname == 'Darwin' then
+      if vim.loop.os_uname().sysname == 'Darwin' and use_clangd_in_mac then
         return
       end
 
@@ -1378,6 +1379,29 @@ require('lazy').setup({
 
 -- slate does not color markdown well. So, I switched to catppuccin-mocha
 vim.cmd.colorscheme 'catppuccin-mocha'
+
+local function open_neotree_on_startup()
+  -- Toggle Neotree on startup
+  -- Auto-commands in Vim/Neovim are commands that execute automatically when certain events occur.
+  -- VimEnter: This event is triggered when Vim/Neovim has finished starting up and is ready to use.
+  -- *: This wildcard specifies that the auto-command applies to all files.
+  vim.cmd [[autocmd VimEnter * Neotree]]
+
+  -- The following is required to move the focus back to the window on the right once NeoTree is open
+  -- nvim_replace_termcodes will replace keycodes with their terminal representation
+  -- <C-w> is ctrl + w
+  -- true: String should be escaped for use in a terminal.
+  -- false: String should not be prefixed with the escape key.
+  -- true: Keys should be treated atomically.
+  local _code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
+  -- nvim_feed_keys will feed keys into Neovim's input buffer
+  -- .. is for concatenation. This effectively sends the key sequence Ctrl + w followed by the letter 'l'.
+  -- 'n': Normal mode.
+  -- true: Keys should be fed asynchronously
+  vim.api.nvim_feedkeys(_code_c_w .. 'l', 'n', true)
+end
+
+open_neotree_on_startup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
