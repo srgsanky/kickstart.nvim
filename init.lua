@@ -1042,27 +1042,26 @@ require('lazy').setup({
     },
     lazy = false,
     config = function()
-      require('neo-tree').setup()
+      require('neo-tree').setup {
+        close_if_last_window = true,
+        filesystem = {
+          filtered_items = {
+            hide_dotfiles = false,
+            hide_hidden = false,
+          },
+          bind_to_cwd = true,
+          follow_current_file = {
+            enabled = true,
+          },
+          hijack_netrw_behavior = 'disabled',
+          use_libuv_file_watcher = true,
+        },
+      }
 
       -- Open Neotree using <leader>[E]xplorer
       -- action=show will open Neotree but keep the focus on the current buffer
       vim.keymap.set('n', '<leader>E', '<cmd>Neotree toggle action=show<CR>', { desc = '[E]xplorer' })
     end,
-    opts = {
-      close_if_last_window = true,
-      filesystem = {
-        filtered_items = {
-          hide_dotfiles = false,
-          hide_hidden = false,
-        },
-        bind_to_cwd = true,
-        follow_current_file = {
-          enabled = true,
-        },
-        hijack_netrw_behavior = 'disabled',
-        use_libuv_file_watcher = true,
-      },
-    },
   },
 
   -- Code folding based on syntax
