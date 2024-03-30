@@ -738,6 +738,11 @@ require('lazy').setup({
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
+            -- Mason auto load clangd if it is installed in the system
+            if server_name == 'clangd' and not use_clangd_in_mac then
+              return
+            end
+
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
@@ -748,7 +753,7 @@ require('lazy').setup({
         },
       }
       -- Use ccls only in linux. clangd is available in Mac which makes things easier
-      if vim.loop.os_uname().sysname == 'Linux' or use_clangd_in_mac then
+      if vim.loop.os_uname().sysname == 'Linux' or not use_clangd_in_mac then
         local function find_path_to_file(filename)
           -- -print -quit will quit on first match
           for entry in io.popen('dirname $(find . -name "' .. filename .. '" -print -quit)'):lines() do
@@ -778,6 +783,7 @@ require('lazy').setup({
             highlight = {
               lsRanges = true, -- Along with jackguo380/vim-lsp-cxx-highlight, helps dim code within undefined macros
             },
+            offset_encoding = 'utf-8',
           },
         }
       end
