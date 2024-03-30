@@ -1266,25 +1266,37 @@ require('lazy').setup({
         return
       end
 
-      vim.keymap.set('n', '<leader>gh', ':CclsCallHierarchy<CR>', { desc = 'Show [c]all [h]ierarchy of symbol under cursor.' })
-      vim.keymap.set('n', '<leader>ch', ':CclsCallHierarchy -float<CR>', { desc = 'Show [c]all [h]ierarchy of symbol under cursor using floating window.' })
+      vim.keymap.set('n', '<leader>ch', ':CclsCallHierarchy<CR>', { desc = 'Show [c]all [h]ierarchy of symbol under cursor.' })
+      -- vim.keymap.set('n', '<leader>chf', ':CclsCallHierarchy -float<CR>', { desc = 'Show [c]all [h]ierarchy of symbol under cursor using floating window.' })
 
       vim.api.nvim_set_var('ccls_float_width', 50)
       vim.api.nvim_set_var('ccls_float_height', 20)
 
+      -- Num of cols for vertical and num of rows for horizontal
+      local size = 10
       -- Num of levels to fetch from LSP client. The more levels that you fetch, the
       -- faster the tree expansion is. This does not make the tree visually expand
       -- automatically
       vim.g.ccls_levels = 1
-      vim.g.ccls_size = 10 -- Num of cols for vertical and num of rows for horizontal
-      vim.g.ccls_position = 'botright' -- topleft, botright
+      vim.g.ccls_size = size
+      vim.g.ccls_position = 'topleft' -- topleft, botright
       vim.g.ccls_orientation = 'horizontal' -- vertical, horizontal
       -- vim.g.ccls_close_on_jump = true
 
       -- Make sure that there is only one call hierarchy window is open at a time
-      vim.api.nvim_create_autocmd('BufCreate', {
+      -- Since we rely on the filetype of the buffer, invoke this only when filetype changes
+      vim.api.nvim_create_autocmd('Filetype', {
         callback = function(e)
+          -- vim-ccls uses yggdrasil to render the call tree
+          local call_hierarchy_file_type = 'yggdrasil'
+
           local buf_being_created = e.buf
+
+          -- Only close existing call hierarchy when trying to open another call hierarchy
+          local filetype_of_buffer_being_created = vim.api.nvim_get_option_value('filetype', { buf = buf_being_created })
+          if filetype_of_buffer_being_created ~= call_hierarchy_file_type then
+            return
+          end
 
           local function close_existing_call_hierarchies(layout)
             if layout[1] == 'row' or layout[1] == 'col' then
@@ -1298,8 +1310,7 @@ require('lazy').setup({
               local buf_number = vim.api.nvim_buf_get_number(buf_handle)
               if buf_number ~= buf_being_created then
                 local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
-                -- vim-ccls uses yggdrasil to render the call tree
-                if filetype == 'yggdrasil' then
+                if filetype == call_hierarchy_file_type then
                   vim.api.nvim_buf_delete(buf_number, {
                     force = true, -- Force deletion and ignore unsaved changes.
                   })
@@ -1311,6 +1322,9 @@ require('lazy').setup({
 
           local layout = vim.api.nvim_call_function('winlayout', {})
           close_existing_call_hierarchies(layout)
+
+          -- When existing window is closed, the newly open buffer can occupy 2x the size. Resize to keep it at 1x
+          vim.api.nvim_win_set_height(vim.api.nvim_get_current_win(), size)
         end,
       })
     end,
