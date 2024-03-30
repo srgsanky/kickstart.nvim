@@ -936,6 +936,26 @@ require('lazy').setup({
         use_libuv_file_watcher = true,
       },
     },
+    config = function()
+      -- Toggle Neotree on startup
+      -- Auto-commands in Vim/Neovim are commands that execute automatically when certain events occur.
+      -- VimEnter: This event is triggered when Vim/Neovim has finished starting up and is ready to use.
+      -- *: This wildcard specifies that the auto-command applies to all files.
+      vim.cmd [[autocmd VimEnter * Neotree]]
+
+      -- The following is required to move the focus back to the window on the right once NeoTree is open
+      -- nvim_replace_termcodes will replace keycodes with their terminal representation
+      -- <C-w> is ctrl + w
+      -- true: String should be escaped for use in a terminal.
+      -- false: String should not be prefixed with the escape key.
+      -- true: Keys should be treated atomically.
+      local _code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
+      -- nvim_feed_keys will feed keys into Neovim's input buffer
+      -- .. is for concatenation. This effectively sends the key sequence Ctrl + w followed by the letter 'l'.
+      -- 'n': Normal mode.
+      -- true: Keys should be fed asynchronously
+      vim.api.nvim_feedkeys(_code_c_w .. 'l', 'n', true)
+    end,
   },
 
   -- Code folding based on syntax
@@ -1203,6 +1223,23 @@ require('lazy').setup({
   -- Show call hierarchy
   {
     'm-pilia/vim-ccls',
+    opts = {},
+    config = function()
+      -- I am using ccls only in Linux.
+      if vim.loop.os_uname().sysname == 'Darwin' then
+        return
+      end
+
+      vim.keymap.set('n', '<leader>gh', ':CclsCallHierarchy<cr>', { desc = 'Show call hierarchy of symbol under cursor.' })
+
+      vim.api.nvim_set_var('ccls_float_width', 50)
+      vim.api.nvim_set_var('ccls_float_height', 20)
+
+      vim.api.nvim_set_var('ccls_levels', 5) -- levels doesn't seem to work
+      vim.api.nvim_set_var('ccls_size', 50)
+      vim.api.nvim_set_var('ccls_position', 'botright')
+      vim.api.nvim_set_var('ccls_orientation', 'horizontal') -- Opens a horizontal split pane
+    end,
   },
 
   -- Terminal in nvim
@@ -1305,7 +1342,9 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  require 'kickstart.plugins.debug',
+  -- I find the debug plugin in neovim to be high effort low returns at this point in time.
+  -- There are way too many failure points for a debugger. I may revisit these plugins later.
+  -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
 
@@ -1337,43 +1376,8 @@ require('lazy').setup({
   },
 })
 
--- Open symbols outline on every file. This is not working. I have added this code to lsp config
--- vim.cmd [[autocmd VimEnter * SymbolsOutline]]
--- local code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
--- vim.api.nvim_feedkeys(code_c_w .. 'h', 'n', true)
-
--- Toggle Neotree on startup
--- Auto-commands in Vim/Neovim are commands that execute automatically when certain events occur.
--- VimEnter: This event is triggered when Vim/Neovim has finished starting up and is ready to use.
--- *: This wildcard specifies that the auto-command applies to all files.
-vim.cmd [[autocmd VimEnter * Neotree]]
-
--- The following is required to move the focus back to the window on the right once NeoTree is open
--- nvim_replace_termcodes will replace keycodes with their terminal representation
--- <C-w> is ctrl + w
--- true: String should be escaped for use in a terminal.
--- false: String should not be prefixed with the escape key.
--- true: Keys should be treated atomically.
-local _code_c_w = vim.api.nvim_replace_termcodes('<C-w>', true, false, true)
--- nvim_feed_keys will feed keys into Neovim's input buffer
--- .. is for concatenation. This effectively sends the key sequence Ctrl + w followed by the letter 'l'.
--- 'n': Normal mode.
--- true: Keys should be fed asynchronously
-vim.api.nvim_feedkeys(_code_c_w .. 'l', 'n', true)
-
 -- slate does not color markdown well. So, I switched to catppuccin-mocha
 vim.cmd.colorscheme 'catppuccin-mocha'
-
--- vim-ccls related config
-vim.keymap.set('n', '<leader>gh', ':CclsCallHierarchy<cr>', { desc = 'Show call hierarchy of symbol under cursor.' })
-
-vim.api.nvim_set_var('ccls_float_width', 50)
-vim.api.nvim_set_var('ccls_float_height', 20)
-
-vim.api.nvim_set_var('ccls_levels', 5) -- levels doesn't seem to work
-vim.api.nvim_set_var('ccls_size', 50)
-vim.api.nvim_set_var('ccls_position', 'botright')
--- vim.api.nvim_set_var("ccls_orientation", 'horizontal') -- Opens a horizontal split pane
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
