@@ -266,6 +266,9 @@ end
 -- Use true to use clangd, false to use ccls
 local use_clangd_in_mac = true
 
+-- Should open Neotree on startup?
+local open_neo_tree_on_startup = false
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -1263,15 +1266,53 @@ require('lazy').setup({
         return
       end
 
-      vim.keymap.set('n', '<leader>gh', ':CclsCallHierarchy<cr>', { desc = 'Show call hierarchy of symbol under cursor.' })
+      vim.keymap.set('n', '<leader>gh', ':CclsCallHierarchy<CR>', { desc = 'Show [c]all [h]ierarchy of symbol under cursor.' })
+      vim.keymap.set('n', '<leader>ch', ':CclsCallHierarchy -float<CR>', { desc = 'Show [c]all [h]ierarchy of symbol under cursor using floating window.' })
 
       vim.api.nvim_set_var('ccls_float_width', 50)
       vim.api.nvim_set_var('ccls_float_height', 20)
 
-      vim.api.nvim_set_var('ccls_levels', 5) -- levels doesn't seem to work
-      vim.api.nvim_set_var('ccls_size', 50)
-      vim.api.nvim_set_var('ccls_position', 'botright')
-      vim.api.nvim_set_var('ccls_orientation', 'horizontal') -- Opens a horizontal split pane
+      -- Num of levels to fetch from LSP client. The more levels that you fetch, the
+      -- faster the tree expansion is. This does not make the tree visually expand
+      -- automatically
+      vim.g.ccls_levels = 1
+      vim.g.ccls_size = 10 -- Num of cols for vertical and num of rows for horizontal
+      vim.g.ccls_position = 'botright' -- topleft, botright
+      vim.g.ccls_orientation = 'horizontal' -- vertical, horizontal
+      -- vim.g.ccls_close_on_jump = true
+
+      -- Make sure that there is only one call hierarchy window is open at a time
+      vim.api.nvim_create_autocmd('BufCreate', {
+        callback = function(e)
+          local buf_being_created = e.buf
+
+          local function close_existing_call_hierarchies(layout)
+            if layout[1] == 'row' or layout[1] == 'col' then
+              -- This will have one or more windows. Traverse recursively
+              for i, _ in ipairs(layout[2]) do
+                close_existing_call_hierarchies(layout[2][i])
+              end
+            elseif layout[1] == 'leaf' then
+              -- Leaf window
+              local buf_handle = vim.api.nvim_win_get_buf(layout[2])
+              local buf_number = vim.api.nvim_buf_get_number(buf_handle)
+              if buf_number ~= buf_being_created then
+                local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
+                -- vim-ccls uses yggdrasil to render the call tree
+                if filetype == 'yggdrasil' then
+                  vim.api.nvim_buf_delete(buf_number, {
+                    force = true, -- Force deletion and ignore unsaved changes.
+                  })
+                  return
+                end
+              end
+            end
+          end
+
+          local layout = vim.api.nvim_call_function('winlayout', {})
+          close_existing_call_hierarchies(layout)
+        end,
+      })
     end,
   },
 
@@ -1433,7 +1474,9 @@ local function open_neotree_on_startup()
   vim.api.nvim_feedkeys(_code_c_w .. 'l', 'n', true)
 end
 
-open_neotree_on_startup()
+if open_neo_tree_on_startup then
+  open_neotree_on_startup()
+end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
