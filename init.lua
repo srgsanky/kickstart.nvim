@@ -263,8 +263,8 @@ local function dump(o)
 end
 
 -- Should use clangd in Mac?
--- Use true to use clangd, false to use ccls
-local use_clangd_in_mac = true
+-- Use true to use clangd, false to use ccls. You may want to use ccls as it supports call hierarchy
+local use_clangd_in_mac = false
 
 -- Should open Neotree on startup?
 local open_neo_tree_on_startup = false
@@ -635,9 +635,17 @@ require('lazy').setup({
                 return
               end
 
+              local call_hierarchy_buf_name = 'yddrasil'
               local buf_being_closed = e.buf
+              local file_type_of_buf_being_closed = vim.api.nvim_get_option_value('filetype', { buf = buf_being_closed })
+              if file_type_of_buf_being_closed == call_hierarchy_buf_name then
+                -- exit early when trying to close the call hierarchy
+                return
+              end
 
               local function traverse_layout(layout)
+                local block_list = { 'neo-tree', 'Outline', call_hierarchy_buf_name, 'noice' }
+
                 if layout[1] == 'row' or layout[1] == 'col' then
                   -- This will have one or more windows. Traverse recursively
                   local count = 0
@@ -650,20 +658,54 @@ require('lazy').setup({
                   local buf_handle = vim.api.nvim_win_get_buf(layout[2])
                   local buf_number = vim.api.nvim_buf_get_number(buf_handle)
                   if buf_number ~= buf_being_closed then
-                    local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
-                    if filetype ~= 'neo-tree' and filetype ~= 'Outline' then -- You may want to make this extendible to add more in the future
-                      return 1
+                    if not vim.api.nvim_buf_is_loaded(buf_handle) then
+                      return 0
                     end
+
+                    local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
+                    for i = 1, #block_list do
+                      if filetype == block_list[i] then
+                        return 0 -- discount block listed buffers
+                      end
+                    end
+                    return 1 -- Buf is an actual file of interest and we want to count it
                   end
                 end
-                return 0
+                return 0 -- don't count the buffer being closed
               end
 
               local layout = vim.api.nvim_call_function('winlayout', {})
-              local other_windows = traverse_layout(layout)
+              local num_other_windows = traverse_layout(layout)
 
-              if other_windows == 0 then
+              -- When closing the last window, close Outline and call hierarchy
+              if num_other_windows == 0 then
                 outline.close_outline()
+
+                -- Untested code
+                -- local function close_call_hierarchies()
+                --   -- local buffers = vim.api.nvim_list_bufs()
+                --   local windows = vim.api.nvim_list_wins()
+                --   for x = 1, #windows do
+                --     local buf_handle = vim.api.nvim_win_get_buf(windows[x])
+
+                --     -- local buf_handle = buffers[x]
+                --     local buf_number = vim.api.nvim_buf_get_number(buf_handle)
+
+                --     if vim.api.nvim_buf_is_loaded(buf_handle) then
+                --       if buf_number ~= buf_being_closed then
+                --         local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
+                --         if filetype == 'yggdrasil' then
+                --           vim.api.nvim_buf_delete(buf_number, { force = true })
+                --           vim.api.nvim_win_close(windows[x], false)
+                --         end
+                --       end
+                --     else
+                --       -- Close unloaded buffers if they are clean
+                --       vim.api.nvim_buf_delete(buf_number, { force = false })
+                --     end
+                --   end
+                -- end
+                -- close_call_hierarchies()
               end
             end,
           })
@@ -1279,7 +1321,7 @@ require('lazy').setup({
       -- automatically
       vim.g.ccls_levels = 1
       vim.g.ccls_size = size
-      vim.g.ccls_position = 'topleft' -- topleft, botright
+      vim.g.ccls_position = 'botright' -- topleft, botright
       vim.g.ccls_orientation = 'horizontal' -- vertical, horizontal
       -- vim.g.ccls_close_on_jump = true
 
