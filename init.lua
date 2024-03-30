@@ -609,8 +609,11 @@ require('lazy').setup({
             require('nvim-navic').attach(client, bufnr)
           end
 
-          -- Open symbols outline :Outline! (! keeps the focus on the current buffer)
-          require('outline').open_outline { focus_on_open = false }
+          -- Don't open the outline for lua files
+          if string.match(event.file, 'lua$') == nil then
+            -- Open symbols outline :Outline! (! keeps the focus on the current buffer)
+            require('outline').open_outline { focus_on_open = false }
+          end
 
           -- Close outline before current buffer is removed from the window
           vim.api.nvim_create_autocmd('BufWinLeave', {
@@ -1216,6 +1219,14 @@ require('lazy').setup({
       require('treesitter-context').setup {
         -- multiline_threshold = 2, -- Separator helps with the contrast, so not limiting multiline_threshold
         separator = '-',
+        on_attach = function(buf)
+          -- buf=0 is current buffer
+          -- Don't enable tree sitter context for lua files
+          if string.match(vim.api.nvim_buf_get_name(buf), 'lua$') ~= nil then
+            return false
+          end
+          return true
+        end,
       }
     end,
     opts = {},
