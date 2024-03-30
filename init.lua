@@ -222,6 +222,10 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Remap quit to quit all - you can only remap uppercase commands, so, I am not able to remap q
+-- For convenience: When you press : and try to press q immediately, you might still be holding shift
+vim.api.nvim_create_user_command('Q', 'qa', { desc = 'Quit all' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -629,13 +633,7 @@ require('lazy').setup({
           vim.api.nvim_create_autocmd('BufWinLeave', {
             buffer = bufnr,
             callback = function(e)
-              local outline = require 'outline'
-              if not outline.is_open() then
-                -- exit early if outline is not open
-                return
-              end
-
-              local call_hierarchy_buf_name = 'yddrasil'
+              local call_hierarchy_buf_name = 'yggdrasil'
               local buf_being_closed = e.buf
               local file_type_of_buf_being_closed = vim.api.nvim_get_option_value('filetype', { buf = buf_being_closed })
               if file_type_of_buf_being_closed == call_hierarchy_buf_name then
@@ -679,7 +677,10 @@ require('lazy').setup({
 
               -- When closing the last window, close Outline and call hierarchy
               if num_other_windows == 0 then
-                outline.close_outline()
+                local outline = require 'outline'
+                if outline.is_open() then
+                  outline.close_outline()
+                end
 
                 -- Untested code
                 -- local function close_call_hierarchies()
@@ -687,21 +688,23 @@ require('lazy').setup({
                 --   local windows = vim.api.nvim_list_wins()
                 --   for x = 1, #windows do
                 --     local buf_handle = vim.api.nvim_win_get_buf(windows[x])
+                --     --local buf_handle = buffers[x]
 
-                --     -- local buf_handle = buffers[x]
                 --     local buf_number = vim.api.nvim_buf_get_number(buf_handle)
+                --     local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
 
                 --     if vim.api.nvim_buf_is_loaded(buf_handle) then
-                --       if buf_number ~= buf_being_closed then
-                --         local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
-                --         if filetype == 'yggdrasil' then
-                --           vim.api.nvim_buf_delete(buf_number, { force = true })
-                --           vim.api.nvim_win_close(windows[x], false)
-                --         end
+                --       if filetype == call_hierarchy_buf_name then
+                --         -- vim.api.nvim_buf_delete(buf_number, { force = true })
+                --         vim.api.nvim_win_close(windows[x], true)
+                --       elseif buf_number ~= buf_being_closed then
+                --         -- vim.api.nvim_win_close(windows[x], false)
                 --       end
                 --     else
                 --       -- Close unloaded buffers if they are clean
-                --       vim.api.nvim_buf_delete(buf_number, { force = false })
+                --       -- vim.api.nvim_buf_delete(buf_number, { force = false })
+
+                --       -- vim.api.nvim_win_close(windows[x], false)
                 --     end
                 --   end
                 -- end
