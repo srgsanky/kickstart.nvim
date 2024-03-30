@@ -183,6 +183,13 @@ vim.opt.scrolloff = 10
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
+-- You can open the current buffer in a new tab. Once you are done, close the tab with :q.
+-- This will help given the options of zooming into a single buffer (when you have multiple windows)
+-- and zoom back out by closing the buffer.
+-- From https://www.reddit.com/r/vim/comments/16sv7uu/maximizing_windows/
+-- Map :tab split to <leader>ts<CR>
+vim.keymap.set('n', '<leader>ts', '<cmd>tab split<CR>', { desc = 'Tab split (open current buffer in new tab)' })
+
 -- Don't wrap around searches
 vim.opt.wrapscan = false
 
@@ -945,6 +952,13 @@ require('lazy').setup({
       -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
     },
     lazy = false,
+    config = function()
+      require('neo-tree').setup()
+
+      -- Open Neotree using <leader>[E]xplorer
+      -- action=show will open Neotree but keep the focus on the current buffer
+      vim.keymap.set('n', '<leader>E', '<cmd>Neotree toggle action=show<CR>', { desc = '[E]xplorer' })
+    end,
     opts = {
       close_if_last_window = true,
       filesystem = {
@@ -1022,6 +1036,7 @@ require('lazy').setup({
     lazy = false,
     cmd = { 'Outline', 'OutlineOpen' },
     keys = { -- Example mapping to toggle outline
+      -- With !, focus stays in the current buffer. Without it, focus moves to Outline.
       { '<leader>o', '<cmd>Outline<CR>', desc = 'Toggle outline' },
     },
     opts = {},
