@@ -867,6 +867,7 @@ require('lazy').setup({
 
         local lspconfig = require 'lspconfig'
         lspconfig.ccls.setup {
+          -- See https://github.com/MaskRay/ccls/wiki/Customization for options.
           -- The only way to set the log file location is via the command line argument
           cmd = { 'ccls', '--log-file=' .. vim.fn.expand '$HOME/ccls-log.log', '-v=1' },
           init_options = {
