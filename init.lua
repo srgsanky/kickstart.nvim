@@ -307,7 +307,7 @@ local function map_telescope_using_dropdown_theme(mode, keybinding, builtin_fn, 
       previewer = true,
       layout_config = {
         width = function(_, max_columns, _)
-          return max_columns - (max_columns / 5) -- 80% of max_columns
+          return max_columns - math.floor(max_columns / 5) -- 80% of max_columns
         end,
 
         height = function(_, _, max_lines)
@@ -852,7 +852,7 @@ require('lazy').setup({
         local function find_path_to_file(filename)
           -- -print -quit will quit on first match
           -- Using maxdepth for a faster start up time
-          for entry in io.popen('dirname $(find . -name "' .. filename .. '" -maxdepth 1 -print -quit)'):lines() do
+          for entry in io.popen('dirname $(find . -maxdepth 1 -type f -name "' .. filename .. '" -print -quit)'):lines() do
             return entry
           end
           return ''
