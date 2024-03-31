@@ -850,15 +850,19 @@ require('lazy').setup({
       -- Use ccls only in linux. clangd is available in Mac which makes things easier
       if vim.loop.os_uname().sysname == 'Linux' or not use_clangd_in_mac then
         local function find_path_to_file(filename)
+          -- Find needs an absolute path if you want it to output absolute paths
+          local cwd = vim.fn.getcwd()
           -- -print -quit will quit on first match
           -- Using maxdepth for a faster start up time
-          for entry in io.popen('dirname $(find . -maxdepth 1 -type f -name "' .. filename .. '" -print -quit)'):lines() do
+          local find_command = 'dirname $(find ' .. cwd .. ' -maxdepth 2 -type f -name "' .. filename .. '" -print -quit)'
+          for entry in io.popen(find_command):lines() do
             return entry
           end
           return ''
         end
 
         -- Automatically find the directory where compile_commands.json is located
+        -- Note that ccls expects the absolute path. If you give a relative path like ., it won't work.
         local compile_commands_json_dir = find_path_to_file 'compile_commands.json'
 
         local lspconfig = require 'lspconfig'
