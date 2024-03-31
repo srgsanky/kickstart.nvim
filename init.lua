@@ -839,7 +839,8 @@ require('lazy').setup({
       if vim.loop.os_uname().sysname == 'Linux' or not use_clangd_in_mac then
         local function find_path_to_file(filename)
           -- -print -quit will quit on first match
-          for entry in io.popen('dirname $(find . -name "' .. filename .. '" -print -quit)'):lines() do
+          -- Using maxdepth for a faster start up time
+          for entry in io.popen('dirname $(find . -name "' .. filename .. '" -maxdepth 1 -print -quit)'):lines() do
             return entry
           end
           return ''
