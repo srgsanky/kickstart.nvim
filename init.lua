@@ -666,13 +666,18 @@ require('lazy').setup({
           map('<leader>ds', function(opts)
             opts = opts or {}
             -- extend it
-            opts.symbol_width = 60
+            opts.symbol_width = 50
             telescope_builtin.lsp_document_symbols(opts)
           end, '[D]ocument [S]ymbols')
 
           -- Fuzzy find all the symbols in your current workspace.
           --  Similar to document symbols, except searches over your entire project.
-          map('<leader>ws', telescope_builtin.lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+          map('<leader>ws', function(opts)
+            opts = opts or {}
+            -- extend it
+            opts.fname_width = 50
+            telescope_builtin.lsp_dynamic_workspace_symbols(opts)
+          end, '[W]orkspace [S]ymbols')
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
