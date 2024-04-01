@@ -716,6 +716,12 @@ require('lazy').setup({
           local bufnr = event.buf
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           require('lsp-inlayhints').on_attach(client, bufnr)
+          local signature_setup = {
+            bind = true, -- This is mandatory, otherwise border config won't get registered.
+            handler_opts = {
+              border = 'single', -- double, rounded, single, shadow, none, or a table of borders
+            },
+          }
           require('lsp_signature').on_attach(signature_setup, bufnr)
 
           -- Attach lsp based breadcrumb
@@ -774,6 +780,13 @@ require('lazy').setup({
               end
             end,
           })
+
+          -- Enable inlay hints (available in unstable nvim only
+          -- vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
+
+          -- Open floating preview
+          -- https://neovim.io/doc/user/lsp.html#vim.lsp.util.open_floating_preview()
+          -- TODO: Is there a way to use this to show preview of definition
         end,
       })
 
@@ -1340,6 +1353,19 @@ require('lazy').setup({
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
+      -- Peek definition: Doesn't seem to work
+      -- opts = opts or {}
+      -- opts.textobjects = {
+      --   lsp_interop = {
+      --     enable = true,
+      --     border = 'none',
+      --     floating_preview_opts = {},
+      --     peek_definition_code = {
+      --       ['<leader>df'] = '@function.outer',
+      --       ['<leader>dF'] = '@class.outer',
+      --     },
+      --   },
+      -- }
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
 
