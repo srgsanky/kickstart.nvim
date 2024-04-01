@@ -300,21 +300,25 @@ local function is_buffer_visible(bufnr)
   return false
 end
 
+local function get_telescope_dropdown()
+  return require('telescope.themes').get_dropdown {
+    previewer = true,
+    layout_config = {
+      width = function(_, max_columns, _)
+        return max_columns - math.floor(max_columns / 5) -- 80% of max_columns
+      end,
+
+      height = function(_, _, max_lines)
+        return math.min(max_lines, 20)
+      end,
+    },
+  }
+end
+
 local function map_telescope_using_dropdown_theme(mode, keybinding, builtin_fn, opts)
   vim.keymap.set(mode, keybinding, function()
     -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-    builtin_fn(require('telescope.themes').get_dropdown {
-      previewer = true,
-      layout_config = {
-        width = function(_, max_columns, _)
-          return max_columns - math.floor(max_columns / 5) -- 80% of max_columns
-        end,
-
-        height = function(_, _, max_lines)
-          return math.min(max_lines, 20)
-        end,
-      },
-    })
+    builtin_fn(get_telescope_dropdown())
   end, opts)
 end
 
@@ -639,30 +643,36 @@ require('lazy').setup({
             map_telescope_using_dropdown_theme('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
+          local telescope_builtin = require 'telescope.builtin'
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          map('gd', telescope_builtin.lsp_definitions, '[G]oto [D]efinition')
 
           -- Find references for the word under your cursor.
-          map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+          map('gr', telescope_builtin.lsp_references, '[G]oto [R]eferences')
 
           -- Jump to the implementation of the word under your cursor.
           --  Useful when your language has ways of declaring types without an actual implementation.
-          map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+          map('gI', telescope_builtin.lsp_implementations, '[G]oto [I]mplementation')
 
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
-          map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+          map('<leader>D', telescope_builtin.lsp_type_definitions, 'Type [D]efinition')
 
           -- Fuzzy find all the symbols in your current document.
           --  Symbols are things like variables, functions, types, etc.
-          map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+          map('<leader>ds', function(opts)
+            opts = opts or {}
+            -- extend it
+            opts.symbol_width = 60
+            telescope_builtin.lsp_document_symbols(opts)
+          end, '[D]ocument [S]ymbols')
 
           -- Fuzzy find all the symbols in your current workspace.
           --  Similar to document symbols, except searches over your entire project.
-          map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+          map('<leader>ws', telescope_builtin.lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
@@ -1203,27 +1213,33 @@ require('lazy').setup({
           end, { expr = true })
 
           -- Actions
-          map('n', '<leader>hs', gs.stage_hunk, { desc = 'Stage hunk' })
-          map('n', '<leader>hr', gs.reset_hunk, { desc = 'Reset hunk' })
+          map('n', '<leader>hs', gs.stage_hunk, { desc = '[h]unk [s]tage' })
+          map('n', '<leader>hr', gs.reset_hunk, { desc = '[h]unk [r]eset' })
           map('v', '<leader>hs', function()
             gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
-          end)
+          end, { desc = '[h]unk [s]tage' })
           map('v', '<leader>hr', function()
             gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
-          end)
+          end, { desc = '[h]unk [r]eset' })
+          -- I think this is whether to add to index and undo it
           map('n', '<leader>hS', gs.stage_buffer, { desc = 'Stage buffer' })
           map('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'Undo stage buffer' })
           map('n', '<leader>hR', gs.reset_buffer, { desc = 'Reset buffer' })
-          map('n', '<leader>hp', gs.preview_hunk, { desc = 'Preview hunk' })
+          -- Once you open a hunk, you can cycle through the hunks using [c (prev change) and ]c (next change)
+          -- use preview_hunk_inline if you don't like the floating window in the future
+          map('n', '<leader>hp', gs.preview_hunk, { desc = '[h]unk [p]review' })
           map('n', '<leader>hb', function()
             gs.blame_line { full = true }
-          end)
-          map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = 'Toggle blame for current line' })
-          map('n', '<leader>hd', gs.diffthis, { desc = 'Diff this' })
+          end, { desc = '[h]unk [b]lame' })
+          map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = '[t]oggle [b]lame for current line' })
+          -- Diff views
+          -- When you open a diff view, the file stays on the right. The left side shows the index or previous commit.
+          -- When you are done, close the left window to return back to the file.
+          map('n', '<leader>hd', gs.diffthis, { desc = '[h]unk [d]iff this (against index)' })
           map('n', '<leader>hD', function()
-            gs.diffthis '~'
-          end)
-          map('n', '<leader>td', gs.toggle_deleted, { desc = 'Toggle deleted' })
+            gs.diffthis '~' -- this is the git notation for last commit
+          end, { desc = '[h]unk [D]iff this (against last commit)' })
+          map('n', '<leader>td', gs.toggle_deleted, { desc = '[t]oggle [d]eleted' })
 
           -- Text object
           map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
