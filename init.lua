@@ -1353,19 +1353,6 @@ require('lazy').setup({
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
-      -- Peek definition: Doesn't seem to work
-      -- opts = opts or {}
-      -- opts.textobjects = {
-      --   lsp_interop = {
-      --     enable = true,
-      --     border = 'none',
-      --     floating_preview_opts = {},
-      --     peek_definition_code = {
-      --       ['<leader>df'] = '@function.outer',
-      --       ['<leader>dF'] = '@class.outer',
-      --     },
-      --   },
-      -- }
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
 
@@ -1376,6 +1363,31 @@ require('lazy').setup({
       --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
+  },
+
+  -- To show preview of full definitions without having to jump to the definition
+  {
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+    },
+    config = function(_, opts)
+      -- Peek definition
+      opts = opts or {}
+      opts.textobjects = {
+        lsp_interop = {
+          enable = true,
+          border = 'none',
+          floating_preview_opts = {},
+          peek_definition_code = {
+            ['<leader>df'] = '@function.outer',
+            ['<leader>dF'] = '@class.outer',
+          },
+        },
+      }
+      require('nvim-treesitter.configs').setup(opts)
+    end,
+    opts = {},
   },
 
   -- Treesitter context for showing current method name as you scroll down
