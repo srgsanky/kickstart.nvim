@@ -281,7 +281,12 @@ local use_clangd_in_mac = false
 local open_neo_tree_on_startup = false
 
 -- These are aux windows from plugins that are meant to assist in editing your main file
-local aux_windows = { 'neo-tree', 'Outline', 'yggdrasil', 'noice', 'notify' }
+-- neo-tree is the file explorer on the left
+-- Outline is the outline of symbols in the file
+-- yggdrasil is used to show call hierachy by vim-ccls
+-- noice and notify are from noice (used to show cmdline at the center instead of bottom left)
+-- fidget is the notification that you see in the bottom right particularly in Lua files
+local aux_windows = { 'neo-tree', 'Outline', 'yggdrasil', 'noice', 'notify', 'fidget' }
 local function is_aux_window(name)
   for i = 1, #aux_windows do
     if aux_windows[i] == name then
@@ -298,6 +303,38 @@ local function is_buffer_visible(bufnr)
     end
   end
   return false
+end
+
+-- Create autocmd to close the given filetype if it is the only buffer
+local function close_file_type_when_only_buffer(file_type_to_close)
+  -- If this is the last buffer, it will automatically receive focus, triggering the BufEnter event.
+  -- So, we try to check if this is the only buffer of interest.
+  vim.api.nvim_create_autocmd('BufEnter', {
+    callback = function(e)
+      local buf_num = e.buf
+      local file_type = vim.api.nvim_get_option_value('filetype', { buf = buf_num })
+
+      if file_type == file_type_to_close then
+        local bufs = vim.api.nvim_list_bufs()
+        local loaded_bufs = 0
+        for buf_idx = 1, #bufs do
+          if vim.api.nvim_buf_is_loaded(bufs[buf_idx]) then
+            local loaded_buf_number = vim.api.nvim_buf_get_number(bufs[buf_idx])
+            local loaded_buf_file_type = vim.api.nvim_get_option_value('filetype', { buf = loaded_buf_number })
+            if not is_aux_window(loaded_buf_file_type) then
+              if is_buffer_visible(loaded_buf_number) then
+                loaded_bufs = loaded_bufs + 1
+              end
+            end
+          end
+        end
+
+        if loaded_bufs == 0 then
+          vim.cmd 'q'
+        end
+      end
+    end,
+  })
 end
 
 local function get_telescope_dropdown()
@@ -735,52 +772,6 @@ require('lazy').setup({
             require('outline').open_outline { focus_on_open = false }
           end
 
-          -- Close outline before current buffer is removed from the window
-          vim.api.nvim_create_autocmd('BufWinLeave', {
-            buffer = bufnr,
-            callback = function(e)
-              local buf_being_closed = e.buf
-
-              local function traverse_layout(layout)
-                if layout[1] == 'row' or layout[1] == 'col' then
-                  -- This will have one or more windows. Traverse recursively
-                  local count = 0
-                  for i, _ in ipairs(layout[2]) do
-                    count = count + traverse_layout(layout[2][i])
-                  end
-                  return count
-                elseif layout[1] == 'leaf' then
-                  -- Leaf window
-                  local buf_handle = vim.api.nvim_win_get_buf(layout[2])
-                  local buf_number = vim.api.nvim_buf_get_number(buf_handle)
-                  if buf_number ~= buf_being_closed then
-                    if not vim.api.nvim_buf_is_loaded(buf_handle) then
-                      return 0
-                    end
-
-                    local filetype = vim.api.nvim_get_option_value('filetype', { buf = buf_number })
-                    if is_aux_window(filetype) then
-                      return 0
-                    end
-                    return 1 -- Buf is an actual file of interest and we want to count it
-                  end
-                end
-                return 0 -- don't count the buffer being closed
-              end
-
-              local layout = vim.api.nvim_call_function('winlayout', {})
-              local num_other_windows = traverse_layout(layout)
-
-              -- When closing the last window, close Outline
-              if num_other_windows == 0 then
-                local outline = require 'outline'
-                if outline.is_open() then
-                  outline.close_outline()
-                end
-              end
-            end,
-          })
-
           -- Enable inlay hints (available in unstable nvim only
           -- vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
 
@@ -1174,6 +1165,11 @@ require('lazy').setup({
       { '<leader>o', '<cmd>Outline<CR>', desc = 'Toggle outline' },
     },
     opts = {},
+    config = function(opts)
+      require('outline').setup(opts)
+      -- Close if outline is the only buffer of interest
+      close_file_type_when_only_buffer 'Outline'
+    end,
   },
 
   -- Show trailing whitespace
@@ -1484,33 +1480,7 @@ require('lazy').setup({
       })
 
       -- Close if call hierarchy is the only buffer of interest
-      vim.api.nvim_create_autocmd('BufEnter', {
-        callback = function(e)
-          local buf_num = e.buf
-          local file_type = vim.api.nvim_get_option_value('filetype', { buf = buf_num })
-
-          if file_type == 'yggdrasil' then
-            -- We just focused on call hierarchy window
-            local bufs = vim.api.nvim_list_bufs()
-            local loaded_bufs = 0
-            for buf_idx = 1, #bufs do
-              if vim.api.nvim_buf_is_loaded(bufs[buf_idx]) then
-                local loaded_buf_number = vim.api.nvim_buf_get_number(bufs[buf_idx])
-                local loaded_buf_file_type = vim.api.nvim_get_option_value('filetype', { buf = loaded_buf_number })
-                if not is_aux_window(loaded_buf_file_type) then
-                  if is_buffer_visible(loaded_buf_number) then
-                    loaded_bufs = loaded_bufs + 1
-                  end
-                end
-              end
-            end
-
-            if loaded_bufs == 0 then
-              vim.cmd 'q'
-            end
-          end
-        end,
-      })
+      close_file_type_when_only_buffer 'yggdrasil'
     end,
   },
 
