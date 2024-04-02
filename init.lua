@@ -367,22 +367,21 @@ end
 vim.cmd [[autocmd! ColorScheme * highlight NormalFloat guibg=#1f2335]]
 vim.cmd [[autocmd! ColorScheme * highlight FloatBorder guifg=white guibg=#1f2335]]
 
+local rounded_border = {
+  { '╭', 'FloatBorder' },
+  { '─', 'FloatBorder' },
+  { '╮', 'FloatBorder' },
+  { '│', 'FloatBorder' },
+  { '╯', 'FloatBorder' },
+  { '─', 'FloatBorder' },
+  { '╰', 'FloatBorder' },
+  { '│', 'FloatBorder' },
+}
 local function get_lsp_handlers_with_border()
-  local border = {
-    { '╭', 'FloatBorder' },
-    { '─', 'FloatBorder' },
-    { '╮', 'FloatBorder' },
-    { '│', 'FloatBorder' },
-    { '╯', 'FloatBorder' },
-    { '─', 'FloatBorder' },
-    { '╰', 'FloatBorder' },
-    { '│', 'FloatBorder' },
-  }
-
   -- LSP settings (for overriding per client)
   return {
-    ['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }), -- single, double
-    ['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }), -- single, double
+    ['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = rounded_border }), -- single, double
+    ['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = rounded_border }), -- single, double
   }
 end
 
@@ -1463,7 +1462,7 @@ require('lazy').setup({
       opts.textobjects = {
         lsp_interop = {
           enable = true,
-          border = 'none',
+          border = rounded_border,
           floating_preview_opts = {},
           peek_definition_code = {
             ['<leader>df'] = '@function.outer',
