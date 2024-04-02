@@ -233,6 +233,9 @@ vim.opt.equalalways = false
 -- For convenience: When you press : and try to press q immediately, you might still be holding shift
 vim.api.nvim_create_user_command('Q', 'qa', { desc = 'Quit all' })
 
+-- Restart LSP using shortcut
+vim.keymap.set('n', '<leader>lr', '<cmd>LspRestart<CR>', { desc = '[L]sp [R]estart' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
