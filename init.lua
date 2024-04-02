@@ -383,7 +383,13 @@ require('lazy').setup({
   --  This is equivalent to:
   --    require('Comment').setup({})
 
-  -- "gc" to comment visual regions/lines
+  -- Comment code blocks using
+  -- Normal mode:
+  --  Line comment: gcc
+  --  Block comment: gbc
+  -- Visual mode:
+  --  Line comment: gc
+  --  Block comment: gb
   { 'numToStr/Comment.nvim', opts = {} },
 
   -- Here is a more advanced example where we pass configuration
