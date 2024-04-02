@@ -1384,6 +1384,38 @@ require('lazy').setup({
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
 
+      -- https://github.com/nvim-treesitter/nvim-treesitter/discussions/1513
+      -- I want to override else_if_statement and else_statement so that the individual blocks can be folded, but this
+      -- doesn't work. Need to find a way to fold individual blocks.
+      if require('nvim-treesitter.parsers').has_parser 'c' then
+        -- Copied from https://github.com/nvim-treesitter/nvim-treesitter/blob/master/queries/c/folds.scm
+        local folds_query = [[
+[
+  (for_statement)
+  (if_statement)
+  (while_statement)
+  (do_statement)
+  (switch_statement)
+  (case_statement)
+  (function_definition)
+  (struct_specifier)
+  (enum_specifier)
+  (comment)
+  (preproc_if)
+  (preproc_elif)
+  (preproc_else)
+  (preproc_ifdef)
+  (preproc_function_def)
+  (initializer_list)
+  (gnu_asm_expression)
+] @fold
+
+(compound_statement
+  (compound_statement) @fold)
+    ]]
+        require('vim.treesitter.query').set('c', 'folds', folds_query)
+      end
+
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
       --
