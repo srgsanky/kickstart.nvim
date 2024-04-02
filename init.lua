@@ -1084,7 +1084,20 @@ require('lazy').setup({
   },
 
   -- Show recent buffers as tabs at the top
-  { 'akinsho/bufferline.nvim', version = '*', dependencies = 'nvim-tree/nvim-web-devicons', opts = {} },
+  -- See :h bufferline-configuration
+  -- :BufferLineCloseOthers (to close all other buffers)
+  -- :BufferLinePick (to visually pick a buffer based on the showcased letters)
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    opts = {
+      options = {
+        max_name_length = 30,
+        diagnostics = 'nvim_lsp',
+      },
+    },
+  },
 
   -- File explorer on the left. Use :Neotree to open it
   {
