@@ -362,6 +362,30 @@ local function map_telescope_using_dropdown_theme(mode, keybinding, builtin_fn, 
   end, opts)
 end
 
+-- Use borders for hover
+-- Taken from https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
+vim.cmd [[autocmd! ColorScheme * highlight NormalFloat guibg=#1f2335]]
+vim.cmd [[autocmd! ColorScheme * highlight FloatBorder guifg=white guibg=#1f2335]]
+
+local function get_lsp_handlers_with_border()
+  local border = {
+    { '╭', 'FloatBorder' },
+    { '─', 'FloatBorder' },
+    { '╮', 'FloatBorder' },
+    { '│', 'FloatBorder' },
+    { '╯', 'FloatBorder' },
+    { '─', 'FloatBorder' },
+    { '╰', 'FloatBorder' },
+    { '│', 'FloatBorder' },
+  }
+
+  -- LSP settings (for overriding per client)
+  return {
+    ['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }), -- single, double
+    ['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }), -- single, double
+  }
+end
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -881,6 +905,7 @@ require('lazy').setup({
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            server.handlers = get_lsp_handlers_with_border()
             require('lspconfig')[server_name].setup(server)
           end,
         },
@@ -924,6 +949,7 @@ require('lazy').setup({
             },
             offset_encoding = 'utf-8',
           },
+          handlers = get_lsp_handlers_with_border(),
         }
       end
     end,
