@@ -1733,6 +1733,30 @@ require('lazy').setup({
     opts = {},
   },
 
+  -- Jump around in the document
+  -- It expects you to type two chars in the location that you want to jump to. For the last character in the line, use
+  -- space.
+  -- s: search forward
+  -- S: search backward
+  {
+    'ggandor/leap.nvim',
+    opts = {},
+    config = function(opts)
+      -- leap's keybindings conflicts with lazy. This is taken from
+      -- <https://github.com/LazyVim/LazyVim/issues/2379#issuecomment-1898491969>
+      local leap = require 'leap'
+      for k, v in pairs(opts) do
+        leap.opts[k] = v
+      end
+      leap.add_default_mappings(true)
+      vim.keymap.del({ 'x', 'o' }, 'x')
+      vim.keymap.del({ 'x', 'o' }, 'X')
+      vim.keymap.set('n', 's', function()
+        require('leap').leap { target_windows = { vim.api.nvim_get_current_win() } }
+      end)
+    end,
+  },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
