@@ -236,6 +236,9 @@ vim.api.nvim_create_user_command('Q', 'qa', { desc = 'Quit all' })
 -- Restart LSP using shortcut
 vim.keymap.set('n', '<leader>lr', '<cmd>LspRestart<CR>', { desc = '[L]sp [R]estart' })
 
+-- Open Navbuddy
+vim.keymap.set('n', '<leader>nb', '<cmd>Navbuddy<CR>', { desc = 'Open [N]av [B]uddy' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -580,6 +583,9 @@ require('lazy').setup({
   -- For winbar (top) and status line (bottom)
   {
     'nvim-lualine/lualine.nvim',
+    dependencies = {
+      'arkav/lualine-lsp-progress', -- helps show lsp indexing progress
+    },
     config = function()
       require('lualine').setup {
         winbar = { -- configuring only the winbar
@@ -620,6 +626,7 @@ require('lazy').setup({
                 newfile = '[New]', -- Text to show for newly created file before first write
               },
             },
+            'lsp_progress',
           },
           lualine_x = {
             {
@@ -811,8 +818,13 @@ require('lazy').setup({
           -- Don't open the outline for lua files
           if string.match(event.file, 'lua$') == nil then
             -- Open symbols outline :Outline! (! keeps the focus on the current buffer)
-            require('outline').open_outline { focus_on_open = false }
+            --
+            -- Since I added NavBuddy, let me see if I still use outline that much
+            -- require('outline').open_outline { focus_on_open = false }
           end
+
+          -- Navbuddy
+          require('nvim-navbuddy').attach(client, bufnr)
 
           -- Enable inlay hints (available in unstable nvim only
           -- vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
@@ -1663,6 +1675,63 @@ require('lazy').setup({
   },
   -- No Neck pain - to center the buffer like Zen mode
   { 'shortcuts/no-neck-pain.nvim', version = '*' },
+
+  -- Search highlight. Highlight characters when using f, F, t, T. Also show visual hints using characters to jump to
+  -- specific search locations
+  -- This also makes f, F, t, T work across lines
+  {
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    ---@type Flash.Config
+    opts = {},
+    -- The following directive asks stylua to not format the following block
+    --      COMMANDS               MODES
+    -- :map   :noremap  :unmap     Normal, Visual, Select, Operator-pending
+    -- :nmap  :nnoremap :nunmap    Normal
+    -- :vmap  :vnoremap :vunmap    Visual and Select
+    -- :smap  :snoremap :sunmap    Select
+    -- :xmap  :xnoremap :xunmap    Visual
+    -- :omap  :onoremap :ounmap    Operator-pending
+    -- :map!  :noremap! :unmap!    Insert and Command-line
+    -- :imap  :inoremap :iunmap    Insert
+    -- :lmap  :lnoremap :lunmap    Insert, Command-line, Lang-Arg
+    -- :cmap  :cnoremap :cunmap    Command-line
+    -- :tmap  :tnoremap :tunmap    Terminal
+
+    -- stylua: ignore
+    keys = {
+      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+
+      -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+      -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+
+      -- In command mode, use <C-s> to toggle flash search which shows visual hints like Vimium
+      { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+    },
+  },
+
+  -- Nav buddy to navigate across symbols in the current document (similar to cmd + F12 in jetbrains IDEs).
+  -- Once nav buddy is opened (my keybinding: <leader>nb)
+  --  j/k: Go to next previous symbol in the same level
+  --  h/l: Move to left/right pannel for parent/children respectively. 0 moves to first panel.
+  --  c: comment out the current scope.
+  --  J/K: Move the scope down or up.
+  --  t: Invoke fuzzy finder at current level within navbuddy
+  {
+    'neovim/nvim-lspconfig',
+    dependencies = {
+      {
+        'SmiteshP/nvim-navbuddy',
+        dependencies = {
+          'SmiteshP/nvim-navic',
+          'MunifTanjim/nui.nvim',
+        },
+        opts = { lsp = { auto_attach = true } },
+      },
+    },
+    opts = {},
+  },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
