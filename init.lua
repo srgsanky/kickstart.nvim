@@ -1757,6 +1757,37 @@ require('lazy').setup({
     end,
   },
 
+  -- Go to next occurrence of symbol, ignoring symbol in comments
+  {
+    'nvim-treesitter/nvim-treesitter-refactor',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+    },
+    opts = {},
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        refactor = {
+          highlight_definitions = {
+            enable = false,
+            -- Set to false if you have an `updatetime` of ~100.
+            clear_on_cursor_move = true,
+          },
+          highlight_current_scope = { enable = false },
+          navigation = {
+            enable = true,
+            keymaps = {
+              -- goto_definition = "gnd",
+              -- list_definitions = "gnD",
+              -- list_definitions_toc = "gO",
+              goto_next_usage = '<a-j>', -- alt + j
+              goto_previous_usage = '<a-k>', -- alt + k
+            },
+          },
+        },
+      }
+    end,
+  },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
