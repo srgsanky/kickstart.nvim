@@ -239,6 +239,18 @@ vim.keymap.set('n', '<leader>lr', '<cmd>LspRestart<CR>', { desc = '[L]sp [R]esta
 -- Open Navbuddy
 vim.keymap.set('n', '<leader>nb', '<cmd>Navbuddy<CR>', { desc = 'Open [N]av [B]uddy' })
 
+-----------------------------------------------------------------------------------------------------------
+-- View man pages with Neovim
+-- https://neovim.io/doc/user/filetype.html#%3AMan
+-----------------------------------------------------------------------------------------------------------
+vim.g.ft_man_folding_enable = true
+vim.g.man_hardwrap = false -- enable soft wrap
+
+-- Make sure to add the following to ~/.zshrc
+-- export MANPAGER='nvim +Man!'
+-- export MANWIDTH=999
+-----------------------------------------------------------------------------------------------------------
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
