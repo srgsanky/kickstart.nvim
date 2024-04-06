@@ -388,6 +388,52 @@ local function get_lsp_handlers_with_border()
   }
 end
 
+--                               ▲
+--                               │
+--                               │
+--                               │
+--             Scrollback        │
+--                               │
+--
+-- ┌────────────────────────────────────┐
+-- │                                    │
+-- │                                    │
+-- │                                    │
+-- │              Screen                │
+-- │                                    │
+-- │                                    │
+-- │                                    │
+-- └────────────────────────────────────┘
+-- Clear buffer on terminal on closing vim. This will not leave traces of the editor on the terminal
+-- This approach clears only the screen, not the scrollback
+-- https://stackoverflow.com/questions/31595411/how-to-clear-the-screen-after-exit-vim
+vim.cmd [[autocmd! VimLeave * :!clear]]
+
+-- local function clear_terminal_scrollback()
+--   -- Temporarily set scrollback to the minimum value of 1
+--   local original_scrollback = vim.opt.scrollback:get()
+--   vim.opt.scrollback = 1
+--
+--   -- Clear the terminal
+--   -- <C-\><C-n> will switch between terminal mode and normal mode
+--   -- true: String should be escaped for use in a terminal.
+--   -- false: String should not be prefixed with the escape key.
+--   -- true: Keys should be treated atomically.
+--   -- true: Keys should be fed Synchronously
+--   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true), 'n', false)
+--   -- vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('clear<CR>', true, false, true), 'n', false)
+--   -- https://unix.stackexchange.com/questions/517025/zsh-clear-scrollback-buffer
+--   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('clear && printf "\\e[3J"<CR>', true, false, true), 'n', false)
+--   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('zle && zle .reset-prompt && zle -R<CR>', true, false, true), 'n', false)
+--   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true), 'n', false)
+--
+--   -- Reset scrollback to its original value
+--   vim.opt.scrollback = original_scrollback
+-- end
+--
+-- -- Call the function on exit
+-- vim.api.nvim_create_autocmd('VimLeave', { callback = clear_terminal_scrollback })
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
