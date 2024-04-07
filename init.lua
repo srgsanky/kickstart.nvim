@@ -1299,10 +1299,9 @@ require('lazy').setup({
     keys = { -- Example mapping to toggle outline
       -- With !, focus stays in the current buffer. Without it, focus moves to Outline.
       -- If I open outline, I want to focus it, so I am not using !.
-      -- Using OutlineOpen instead of Outline for one quirk that don't know how to solve - :OutlineOpen sets the
-      -- filetype to Outline whereas :Outline doesn't set the filetype. My logic to close vim when Outline is the last
-      -- open buffer works only when filetype is set correctly.
-      { '<leader>o', '<cmd>OutlineOpen<CR>', desc = 'Toggle outline' },
+      -- FIXME: If I don't open Outline on LspAttach and rather rely on this command to open, the filetype is not set as
+      -- Outline. My logic to close vim when Outline is the last open buffer works only when filetype is set correctly.
+      { '<leader>o', '<cmd>Outline<CR>', desc = 'Toggle outline' },
     },
     opts = {},
     config = function(opts)
