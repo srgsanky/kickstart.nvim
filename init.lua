@@ -329,8 +329,13 @@ local function close_file_type_when_only_buffer(file_type_to_close)
   -- So, we try to check if this is the only buffer of interest.
   vim.api.nvim_create_autocmd('BufEnter', {
     callback = function(e)
+      -- Set this to true to see what is keeping nvim from closing
+      local debug = false
       local buf_num = e.buf
       local file_type = vim.api.nvim_get_option_value('filetype', { buf = buf_num })
+      if debug then
+        print('BufEnter: ' .. file_type .. ' focused')
+      end
 
       if file_type == file_type_to_close then
         local bufs = vim.api.nvim_list_bufs()
@@ -341,6 +346,9 @@ local function close_file_type_when_only_buffer(file_type_to_close)
             local loaded_buf_file_type = vim.api.nvim_get_option_value('filetype', { buf = loaded_buf_number })
             if not is_aux_window(loaded_buf_file_type) then
               if is_buffer_visible(loaded_buf_number) then
+                if debug then
+                  print('BufEnter: ' .. loaded_buf_file_type .. ' (len: ' .. string.len(loaded_buf_file_type) .. ') is still open')
+                end
                 loaded_bufs = loaded_bufs + 1
               end
             end
@@ -348,6 +356,7 @@ local function close_file_type_when_only_buffer(file_type_to_close)
         end
 
         if loaded_bufs == 0 then
+          -- Try to quit. This will fail if buffer is dirty
           vim.cmd 'q'
         end
       end
@@ -1289,7 +1298,11 @@ require('lazy').setup({
     cmd = { 'Outline', 'OutlineOpen' },
     keys = { -- Example mapping to toggle outline
       -- With !, focus stays in the current buffer. Without it, focus moves to Outline.
-      { '<leader>o', '<cmd>Outline<CR>', desc = 'Toggle outline' },
+      -- If I open outline, I want to focus it, so I am not using !.
+      -- Using OutlineOpen instead of Outline for one quirk that don't know how to solve - :OutlineOpen sets the
+      -- filetype to Outline whereas :Outline doesn't set the filetype. My logic to close vim when Outline is the last
+      -- open buffer works only when filetype is set correctly.
+      { '<leader>o', '<cmd>OutlineOpen<CR>', desc = 'Toggle outline' },
     },
     opts = {},
     config = function(opts)
