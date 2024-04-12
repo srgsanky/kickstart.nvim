@@ -239,6 +239,13 @@ vim.keymap.set('n', '<leader>lr', '<cmd>LspRestart<CR>', { desc = '[L]sp [R]esta
 -- Open Navbuddy
 vim.keymap.set('n', '<leader>nb', '<cmd>Navbuddy<CR>', { desc = 'Open [N]av [B]uddy' })
 
+vim.keymap.set(
+  'n',
+  '<leader>bc',
+  '<cmd>Git log --color --pretty=format:"%h %<(20,trunc)%an(%<(15,trunc)%al) %<(10)%as %<(70,trunc)%s"<CR>',
+  { desc = '[b]uffer [c]ommits' }
+)
+
 -----------------------------------------------------------------------------------------------------------
 -- View man pages with Neovim
 -- https://neovim.io/doc/user/filetype.html#%3AMan
@@ -365,16 +372,21 @@ local function close_file_type_when_only_buffer(file_type_to_close)
 end
 
 local function get_telescope_dropdown()
+  -- See help for telescope.layout.center()
+  -- https://github.com/nvim-telescope/telescope.nvim/blob/5a701e99906961218b55d7ad6c2a998f066c6fe0/lua/telescope/pickers/layout_strategies.lua#L395
   return require('telescope.themes').get_dropdown {
     previewer = true,
+    layout_strategy = 'center',
     layout_config = {
       width = function(_, max_columns, _)
         return max_columns - math.floor(max_columns / 5) -- 80% of max_columns
       end,
 
       height = function(_, _, max_lines)
-        return math.min(max_lines, 20)
+        return math.min(max_lines, 15) -- show limited number of results so more space is given for preview
       end,
+
+      anchor = 'S', -- Anchor to the bottom (south), so the rest of the top is used for dropdown and preview
     },
   }
 end
