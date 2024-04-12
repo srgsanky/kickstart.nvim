@@ -921,7 +921,7 @@ require('lazy').setup({
       local servers = {
         -- gopls = {},
         -- pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {}, -- For rust
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -1185,6 +1185,13 @@ require('lazy').setup({
     'ray-x/lsp_signature.nvim',
     event = 'VeryLazy',
     opts = {},
+  },
+
+  -- Rust tools -> Rustacean vim
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^4', -- Recommended
+    ft = { 'rust' },
   },
 
   -- Show recent buffers as tabs at the top
