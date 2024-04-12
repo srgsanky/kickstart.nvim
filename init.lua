@@ -1877,6 +1877,7 @@ require('lazy').setup({
   },
 
   -- Plugin to browse github issues and pr. This shows more information than the github CLI tool
+  -- Use gx to open link under cursor in browser.
   {
     'pwntester/octo.nvim',
     requires = {
@@ -1889,8 +1890,12 @@ require('lazy').setup({
       require('octo').setup {
         default_to_projects_v2 = true,
         mappings_disable_default = false,
+        enable_builtin = true,
       }
     end,
+    keys = {
+      { '<leader>O', '<cmd>Octo<cr>', desc = 'Octo' },
+    },
   },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
