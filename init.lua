@@ -1879,7 +1879,10 @@ require('lazy').setup({
       'nvim-tree/nvim-web-devicons',
     },
     config = function()
-      require('octo').setup()
+      require('octo').setup {
+        default_to_projects_v2 = true,
+        mappings_disable_default = false,
+      }
     end,
   },
 
