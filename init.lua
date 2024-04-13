@@ -421,6 +421,18 @@ local function get_lsp_handlers_with_border()
   }
 end
 
+-- rust toolchain to use
+-- Use "rustup toolchain list" to list all toolchains
+local use_nightly_toolchain = true
+local rustup_toolchain = 'stable'
+if use_nightly_toolchain then
+  rustup_toolchain = 'nightly'
+end
+
+-- Use vanilla rust analyzer or rustacenavim (mrcjkb/rustaceanvim)
+-- Currently I don't see the value add with rustacenavim, so configuring it behind a flag.
+local use_vanilla_rust_analyzer = true
+
 --                               ▲
 --                               │
 --                               │
@@ -1042,6 +1054,28 @@ require('lazy').setup({
           handlers = get_lsp_handlers_with_border(),
         }
       end
+
+      if use_vanilla_rust_analyzer then
+        -- LSP config for rust. Use rust-analyzer from the rustup toolchain.
+        require('lspconfig').rust_analyzer.setup {
+          -- Ask rustup to run the rust-analyzer from stable toolchain
+          cmd = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' },
+          settings = {
+            ['rust-analyzer'] = {
+              server = {
+                extraEnv = {
+                  ['foo'] = 'bar', -- placeholder env variables
+                },
+              },
+              cargo = {
+                ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
+              },
+            },
+          },
+          capabilities = capabilities,
+          handlers = get_lsp_handlers_with_border(),
+        }
+      end
     end,
   },
 
@@ -1204,6 +1238,28 @@ require('lazy').setup({
     'mrcjkb/rustaceanvim',
     version = '^4', -- Recommended
     ft = { 'rust' },
+    enabled = not use_vanilla_rust_analyzer,
+    config = function()
+      ---@type RustaceanOpts
+      vim.g.rustaceanvim = {
+        ---@type RustaceanLspClientOpts
+        server = {
+          cmd = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' },
+
+          -- rust-analyzer language server configuration
+          ['rust-analyzer'] = {
+            server = {
+              extraEnv = {
+                ['foo'] = 'bar', -- placeholder env variables
+              },
+            },
+            cargo = {
+              ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
+            },
+          },
+        },
+      }
+    end,
   },
 
   -- Show recent buffers as tabs at the top
