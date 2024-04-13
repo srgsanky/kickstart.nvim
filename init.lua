@@ -948,7 +948,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- gopls = {},
-        pyright = {}, -- Python
+        -- pyright = {}, -- Python. NOTE: See below, pyright is added conditionally only if npm is available
         -- rust_analyzer = {}, -- NOTE: Don't use the rust analyzer from mason. Use rust-analyzer from your rustup toolchain
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -976,6 +976,14 @@ require('lazy').setup({
         },
       }
 
+      -- pyright is written in typescript and requires npm to be installed.
+      -- In Linux, you can install using "sudo yum install -y npm"
+      --  https://neovim.io/doc/user/builtin.html
+      if vim.fn.executable 'npm' == 1 then
+        -- npm exists
+        servers.pyright = {}
+      end
+
       -- clangd from mason is available only on Mac
       if vim.loop.os_uname().sysname == 'Darwin' and use_clangd_in_mac then
         -- MacOS
@@ -995,13 +1003,14 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+
         -- python specific
-        'black',
-        'debugpy',
-        'flake8',
-        'isort',
-        'mypy',
-        'pylint',
+        'black', -- formatter
+        'debugpy', -- debugging
+        'isort', -- sort imports
+        'flake8', -- linter - checks for errors, styling issues and complexity
+        'mypy', -- static type checker for python
+        'pylint', -- static code analyzer
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
