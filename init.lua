@@ -433,6 +433,10 @@ end
 -- Currently I don't see the value add with rustacenavim, so configuring it behind a flag.
 local use_vanilla_rust_analyzer = true
 
+-- Logic to save only modified lines on save
+-- I don't like the way rustfmt formats ranges of lines. In rust, anyway you have to format the entire file.
+local enable_format_only_modified_lines_on_save = false
+
 --                               ▲
 --                               │
 --                               │
@@ -1087,11 +1091,40 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        return {
-          timeout_ms = 500,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-        }
+        local ignore_filetypes = { 'c', 'cpp', 'lua' }
+        if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
+          return { timeout_ms = 500, lsp_fallback = false }
+        end
+
+        if not enable_format_only_modified_lines_on_save then
+          return { timeout_ms = 500, lsp_fallback = true }
+        end
+
+        -- format only modified lines in current buffer based on git. Taken from https://github.com/stevearc/conform.nvim/issues/92
+        local lines = vim.fn.system('git diff --unified=0 '):gmatch '[^\n\r]+'
+        local ranges = {}
+        for line in lines do
+          if line:find '^@@' then
+            local line_nums = line:match '%+.- '
+            if line_nums:find ',' then
+              local _, _, first, second = line_nums:find '(%d+),(%d+)'
+              table.insert(ranges, {
+                start = { tonumber(first), 0 },
+                ['end'] = { tonumber(first) + tonumber(second), 0 },
+              })
+            else
+              local first = tonumber(line_nums:match '%d+')
+              table.insert(ranges, {
+                start = { first, 0 },
+                ['end'] = { first + 1, 0 },
+              })
+            end
+          end
+        end
+        local format = require('conform').format
+        for _, range in pairs(ranges) do
+          format { range = range }
+        end
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
