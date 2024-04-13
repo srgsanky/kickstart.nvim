@@ -948,7 +948,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- gopls = {},
-        -- pyright = {},
+        pyright = {}, -- Python
         -- rust_analyzer = {}, -- NOTE: Don't use the rust analyzer from mason. Use rust-analyzer from your rustup toolchain
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -995,6 +995,13 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        -- python specific
+        'black',
+        'debugpy',
+        'flake8',
+        'isort',
+        'mypy',
+        'pylint',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -1129,7 +1136,7 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        python = { 'isort', 'black' },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
