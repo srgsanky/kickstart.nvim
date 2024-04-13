@@ -1892,7 +1892,7 @@ require('lazy').setup({
   -- Use gx to open link under cursor in browser.
   {
     'pwntester/octo.nvim',
-    requires = {
+    dependencies = {
       'nvim-lua/plenary.nvim',
       'nvim-telescope/telescope.nvim',
       -- OR 'ibhagwan/fzf-lua',
