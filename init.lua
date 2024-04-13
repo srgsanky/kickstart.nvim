@@ -1879,6 +1879,8 @@ require('lazy').setup({
 
   -- Preview markdown live in a webbrowser
   -- Current cursorline will be at the center of the browser screen
+  -- Make sure to URL encode image paths for it to render correctly. For e.g. a space in image name will prevent the
+  -- image from rendering.
   {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
