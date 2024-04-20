@@ -93,6 +93,11 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed
 vim.g.have_nerd_font = true
 
+-- Setup python3 path in Linux
+if vim.loop.os_uname().sysname == 'Linux' then
+  vim.g.python3_host_prog = '/usr/bin/python3'
+end
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -435,7 +440,9 @@ local use_vanilla_rust_analyzer = true
 
 -- Logic to save only modified lines on save
 -- I don't like the way rustfmt formats ranges of lines. In rust, anyway you have to format the entire file.
-local enable_format_only_modified_lines_on_save = false
+-- Update: this works great for python after I added the current buffer name in git diff command. So, I am giving it a
+-- shot again.
+local enable_format_only_modified_lines_on_save = true
 
 --                               ▲
 --                               │
@@ -918,8 +925,10 @@ require('lazy').setup({
             -- require('outline').open_outline { focus_on_open = false }
           end
 
-          -- Navbuddy
-          require('nvim-navbuddy').attach(client, bufnr)
+          -- Navbuddy - attach it only if the lsp has documentSymbol capability. For e.g. ruff_lsp for python doesn't have this
+          if client.server_capabilities.documentSymbolProvider then
+            require('nvim-navbuddy').attach(client, bufnr)
+          end
 
           -- Enable inlay hints (available in unstable nvim only
           -- vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
@@ -981,7 +990,24 @@ require('lazy').setup({
       --  https://neovim.io/doc/user/builtin.html
       if vim.fn.executable 'npm' == 1 then
         -- npm exists
-        servers.pyright = {}
+        if vim.fn.executable 'ruff-lsp' == 1 then
+          servers.pyright = {
+            settings = {
+              pyright = {
+                -- Using Ruff's import organizer
+                disableOrganizeImports = true,
+              },
+              python = {
+                analysis = {
+                  -- Ignore all files for analysis to exclusively use Ruff for linting
+                  ignore = { '*' },
+                },
+              },
+            },
+          }
+        else
+          servers.pyright = {}
+        end
       end
 
       -- clangd from mason is available only on Mac
@@ -1005,6 +1031,8 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
 
         -- python specific
+        'ruff', -- extremely fast python linter. Replacement for black https://docs.astral.sh/ruff/
+        'ruff-lsp', -- Python linter lsp based on ruff
         'black', -- formatter
         'debugpy', -- debugging
         'isort', -- sort imports
@@ -1039,7 +1067,7 @@ require('lazy').setup({
           local cwd = vim.fn.getcwd()
           -- -print -quit will quit on first match
           -- Using maxdepth for a faster start up time
-          local find_command = 'dirname $(find ' .. cwd .. ' -maxdepth 2 -type f -name "' .. filename .. '" -print -quit)'
+          local find_command = 'find ' .. cwd .. ' -maxdepth 2 -type f -name "' .. filename .. '" -print -quit | xargs -I {} "dirname {}"'
           for entry in io.popen(find_command):lines() do
             return entry
           end
@@ -1096,6 +1124,26 @@ require('lazy').setup({
           handlers = get_lsp_handlers_with_border(),
         }
       end
+
+      -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#ruff_lsp
+      if vim.fn.executable 'ruff-lsp' == 1 then
+        require('lspconfig').ruff_lsp.setup {
+          init_options = {
+            settings = {
+              -- Any extra CLI arguments for `ruff` go here.
+              args = {},
+            },
+          },
+          capabilities = capabilities,
+          on_attach = function(client, _)
+            -- Disable hover in favor of Pyright
+            client.server_capabilities.hoverProvider = false
+            -- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/
+            client.server_capabilities.documentSymbolProvider = false
+          end,
+          handlers = get_lsp_handlers_with_border(),
+        }
+      end
     end,
   },
 
@@ -1104,23 +1152,27 @@ require('lazy').setup({
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
+        local timeout_ms = 1000
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         local ignore_filetypes = { 'c', 'cpp', 'lua' }
         if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
-          return { timeout_ms = 500, lsp_fallback = false }
+          return { timeout_ms = timeout_ms, lsp_fallback = false }
         end
 
         if not enable_format_only_modified_lines_on_save then
-          return { timeout_ms = 500, lsp_fallback = true }
+          return { timeout_ms = timeout_ms, lsp_fallback = true }
         end
 
         -- format only modified lines in current buffer based on git. Taken from https://github.com/stevearc/conform.nvim/issues/92
-        local lines = vim.fn.system('git diff --unified=0 '):gmatch '[^\n\r]+'
+        -- --unified=0 tells the diff to have 0 lines of context (before and after)
+        local lines = vim.fn.system('git diff --unified=0 ' .. vim.fn.bufname(bufnr)):gmatch '[^\n\r]+'
         local ranges = {}
         for line in lines do
           if line:find '^@@' then
+            --     Del   Add
+            --  @@ -31,2 +39 @@ class TestRedisClusterSlotMigration(RedisClusterSlotMigrationTestCaseBase):
             local line_nums = line:match '%+.- '
             if line_nums:find ',' then
               local _, _, first, second = line_nums:find '(%d+),(%d+)'
@@ -1139,13 +1191,20 @@ require('lazy').setup({
         end
         local format = require('conform').format
         for _, range in pairs(ranges) do
-          format { range = range }
+          format { range = range, timeout_ms = timeout_ms }
         end
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        python = { 'isort', 'black' },
+        python = { 'ruff_fix', 'ruff_format' },
+        -- python = function(bufnr)
+        --   if require("conform").get_formatter_info("ruff_format", bufnr).available then
+        --     return { "ruff_format" }
+        --   else
+        --     return { "isort", "black" }
+        --   end
+        -- end,
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
