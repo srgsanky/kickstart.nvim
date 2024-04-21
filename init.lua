@@ -184,6 +184,11 @@ vim.opt.scrolloff = 7
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
+-- Disable showing help with F1 is hit. I tend to accidentally hit F1 all the time when I hit Esc.
+-- https://vim.fandom.com/wiki/Disable_F1_built-in_help_key
+vim.keymap.set('n', '<F1>', '<nop>')
+vim.keymap.set('i', '<F1>', '<nop>')
+
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
