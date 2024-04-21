@@ -711,7 +711,22 @@ require('lazy').setup({
           globalstatus = true, -- Have a single status line across all windows instead of one per window
         },
         sections = {
-          lualine_b = { 'branch', 'diagnostics' }, -- 'branch', 'diff', 'diagnostics'
+          lualine_a = {
+            'mode',
+          },
+          lualine_b = {
+            -- Show recording note when macro is being recorded (i.e. recording @q)
+            -- https://www.reddit.com/r/neovim/comments/yvq93j/noicenvim_macros_key_q_not_working_anymore/
+            -- Followed https://github.com/folke/noice.nvim/wiki/A-Guide-to-Messages#showmode, but the example in that
+            -- wiki uses deprecated field. Followed https://github.com/folke/noice.nvim/discussions/246
+            {
+              require('noice').api.status.mode.get,
+              cond = require('noice').api.status.mode.has,
+              color = { fg = '#ff9e64' },
+            },
+            'branch',
+            'diagnostics',
+          }, -- 'branch', 'diff', 'diagnostics'
           lualine_c = {
             {
               'filename',
