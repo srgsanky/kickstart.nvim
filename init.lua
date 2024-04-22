@@ -1169,6 +1169,7 @@ require('lazy').setup({
 
   { -- Autoformat
     'stevearc/conform.nvim',
+    branch = 'master', -- without specifying the branch, I was seeing older version of the plugin at ~/.local/share/nvim/lazy/conform.nvim which couldn't handle function in formatters_by_ft
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
@@ -1217,14 +1218,14 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        python = { 'ruff_fix', 'ruff_format' },
-        -- python = function(bufnr)
-        --   if require("conform").get_formatter_info("ruff_format", bufnr).available then
-        --     return { "ruff_format" }
-        --   else
-        --     return { "isort", "black" }
-        --   end
-        -- end,
+        -- python = { 'ruff_fix', 'ruff_format' },
+        python = function(bufnr)
+          if require('conform').get_formatter_info('ruff_format', bufnr).available then
+            return { 'ruff_fix', 'ruff_format' }
+          else
+            return { 'isort', 'black' }
+          end
+        end,
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
