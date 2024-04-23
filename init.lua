@@ -1631,8 +1631,10 @@ require('lazy').setup({
     end,
   },
 
-  -- catppuccin theme
+  -- Themes - from https://github.com/topics/neovim-colorscheme
   { 'catppuccin/nvim', name = 'catppuccin', priority = 1000, opts = {} },
+  { 'rebelot/kanagawa.nvim', opts = {} },
+  { 'kepano/flexoki-neovim', name = 'flexoki', opts = {} },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
@@ -2141,7 +2143,9 @@ require('lazy').setup({
 })
 
 -- slate does not color markdown well. So, I switched to catppuccin-mocha
-vim.cmd.colorscheme 'catppuccin-mocha'
+vim.cmd.colorscheme 'catppuccin-mocha' -- catppuccin-mocha (dark)/catppuccin-latte/catppuccin-frappe/catppuccin-latte (light)
+-- vim.cmd.colorscheme 'kanagawa-dragon' -- kanagawa-dragon (dark) / kanagawa-wave (mid - like tokyo night) / kanagawa-lotus (light)
+-- vim.cmd.colorscheme 'flexoki-dark' -- flexoki-dark/flexoki-light
 
 local function open_neotree_on_startup()
   -- Toggle Neotree on startup
