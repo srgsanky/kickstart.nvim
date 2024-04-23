@@ -1187,7 +1187,9 @@ require('lazy').setup({
           return { timeout_ms = timeout_ms, lsp_fallback = false }
         end
 
-        if curr_buffer_ft == 'rust' or not enable_format_only_modified_lines_on_save then
+        -- taplo for toml currently doesn't support ranges
+        local ft_format_entire_file = { 'rust', 'toml' }
+        if vim.tbl_contains(ft_format_entire_file, curr_buffer_ft) or not enable_format_only_modified_lines_on_save then
           -- Use LSP for formatting. For e.g. rust uses rust-analyzer
           return { timeout_ms = timeout_ms, lsp_fallback = true }
         end
