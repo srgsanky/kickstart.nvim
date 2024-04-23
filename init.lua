@@ -1178,11 +1178,14 @@ require('lazy').setup({
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         local ignore_filetypes = { 'c', 'cpp', 'lua' }
-        if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
+        local curr_buffer_ft = vim.bo[bufnr].filetype
+        if vim.tbl_contains(ignore_filetypes, curr_buffer_ft) then
+          -- Don't use LSP for formatting
           return { timeout_ms = timeout_ms, lsp_fallback = false }
         end
 
-        if not enable_format_only_modified_lines_on_save then
+        if curr_buffer_ft == 'rust' or not enable_format_only_modified_lines_on_save then
+          -- Use LSP for formatting. For e.g. rust uses rust-analyzer
           return { timeout_ms = timeout_ms, lsp_fallback = true }
         end
 
