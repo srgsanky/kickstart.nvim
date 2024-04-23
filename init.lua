@@ -1090,7 +1090,7 @@ require('lazy').setup({
           local cwd = vim.fn.getcwd()
           -- -print -quit will quit on first match
           -- Using maxdepth for a faster start up time
-          local find_command = 'find ' .. cwd .. ' -maxdepth 2 -type f -name "' .. filename .. '" -print -quit | xargs -I {} "dirname {}"'
+          local find_command = 'find ' .. cwd .. ' -maxdepth 2 -type f -name "' .. filename .. '" -print -quit | xargs -I {} dirname {}'
           for entry in io.popen(find_command):lines() do
             return entry
           end
