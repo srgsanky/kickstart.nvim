@@ -1059,6 +1059,9 @@ require('lazy').setup({
         'flake8', -- linter - checks for errors, styling issues and complexity
         'mypy', -- static type checker for python
         'pylint', -- static code analyzer
+
+        --toml
+        'taplo',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -1229,6 +1232,7 @@ require('lazy').setup({
             return { 'isort', 'black' }
           end
         end,
+        toml = { 'taplo' },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
