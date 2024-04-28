@@ -143,6 +143,9 @@ return {
 
     -- Show variable values in editor
     'theHamsta/nvim-dap-virtual-text',
+
+    -- Telescope integration
+    'nvim-telescope/telescope-dap.nvim',
   },
   config = function()
     local dap = require 'dap'
@@ -303,5 +306,7 @@ return {
     require('nvim-dap-virtual-text').setup {
       commented = true,
     }
+
+    require('telescope').load_extension 'dap'
   end,
 }
