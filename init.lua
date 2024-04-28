@@ -110,6 +110,8 @@ vim.opt.number = true
 vim.opt.relativenumber = false
 
 -- Enable mouse mode, can be useful for resizing splits for example!
+-- If mouse is not working when using iTerm, check
+-- https://stackoverflow.com/questions/77560255/set-mouse-a-not-working-on-vim-neovim-in-iterm2
 vim.opt.mouse = 'a'
 
 -- Don't show the mode, since it's already in the status line
@@ -321,7 +323,21 @@ local open_neo_tree_on_startup = false
 -- yggdrasil is used to show call hierachy by vim-ccls
 -- noice and notify are from noice (used to show cmdline at the center instead of bottom left)
 -- fidget is the notification that you see in the bottom right particularly in Lua files
-local aux_windows = { 'neo-tree', 'Outline', 'yggdrasil', 'noice', 'notify', 'fidget' }
+-- dapui* are debugger windows used by nvim-dap-ui. Ignoring them makes the debug control show up.
+local aux_windows = {
+  'neo-tree',
+  'Outline',
+  'yggdrasil',
+  'noice',
+  'notify',
+  'fidget',
+  'dapui_watches',
+  'dapui_breakpoints',
+  'dapui_scopes',
+  'dapui_console',
+  'dapui_stacks',
+  'dap-repl',
+}
 local function is_aux_window(name)
   for i = 1, #aux_windows do
     if aux_windows[i] == name then

@@ -63,6 +63,7 @@ return {
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
+    -- https://github.com/rcarriga/nvim-dap-ui/blob/master/doc/nvim-dap-ui.txt
     dapui.setup {
       icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
       element_mappings = {},
@@ -74,9 +75,14 @@ return {
           close = { 'q', '<Esc>' },
         },
       },
+      -- The controls show up in the winbar (top left) of repl window. I use lualine which configures the winbar.
+      -- The controls are showing up after I started ignoring dap* in lualine.
+      -- If mouse controls are not working, make sure mouse is working in neovim.
+      -- https://stackoverflow.com/questions/77560255/set-mouse-a-not-working-on-vim-neovim-in-iterm2
+      -- https://github.com/nvim-lualine/lualine.nvim/blob/0a5a66803c7407767b799067986b4dc3036e1983/lua/lualine/extensions/nvim-dap-ui.lua#L4
       controls = {
-        element = 'repl',
-        enabled = true,
+        element = 'repl', -- Element to show controls on
+        enabled = true, -- Show controls on an element (requires winbar feature)
         icons = {
           pause = '',
           play = '',
@@ -113,13 +119,16 @@ return {
           size = 40,
         },
         {
-          elements = { {
-            id = 'repl',
-            size = 0.5,
-          }, {
-            id = 'console',
-            size = 0.5,
-          } },
+          elements = {
+            {
+              id = 'repl',
+              size = 0.5,
+            },
+            {
+              id = 'console',
+              size = 0.5,
+            },
+          },
           position = 'bottom',
           size = 10,
         },
