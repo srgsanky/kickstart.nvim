@@ -161,49 +161,60 @@ return {
     require('dap-go').setup()
 
     -- C specific
-    -- dap.adapters.codelldb = {
-    --   type = 'server',
-    --   port = '${port}',
-    --   executable = {
-    --     command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb',
-    --     args = { '--port', '${port}' },
-    --   },
-    -- }
+    local use_code_lldb = true
 
-    -- dap.configurations.cpp = {
-    --   {
-    --     name = 'Launch file',
-    --     type = 'codelldb',
-    --     request = 'launch',
-    --     program = '${workspaceFolder}/src/valkey-server',
-    --     -- program = function()
-    --     --   return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-    --     -- end,
-    --     cwd = '${workspaceFolder}',
-    --     stopOnEntry = true,
-    --   },
-    -- }
+    if use_code_lldb then
+      dap.adapters.codelldb = {
+        type = 'server',
+        port = '${port}',
+        executable = {
+          command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb',
+          args = { '--port', '${port}' },
+        },
+      }
 
-    dap.adapters.lldb = {
-      type = 'executable',
-      command = '/opt/homebrew/opt/llvm/bin/lldb-vscode',
-      name = 'lldb',
-    }
+      dap.configurations.cpp = {
+        {
+          name = 'Launch file',
+          type = 'codelldb',
+          request = 'launch',
+          program = '${workspaceFolder}/src/valkey-server',
+          -- program = function()
+          --   return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          -- end,
+          cwd = '${workspaceFolder}',
+          -- When I set stopOnEntry to true, it drops me in assembly code. I can still set breakpoint in source code
+          -- and the debugger works with source code. But the initial drop in assembly can be confusing.
+          stopOnEntry = false,
+        },
+      }
+      -- Print variables using "p <variable name>". This is the same as gdb syntax.
+      -- codelldb keeps the console output and repl output separate
+    else
+      dap.adapters.lldb = {
+        type = 'executable',
+        command = '/opt/homebrew/opt/llvm/bin/lldb-vscode',
+        name = 'lldb',
+      }
 
-    dap.configurations.cpp = {
-      {
-        name = 'Launch file',
-        type = 'lldb',
-        request = 'launch',
-        -- workspaceFolder is the current directory where neovim is opened
-        program = '${workspaceFolder}/src/valkey-server',
-        cwd = '${workspaceFolder}',
-        -- When I set stopOnEntry to true, it drops me in assembly code. I can still set breakpoint in source code
-        -- and the debugger works with source code. But the initial drop in assembly can be confusing.
-        stopOnEntry = false,
-        args = {},
-      },
-    }
+      dap.configurations.cpp = {
+        {
+          name = 'Launch file',
+          type = 'lldb',
+          request = 'launch',
+          -- workspaceFolder is the current directory where neovim is opened
+          program = '${workspaceFolder}/src/valkey-server',
+          cwd = '${workspaceFolder}',
+          -- When I set stopOnEntry to true, it drops me in assembly code. I can still set breakpoint in source code
+          -- and the debugger works with source code. But the initial drop in assembly can be confusing.
+          stopOnEntry = false,
+          args = {},
+        },
+      }
+      -- Print variables using "<variable name>". This is different from gdb syntax.
+      -- lldb-vscode mixes the console output in the repl window.
+    end
+
     -- Copy the same for C and Rust
     dap.configurations.c = dap.configurations.cpp
     dap.configurations.rust = dap.configurations.cpp
