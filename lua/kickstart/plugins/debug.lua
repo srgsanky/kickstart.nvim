@@ -95,6 +95,7 @@ local function configure_cppdbg()
   -- How to start the debug adaptor?
   -- GDB version 14 (released in Dec 23) and above support dap. But for versions before it,
   -- we have to use the MI interface.
+  -- https://github.com/mfussenegger/nvim-dap/wiki/C-C---Rust-(gdb-via--vscode-cpptools)
   dap.adapters.cppdbg = {
     id = 'cppdbg',
     type = 'executable',
@@ -119,7 +120,16 @@ local function configure_cppdbg()
       -- When I set stopOnEntry to true, it drops me in assembly code. I can still set breakpoint in source code
       -- and the debugger works with source code. But the initial drop in assembly can be confusing.
       stopOnEntry = false,
+      setupCommands = {
+        {
+          text = '-enable-pretty-printing',
+          description = 'enable pretty printing',
+          ignoreFailures = false,
+        },
+      },
     },
+    -- Print variables using "<variable name>". To use gdb commands, prefix the command with "-exec ".
+    -- For e.g. "-exec info registers"
   }
 end
 

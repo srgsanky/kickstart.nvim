@@ -449,7 +449,7 @@ end
 
 -- rust toolchain to use
 -- Use "rustup toolchain list" to list all toolchains
-local use_nightly_toolchain = true
+local use_nightly_toolchain = false
 local rustup_toolchain = 'stable'
 if use_nightly_toolchain then
   rustup_toolchain = 'nightly'
@@ -2135,7 +2135,7 @@ require('lazy').setup({
   --
   -- I find the debug plugin in neovim to be high effort low returns at this point in time.
   -- There are way too many failure points for a debugger. I may revisit these plugins later.
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
 
