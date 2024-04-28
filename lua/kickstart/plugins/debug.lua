@@ -5,6 +5,10 @@
 -- Primarily focused on configuring the debugger for Go, but can
 -- be extended to other languages as well. That's why it's called
 -- kickstart.nvim and not kitchen-sink.nvim ;)
+--
+--
+-- Log file can be found in the location :lua print(vim.fn.stdpath('cache')). Look for the default log file dap.log
+-- ~/.cache/nvim/dap.log
 
 return {
   -- NOTE: Yes, you can install new plugins here!
@@ -32,6 +36,7 @@ return {
       -- Makes a best effort to setup the various debuggers with
       -- reasonable debug configurations
       automatic_setup = true,
+      automatic_installation = true,
 
       -- You can provide additional configuration to the handlers,
       -- see mason-nvim-dap README for more information
@@ -41,7 +46,7 @@ return {
       -- online, please don't ask me how to install them :)
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
-        'delve',
+        'delve', -- for go <https://github.com/go-delve/delve>
         'codelldb', -- for C
       },
     }
@@ -59,24 +64,82 @@ return {
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
     dapui.setup {
-      -- Set icons to characters that are more likely to work in every terminal.
-      --    Feel free to remove or use ones that you like more! :)
-      --    Don't feel like these are good choices.
       icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
-      controls = {
-        icons = {
-          pause = '⏸',
-          play = '▶',
-          step_into = '⏎',
-          step_over = '⏭',
-          step_out = '⏮',
-          step_back = 'b',
-          run_last = '▶▶',
-          terminate = '⏹',
-          disconnect = '⏏',
+      element_mappings = {},
+      expand_lines = true,
+      force_buffers = true,
+      floating = {
+        border = 'single',
+        mappings = {
+          close = { 'q', '<Esc>' },
         },
       },
+      controls = {
+        element = 'repl',
+        enabled = true,
+        icons = {
+          pause = '',
+          play = '',
+          step_into = '',
+          step_over = '',
+          step_out = '',
+          step_back = '',
+          run_last = '',
+          terminate = '',
+          disconnect = '',
+        },
+      },
+      layouts = {
+        {
+          elements = {
+            {
+              id = 'scopes',
+              size = 0.25,
+            },
+            {
+              id = 'breakpoints',
+              size = 0.25,
+            },
+            {
+              id = 'stacks',
+              size = 0.25,
+            },
+            {
+              id = 'watches',
+              size = 0.25,
+            },
+          },
+          position = 'left',
+          size = 40,
+        },
+        {
+          elements = { {
+            id = 'repl',
+            size = 0.5,
+          }, {
+            id = 'console',
+            size = 0.5,
+          } },
+          position = 'bottom',
+          size = 10,
+        },
+      },
+      mappings = {
+        edit = 'e',
+        expand = { '<CR>', '<2-LeftMouse>' },
+        open = 'o',
+        remove = 'd',
+        repl = 'r',
+        toggle = 't',
+      },
+      render = {
+        indent = 1,
+        max_value_lines = 100,
+      },
     }
+    vim.fn.sign_define('DapBreakpointRejected', { text = '❌', texthl = '', linehl = '', numhl = '' })
+    vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
+    vim.fn.sign_define('DapStopped', { text = '➜', texthl = '', linehl = '', numhl = '' })
 
     -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
     vim.keymap.set('n', '<F7>', dapui.toggle, { desc = 'Debug: See last session result.' })
@@ -89,25 +152,47 @@ return {
     require('dap-go').setup()
 
     -- C specific
-    dap.adapters.codelldb = {
-      type = 'server',
-      port = '${port}',
-      executable = {
-        command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb',
-        args = { '--port', '${port}' },
-      },
+    -- dap.adapters.codelldb = {
+    --   type = 'server',
+    --   port = '${port}',
+    --   executable = {
+    --     command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb',
+    --     args = { '--port', '${port}' },
+    --   },
+    -- }
+
+    -- dap.configurations.cpp = {
+    --   {
+    --     name = 'Launch file',
+    --     type = 'codelldb',
+    --     request = 'launch',
+    --     program = '${workspaceFolder}/src/valkey-server',
+    --     -- program = function()
+    --     --   return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    --     -- end,
+    --     cwd = '${workspaceFolder}',
+    --     stopOnEntry = true,
+    --   },
+    -- }
+
+    dap.adapters.lldb = {
+      type = 'executable',
+      command = '/opt/homebrew/opt/llvm/bin/lldb-vscode',
+      name = 'lldb',
     }
 
     dap.configurations.cpp = {
       {
         name = 'Launch file',
-        type = 'codelldb',
+        type = 'lldb',
         request = 'launch',
-        program = function()
-          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-        end,
+        -- workspaceFolder is the current directory where neovim is opened
+        program = '${workspaceFolder}/src/valkey-server',
         cwd = '${workspaceFolder}',
-        stopOnEntry = true,
+        -- When I set stopOnEntry to true, it drops me in assembly code. I can still set breakpoint in source code
+        -- and the debugger works with source code. But the initial drop in assembly can be confusing.
+        stopOnEntry = false,
+        args = {},
       },
     }
     -- Copy the same for C and Rust
