@@ -183,6 +183,8 @@ return {
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
     -- https://github.com/rcarriga/nvim-dap-ui/blob/master/doc/nvim-dap-ui.txt
+    -- If dap UI doesn't close for some reason, use :lua require("dapui").close()
+    -- https://github.com/rcarriga/nvim-dap-ui/issues/13
     dapui.setup {
       icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
       element_mappings = {},
