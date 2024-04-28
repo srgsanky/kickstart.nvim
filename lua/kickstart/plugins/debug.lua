@@ -20,7 +20,8 @@
 --      Communication via debug adapter protocol
 --
 
-local function configure_codelldb(dap)
+local function configure_codelldb()
+  local dap = require 'dap'
   dap.adapters.codelldb = {
     type = 'server',
     port = '${port}',
@@ -32,7 +33,7 @@ local function configure_codelldb(dap)
 
   dap.configurations.cpp = {
     {
-      name = 'Launch file',
+      name = 'Launch executable via codelldb',
       type = 'codelldb',
       request = 'launch',
       program = '${workspaceFolder}/src/valkey-server',
@@ -49,7 +50,8 @@ local function configure_codelldb(dap)
   -- codelldb keeps the console output and repl output separate
 end
 
-local function configure_lldb_vscode(dap)
+local function configure_lldb_vscode()
+  local dap = require 'dap'
   dap.adapters.lldb = {
     type = 'executable',
     command = '/opt/homebrew/opt/llvm/bin/lldb-vscode',
@@ -58,7 +60,7 @@ local function configure_lldb_vscode(dap)
 
   dap.configurations.cpp = {
     {
-      name = 'Launch file',
+      name = 'Launch executable via lldb-vscode',
       type = 'lldb',
       request = 'launch',
       -- workspaceFolder is the current directory where neovim is opened
@@ -74,7 +76,8 @@ local function configure_lldb_vscode(dap)
   -- lldb-vscode mixes the console output in the repl window.
 end
 
-local function configure_gdb_with_dap_support(dap)
+local function configure_gdb_with_dap_support()
+  local dap = require 'dap'
   -- GDB version 14 (released in Dec 23) and above support dap.
   -- https://blog.cryptomilk.org/2024/01/02/neovim-dap-and-gdb-14-1/
   -- https://sourceware.org/gdb/current/onlinedocs/gdb.html/Interpreters.html
@@ -87,7 +90,8 @@ local function configure_gdb_with_dap_support(dap)
   }
 end
 
-local function configure_cppdbg(dap)
+local function configure_cppdbg()
+  local dap = require 'dap'
   -- How to start the debug adaptor?
   -- GDB version 14 (released in Dec 23) and above support dap. But for versions before it,
   -- we have to use the MI interface.
@@ -100,9 +104,9 @@ local function configure_cppdbg(dap)
 
   -- How to start the debugee?
   -- https://code.visualstudio.com/docs/cpp/launch-json-reference#_customizing-gdb-or-lldb
-  dap.configurations.cppdbg = {
+  dap.configurations.cpp = {
     {
-      name = 'Launch file',
+      name = 'Launch executable via gdb',
       type = 'cppdbg',
       MIMode = 'gdb',
       miDebuggerPath = '/usr/bin/gdb',
@@ -136,6 +140,9 @@ return {
 
     -- Add your own debuggers here
     'leoluz/nvim-dap-go',
+
+    -- Show variable values in editor
+    'theHamsta/nvim-dap-virtual-text',
   },
   config = function()
     local dap = require 'dap'
@@ -277,18 +284,22 @@ return {
       local use_code_lldb = true
 
       if use_code_lldb then
-        configure_codelldb(dap)
+        configure_codelldb()
       else
-        configure_lldb_vscode(dap)
+        configure_lldb_vscode()
       end
     else
       -- Linux
-      configure_gdb_with_dap_support(dap)
-      configure_cppdbg(dap)
+      configure_gdb_with_dap_support()
+      configure_cppdbg()
     end
 
     -- Copy the same for C and Rust
     dap.configurations.c = dap.configurations.cpp
     dap.configurations.rust = dap.configurations.cpp
+
+    require('nvim-dap-virtual-text').setup {
+      commented = true,
+    }
   end,
 }
