@@ -1948,6 +1948,7 @@ require('lazy').setup({
 
       require('noice').setup {
         -- Position the command popup at the center of the screen
+        -- https://github.com/folke/noice.nvim/issues/779
         -- See https://github.com/folke/noice.nvim/blob/0cbe3f88d038320bdbda3c4c5c95f43a13c3aa12/lua/noice/types/nui.lua#L6
         -- See https://github.com/folke/noice.nvim/wiki/Configuration-Recipes
         ---@type NoiceConfigViews
