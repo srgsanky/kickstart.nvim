@@ -19,6 +19,11 @@
 --             |
 --      Communication via debug adapter protocol
 --
+-- TODO: Other plugins to explore
+-- 1. Record and replay support <https://github.com/jonboh/nvim-dap-rr>
+--   * This is based on <https://github.com/rr-debugger/rr>
+-- 2. Project specific configuration <https://github.com/ldelossa/nvim-dap-projects>
+-- <https://www.youtube.com/watch?v=lEMZnrC-ST4>
 
 local function configure_codelldb()
   local dap = require 'dap'
