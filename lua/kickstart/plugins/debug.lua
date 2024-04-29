@@ -166,6 +166,21 @@ return {
     local dap = require 'dap'
     local dapui = require 'dapui'
 
+    local debuggers_to_install = {
+      -- Update this to ensure that you have the debuggers for the langs you want
+      'codelldb', -- for C
+      -- for C to use with gdb <https://github.com/microsoft/vscode-cpptools>.
+      -- Provides OpenDebugAD7
+      'cpptools',
+    }
+
+    -- Add go debugger only if go is installed in the system
+    if vim.fn.executable 'go' == 1 then
+      debuggers_to_install = vim.tbl_deep_extend('force', debuggers_to_install, {
+        'delve', -- for go <https://github.com/go-delve/delve>
+      })
+    end
+
     require('mason-nvim-dap').setup {
       -- Makes a best effort to setup the various debuggers with
       -- reasonable debug configurations
@@ -178,14 +193,7 @@ return {
 
       -- You'll need to check that you have the required things installed
       -- online, please don't ask me how to install them :)
-      ensure_installed = {
-        -- Update this to ensure that you have the debuggers for the langs you want
-        'delve', -- for go <https://github.com/go-delve/delve>
-        'codelldb', -- for C
-        -- for C to use with gdb <https://github.com/microsoft/vscode-cpptools>.
-        -- Provides OpenDebugAD7
-        'cpptools',
-      },
+      ensure_installed = debuggers_to_install,
     }
 
     -- Basic debugging keymaps, feel free to change to your liking!
