@@ -251,11 +251,21 @@ vim.keymap.set('n', '<leader>lr', '<cmd>LspRestart<CR>', { desc = '[L]sp [R]esta
 -- Open Navbuddy
 vim.keymap.set('n', '<leader>nb', '<cmd>Navbuddy<CR>', { desc = 'Open [N]av [B]uddy' })
 
+-- vim.fn.expand '%:.' gives the current buffer name's relative path from the current working directory
+-- vim.fn.expand '%:p' gives the absolute path of the current buffer.
+-- Note: I am not using coloring in git log as the colors show up as control characters in VIM fugitive instead of the
+-- actual color. E.g. coloring: %C(yellow)%s%Creset
 vim.keymap.set(
   'n',
   '<leader>bc',
-  '<cmd>Git log --color --pretty=format:"%h %<(20,trunc)%an(%<(15,trunc)%al) %<(10)%as %<(70,trunc)%s"<CR>',
+  '<cmd>Git log --color --pretty=format:"%h %<(10)%as %<(20,trunc)%an(%<(15,trunc)%al) %<(70,trunc)%s" -- ' .. vim.fn.expand '%:p' .. '<CR>',
   { desc = '[b]uffer [c]ommits' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>rc',
+  '<cmd>Git log --color --pretty=format:"%h %<(10)%as %<(20,trunc)%an(%<(15,trunc)%al) %<(70,trunc)%s"<CR>',
+  { desc = '[r]epo [c]ommits' }
 )
 
 -----------------------------------------------------------------------------------------------------------
