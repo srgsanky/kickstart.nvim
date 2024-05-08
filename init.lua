@@ -2179,7 +2179,11 @@ require('lazy').setup({
   },
 
   -- Plugin to browse github issues and pr. This shows more information than the github CLI tool
+  -- This plugin is lazily loaded. Use <leader>O to load it. You can then use it via
+  -- 1. <leader>O
+  -- 2. :Octo <tab>
   -- Use gx to open link under cursor in browser.
+  -- Use <C-b> to open the current issue or pr in Github.
   {
     'pwntester/octo.nvim',
     dependencies = {
