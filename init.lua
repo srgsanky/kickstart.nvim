@@ -205,6 +205,26 @@ vim.keymap.set('n', '<leader>ts', '<cmd>tab split<CR>', { desc = 'Tab split (ope
 -- Don't wrap around searches
 vim.opt.wrapscan = false
 
+-- Use stack for jumplist.
+-- When you backtrack and move forward, the behavior is similar to a stack which is more intuitive.
+--
+--                                         [A, B, C, D]
+--                            [A, B, C]
+--                                  ┏━━━━┓  4  ┏━━━━┓
+--        [A]       [A, B]      ┌──▶┃ D  ┣─────▶ E  ┃
+--                            3 │┌──┻━━━━◀─────┻━━━━┛
+--         1          2         ││          5
+-- ┏━━━━┓     ┏━━━━┓     ┏━━━━┳─┘│ 6  [A, B, C]
+-- ┃ A  ┣─────▶ B  ┣─────▶ C  ┃◀─┘ [A, B]
+-- ┗━━━━┛     ┗━━━━┛     ┗━━━━┻─┐
+--                              │   ┏━━━━┓     ┏━━━━┓
+--                              └──▶┃ F  ┣─────▶ G  ┃
+--                               7  ┗━━━━┛  8  ┗━━━━┛
+--
+--                              [A, B, C]    [A, B, C, F]
+--
+vim.opt.jumpoptions = 'stack'
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
