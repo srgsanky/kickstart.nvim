@@ -430,13 +430,41 @@ local function close_file_type_when_only_buffer(file_type_to_close)
         for buf_idx = 1, #bufs do
           if vim.api.nvim_buf_is_loaded(bufs[buf_idx]) then
             local loaded_buf_number = vim.api.nvim_buf_get_number(bufs[buf_idx])
+
+            -- https://neovim.io/doc/user/options.html
+            local loaded_buf_type = vim.api.nvim_get_option_value('buftype', { buf = loaded_buf_number })
+            local loaded_buf_listed = vim.api.nvim_get_option_value('buflisted', { buf = loaded_buf_number })
+            local loaded_buf_modified = vim.api.nvim_get_option_value('modified', { buf = loaded_buf_number })
+            local loaded_buf_modifiable = vim.api.nvim_get_option_value('modifiable', { buf = loaded_buf_number })
             local loaded_buf_file_type = vim.api.nvim_get_option_value('filetype', { buf = loaded_buf_number })
-            if not is_aux_window(loaded_buf_file_type) then
-              if is_buffer_visible(loaded_buf_number) then
-                if debug then
-                  print('BufEnter: ' .. loaded_buf_file_type .. ' (len: ' .. string.len(loaded_buf_file_type) .. ') is still open')
+
+            if debug then
+              print(
+                'Buffer='
+                  .. loaded_buf_number
+                  .. ', type='
+                  .. loaded_buf_type
+                  .. ', listed='
+                  .. tostring(loaded_buf_listed)
+                  .. ', modified='
+                  .. tostring(loaded_buf_modified)
+                  .. ', modifiable='
+                  .. tostring(loaded_buf_modifiable)
+                  .. ', filetype='
+                  .. loaded_buf_file_type
+                  .. ' is still open'
+              )
+            end
+
+            -- We only care about buffers that are listed or modified
+            if loaded_buf_listed or loaded_buf_modified then
+              if not is_aux_window(loaded_buf_file_type) then
+                if is_buffer_visible(loaded_buf_number) then
+                  if debug then
+                    print('BufEnter: ' .. loaded_buf_file_type .. ' (len: ' .. string.len(loaded_buf_file_type) .. ') is still open')
+                  end
+                  loaded_bufs = loaded_bufs + 1
                 end
-                loaded_bufs = loaded_bufs + 1
               end
             end
           end
