@@ -177,6 +177,29 @@ vim.opt.formatoptions:append 'n'
 -- Or you can spell out the full options
 -- vim.opt.formatoptions = 'jcroqln'
 
+-- Pattern to recognize lists while formatting. This is used only when formatoptions contains 'n'
+-- Based on https://vimways.org/2018/formatting-lists-with-vim/
+-- WARN: It is tedious to figure out which characters need double backslash and which doesn't.
+-- NOTE: This is missing roman numerals. Might need something like
+-- <https://stackoverflow.com/questions/267399/how-do-you-match-only-valid-roman-numerals-with-a-regular-expression>
+vim.opt.formatlistpat = '^\\s*' --  Optional leading whitespace
+
+vim.opt.formatlistpat:append '[' -- Start character class
+vim.opt.formatlistpat:append '\\[({]\\?' -- Optionally match opening punctuation
+
+vim.opt.formatlistpat:append '\\(' -- Start group
+vim.opt.formatlistpat:append '[0-9]\\+' -- Numbers
+vim.opt.formatlistpat:append '\\|' -- or
+vim.opt.formatlistpat:append '[a-zA-Z]\\+' -- Letters
+vim.opt.formatlistpat:append '\\)' -- End group
+
+vim.opt.formatlistpat:append '[\\]:.)}' -- Closing punctuation
+vim.opt.formatlistpat:append ']' -- End character class
+
+vim.opt.formatlistpat:append '\\s\\+' --  One or more spaces
+vim.opt.formatlistpat:append '\\|' --  or
+vim.opt.formatlistpat:append '^\\s*[-–+o*•]\\s\\+' --  Bullet points
+
 -- NOTE: Pro-tip: use :options to view all options in Neovim
 -- https://www.reddit.com/r/neovim/comments/12d075n/some_people_dont_know_this_options/
 
