@@ -159,7 +159,7 @@ vim.opt.shiftwidth = 4 -- Num of spaces to use for each step of (auto)indent. Us
 vim.opt.softtabstop = 4 -- Num of spaces that a tab accounts for while performing editing operations.
 
 -- Line length above which to break a line. Whether to break a line or not is controlled by formatoptions
-vim.opt.textwidth = 120
+vim.opt.textwidth = 100
 
 -- default formatoptions (Use :set formatoptions? to find out)
 -- jcroql
@@ -170,6 +170,12 @@ vim.opt.textwidth = 120
 -- o: Automatically insert the current comment leader after hitting 'o' or 'O' in Normal mode.
 -- q: Allow formatting of comments with "gq".
 -- l: Existing long lines are not broken when entering insert mode
+-- n: Treat lines starting with numbers as list items, which helps in preserving the structure when reformatting using gw.
+vim.opt.formatoptions:append 'n'
+-- To remove a specific option, use
+-- vim.opt.formatoptions:remove 'n'
+-- Or you can spell out the full options
+-- vim.opt.formatoptions = 'jcroqln'
 
 -- NOTE: Pro-tip: use :options to view all options in Neovim
 -- https://www.reddit.com/r/neovim/comments/12d075n/some_people_dont_know_this_options/
