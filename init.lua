@@ -2326,6 +2326,34 @@ require('lazy').setup({
     end,
   },
 
+  -- Automatically save and restore session. This remembers the open buffers, cursor position in
+  -- each buffer along with folds etc.
+  --
+  -- Usage:
+  --  * Use "nvim" or "nvim <dir>" to start neovim. If you start with a specific file, auto-session
+  --    won't kick-in.
+  --  * Or Manually save and restore using the following commands.
+  --
+  -- Commands
+  -- :SessionSave
+  -- :SessionRestore
+  -- :SessionSearch
+  {
+    'rmagatti/auto-session',
+    lazy = false,
+    dependencies = {
+      'nvim-telescope/telescope.nvim', -- Only needed if you want to use session lens
+    },
+
+    ---enables autocomplete for opts
+    ---@module "auto-session"
+    ---@type AutoSession.Config
+    opts = {
+      suppressed_dirs = { '~/', '~/Downloads', '/' },
+      -- log_level = 'debug',
+    },
+  },
+
   -- Remember the last cursor position and open file in that position.
   -- It won't impact git commit messages etc.
   {
