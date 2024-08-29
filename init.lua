@@ -2399,6 +2399,30 @@ require('lazy').setup({
     config = function() end, -- dummy config function for vimscript plugins
   },
 
+  -- Highlight undo/redo text
+  -- Couldn't get this to work. Moved to yuki-yano/highlight-undo
+  -- {
+  --   'tzachar/highlight-undo.nvim',
+  --   opts = {},
+  -- },
+
+  -- Highlight undo/redo text
+  {
+    'yuki-yano/highlight-undo.nvim',
+    config = function()
+      if vim.fn.executable 'deno' == 1 then
+        -- deno is installed
+        require('highlight-undo').setup {}
+      else
+        print 'deno is not available. Follow https://github.com/denoland/deno/ to install it'
+      end
+    end,
+    dependencies = {
+      -- Also make sure deno is installed <https://github.com/denoland/deno/>
+      'vim-denops/denops.vim',
+    },
+  },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
