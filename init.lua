@@ -2439,6 +2439,14 @@ require('lazy').setup({
         require('highlight-undo').setup {}
       else
         print 'deno is not available. Follow https://github.com/denoland/deno/ to install it'
+        -- For Mac/Linux, this is
+        --
+        -- curl -fsSL https://deno.land/install.sh | sh
+        --
+        -- Add to the zshrc path
+        --
+        -- export DENO_INSTALL="/home/sanka/.deno"
+        -- export PATH="$DENO_INSTALL/bin:$PATH"
       end
     end,
     dependencies = {
