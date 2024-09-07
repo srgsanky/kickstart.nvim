@@ -2274,6 +2274,12 @@ require('lazy').setup({
         callhierarchy = {
           layout = 'normal',
         },
+        -- lightbulb for code actions https://nvimdev.github.io/lspsaga/lightbulb/#default-options
+        lightbulb = {
+          -- Don't show a virtual light bulb at the end of the line, it mess up with cursor movement
+          -- and yanking.
+          virtual_text = false,
+        },
       }
 
       -- Show incoming calls to the method
