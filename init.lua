@@ -2270,6 +2270,12 @@ require('lazy').setup({
           layout = 'normal',
         },
       }
+
+      -- Show incoming calls to the method
+      vim.keymap.set('n', '<leader>ci', '<cmd>Lspsaga incoming_calls<CR>', { silent = true })
+
+      -- Show outgoing calls from the method
+      vim.keymap.set('n', '<leader>co', '<cmd>Lspsaga outgoing_calls<CR>', { silent = true })
     end,
     dependencies = {
       'nvim-treesitter/nvim-treesitter', -- optional
