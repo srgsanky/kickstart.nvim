@@ -2253,6 +2253,30 @@ require('lazy').setup({
     opts = {},
   },
 
+  -- Lspsaga has a call hierarchy view which is amazing for browsing rust
+  -- https://nvimdev.github.io/lspsaga/callhierarchy/#default-keymaps
+  --
+  -- Usage: Move over the symbol and invoke the command
+  -- :Lspsaga incoming_calls
+  --
+  -- Default key bindings:
+  -- q: quit the layout
+  -- u: toggle a hierarchy
+  {
+    'nvimdev/lspsaga.nvim',
+    config = function()
+      require('lspsaga').setup {
+        callhierarchy = {
+          layout = 'normal',
+        },
+      }
+    end,
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter', -- optional
+      'nvim-tree/nvim-web-devicons', -- optional
+    },
+  },
+
   -- Jump around in the document
   -- It expects you to type two chars in the location that you want to jump to. For the last character in the line, use
   -- space.
