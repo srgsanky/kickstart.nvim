@@ -393,6 +393,10 @@ local function dump(o)
   end
 end
 
+-- OS detection
+local is_linux = vim.loop.os_uname().sysname == 'Linux'
+local is_mac = vim.loop.os_uname().sysname == 'Darwin'
+
 -- Should use clangd in Mac?
 -- Use true to use clangd, false to use ccls. You may want to use ccls as it supports call hierarchy
 local use_clangd_in_mac = false
@@ -1203,7 +1207,7 @@ require('lazy').setup({
       end
 
       -- clangd from mason is available only on Mac
-      if vim.loop.os_uname().sysname == 'Darwin' and use_clangd_in_mac then
+      if is_mac and use_clangd_in_mac then
         -- MacOS
         servers.clangd = {}
       end
@@ -1256,7 +1260,7 @@ require('lazy').setup({
         },
       }
       -- Use ccls only in linux. clangd is available in Mac which makes things easier
-      if vim.loop.os_uname().sysname == 'Linux' or not use_clangd_in_mac then
+      if is_linux or not use_clangd_in_mac then
         local function find_path_to_file(filename)
           -- Find needs an absolute path if you want it to output absolute paths
           local cwd = vim.fn.getcwd()
@@ -1976,7 +1980,7 @@ require('lazy').setup({
     opts = {},
     config = function()
       -- I am using ccls only in Linux.
-      if vim.loop.os_uname().sysname == 'Darwin' and use_clangd_in_mac then
+      if is_mac and use_clangd_in_mac then
         return
       end
 
@@ -2201,6 +2205,7 @@ require('lazy').setup({
   -- This also makes f, F, t, T work across lines
   {
     'folke/flash.nvim',
+    enabled = not is_linux, -- This is very slow when using over ssh.
     event = 'VeryLazy',
     ---@type Flash.Config
     opts = {},
@@ -2290,6 +2295,7 @@ require('lazy').setup({
   -- S: search backward
   {
     'ggandor/leap.nvim',
+    enabled = not is_linux, -- This is very slow when using over ssh.
     opts = {},
     config = function(opts)
       -- leap's keybindings conflicts with lazy. This is taken from
