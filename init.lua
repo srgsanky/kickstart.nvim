@@ -2391,18 +2391,26 @@ require('lazy').setup({
 
   -- Highlight background in markdown header, code blocks etc.
   -- Makes the markdown easier to read inside neovim.
+  -- {
+  --   'lukas-reineke/headlines.nvim',
+  --   dependencies = 'nvim-treesitter/nvim-treesitter',
+  --   config = function()
+  --     require('headlines').setup {
+  --       markdown = {
+  --         -- I don't like the default config that shows bullets in headers. But I do want the
+  --         -- highlight for headers.
+  --         bullets = {},
+  --       },
+  --     }
+  --   end,
+  -- },
+
+  -- https://github.com/MeanderingProgrammer/render-markdown.nvim
+  -- Improve viewing of markdown files in neovim
   {
-    'lukas-reineke/headlines.nvim',
-    dependencies = 'nvim-treesitter/nvim-treesitter',
-    config = function()
-      require('headlines').setup {
-        markdown = {
-          -- I don't like the default config that shows bullets in headers. But I do want the
-          -- highlight for headers.
-          bullets = {},
-        },
-      }
-    end,
+    'MeanderingProgrammer/render-markdown.nvim',
+    opts = {},
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
   },
 
   -- Automatically save and restore session. This remembers the open buffers, cursor position in
