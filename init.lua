@@ -2481,6 +2481,42 @@ require('lazy').setup({
     },
   },
 
+  -- Run tests from within neovim using neotest
+  --
+  -- neotest-rust requires cargo-nextest to be installed <https://nexte.st/>
+  --
+  -- I have decided not to use cargo-nextest as it is not a superset of cargo test and might require
+  -- code changes to the test <https://nexte.st/docs/design/custom-test-harnesses/>.
+  {
+    'nvim-neotest/neotest',
+    dependencies = {
+      'nvim-neotest/nvim-nio',
+      'nvim-lua/plenary.nvim',
+      'antoinemadec/FixCursorHold.nvim',
+      'nvim-treesitter/nvim-treesitter',
+      'vim-test/vim-test', -- For running tests via vim-test
+      'nvim-neotest/neotest-vim-test', -- Neotest adapter for vim-test
+
+      -- 'rouge8/neotest-rust',
+    },
+    config = function()
+      require('neotest').setup {
+        adapters = {
+          require 'neotest-vim-test' {
+            ignore_file_types = {}, -- You can adjust this for other languages if needed
+          },
+
+          -- require 'neotest-rust',
+        },
+      }
+
+      -- keymap
+      vim.keymap.set('n', '<leader>tn', '<cmd>lua require("neotest").run.run()<CR>', { desc = '[t]est [n]earest' })
+      vim.keymap.set('n', '<leader>tf', '<cmd>lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = '[t]est [f]ile' })
+      vim.keymap.set('n', '<leader>th', '<cmd>lua require("neotest").run.stop()<CR>', { desc = '[t]est [h]alt' })
+    end,
+  },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
