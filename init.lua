@@ -2508,12 +2508,22 @@ require('lazy').setup({
 
           -- require 'neotest-rust',
         },
+        -- Floating window for test result is controlled by the property relative = "editor"
+        -- <https://github.com/nvim-neotest/neotest/blob/6d6ad113f56edc7c3f2a77a0836ea8c1b955ebea/lua/neotest/lib/ui/float.lua#L33>
+        -- I couldn't find a way to configure this using floating.options
+        --
+        -- For the default configuration values see ~/.local/share/nvim/lazy/neotest/lua/neotest/config/init.lua
       }
 
       -- keymap
       vim.keymap.set('n', '<leader>tn', '<cmd>lua require("neotest").run.run()<CR>', { desc = '[t]est [n]earest' })
       vim.keymap.set('n', '<leader>tf', '<cmd>lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = '[t]est [f]ile' })
+      vim.keymap.set('n', '<leader>ta', '<cmd>lua require("neotest").run.run({ suite = true })<CR>', { desc = '[T]est [A]ll' })
+
       vim.keymap.set('n', '<leader>th', '<cmd>lua require("neotest").run.stop()<CR>', { desc = '[t]est [h]alt' })
+
+      vim.keymap.set('n', '<leader>tr', '<cmd>lua require("neotest").summary.toggle()<CR>', { desc = '[T]est [R]eport' })
+      vim.keymap.set('n', '<leader>to', '<cmd>lua require("neotest").output.open({ enter = true })<CR>', { desc = '[T]est [O]utput' })
     end,
   },
 
