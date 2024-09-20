@@ -2276,6 +2276,7 @@ require('lazy').setup({
         },
         -- lightbulb for code actions https://nvimdev.github.io/lspsaga/lightbulb/#default-options
         lightbulb = {
+          enable = false,
           -- Don't show a virtual light bulb at the end of the line, it mess up with cursor movement
           -- and yanking.
           virtual_text = false,
