@@ -424,6 +424,7 @@ local aux_windows = {
   'dapui_console',
   'dapui_stacks',
   'dap-repl',
+  'neotest-summary',
 }
 local function is_aux_window(name)
   for i = 1, #aux_windows do
