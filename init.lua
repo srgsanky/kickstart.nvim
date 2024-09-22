@@ -2517,6 +2517,8 @@ require('lazy').setup({
         -- For the default configuration values see ~/.local/share/nvim/lazy/neotest/lua/neotest/config/init.lua
       }
 
+      close_file_type_when_only_buffer 'neotest-summary'
+
       -- keymap
       vim.keymap.set('n', '<leader>tn', '<cmd>lua require("neotest").run.run()<CR>', { desc = '[t]est [n]earest' })
       vim.keymap.set('n', '<leader>tf', '<cmd>lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = '[t]est [f]ile' })
