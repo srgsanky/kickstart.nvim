@@ -1318,6 +1318,9 @@ require('lazy').setup({
               cargo = {
                 ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
               },
+              check = {
+                command = 'clippy', -- default is 'check' https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
+              },
             },
           },
           capabilities = capabilities,
