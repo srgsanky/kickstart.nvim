@@ -839,6 +839,8 @@ require('lazy').setup({
       map_telescope_using_dropdown_theme('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       map_telescope_using_dropdown_theme('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       map_telescope_using_dropdown_theme('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+      -- Pick a buffer by searching. Also see the bufferline keybinding below which uses <leader>bp to
+      -- pick a buffer by typing characters.
       map_telescope_using_dropdown_theme('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
@@ -1598,6 +1600,13 @@ require('lazy').setup({
         diagnostics = 'nvim_lsp',
       },
     },
+    config = function()
+      require('bufferline').setup {}
+
+      -- Pick a buffer by typing the character shown (this is similar to the link navigation using Vimium in Chrome)
+      -- Also see the telescope keybinding above to search and pick a buffer using <leader><leader>
+      vim.keymap.set('n', '<leader>bp', '<cmd>BufferLinePick<CR>', { desc = '[B]uffer [P]ick', silent = true })
+    end,
   },
 
   -- File explorer on the left. Use :Neotree to open it
