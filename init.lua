@@ -879,7 +879,14 @@ require('lazy').setup({
       map_telescope_using_dropdown_theme('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       map_telescope_using_dropdown_theme('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       map_telescope_using_dropdown_theme('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      map_telescope_using_dropdown_theme('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+      map_telescope_using_dropdown_theme('n', '<leader>su', builtin.grep_string, { desc = '[S]earch [U]sages for word under cursor' })
+      map_telescope_using_dropdown_theme('n', '<leader>sw', function()
+        -- NOTE: lsp_workspace_symbols vs lsp_dynamic_workspace_symbols: Use the dynamic version for
+        --       interactive search where you type in the symbols. The following is a static search
+        --       that looks up the exact word and is also blocking. I have mapped the dynamic search
+        --       to the keybinding <leader>ws.
+        builtin.lsp_workspace_symbols { query = vim.fn.expand '<cword>' }
+      end, { desc = '[S]earch [W]ord under cursor in workspace symbols' })
       map_telescope_using_dropdown_theme('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       map_telescope_using_dropdown_theme('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       map_telescope_using_dropdown_theme('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
