@@ -1862,8 +1862,6 @@ require('lazy').setup({
   { 'tpope/vim-fugitive', config = function() end, opts = {} },
 
   -- For quickfix list shortcuts. Especially to delete an item on the list
-  -- Empty config function is required to avoid error while loading vim plugin
-  -- https://www.reddit.com/r/AstroNvim/comments/17p224n/how_do_i_track_down_this_error_lua_module_not/
   {
     'romainl/vim-qf',
     config = function()
