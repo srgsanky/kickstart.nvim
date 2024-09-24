@@ -323,17 +323,31 @@ end, {
   desc = 'Re-enable autoformat-on-save',
 })
 ---------------------------------------------------------------------
+local function find_git_dir(current_path)
+  while current_path do
+    if vim.fn.isdirectory(current_path .. '/.git') == 1 then
+      return current_path .. '/.git'
+    end
+
+    local parent_path = vim.fn.fnamemodify(current_path, ':h')
+    if parent_path == current_path then
+      return nil
+    end
+    current_path = parent_path
+  end
+end
 
 -- vim.fn.expand '%:.' gives the current buffer name's relative path from the current working directory
 -- vim.fn.expand '%:p' gives the absolute path of the current buffer.
+-- vim.fn.expand '%:p:h' :h removes the last component in the path, essentially returning the parent of a path
 -- Note: I am not using coloring in git log as the colors show up as control characters in VIM fugitive instead of the
 -- actual color. E.g. coloring: %C(yellow)%s%Creset
-vim.keymap.set(
-  'n',
-  '<leader>bc',
-  '<cmd>Git log --color --pretty=format:"%h %<(10)%as %<(20,trunc)%an(%<(15,trunc)%al) %<(70,trunc)%s" -- ' .. vim.fn.expand '%:p' .. '<CR>',
-  { desc = '[b]uffer [c]ommits' }
-)
+vim.keymap.set('n', '<leader>bc', function()
+  -- I am using a function so that vim.fn.expand is evaluated at runtime for the current buffer
+  -- instead of being evaluated at neovim startup time.
+  vim.cmd('Git' .. ' log --color --pretty=format:"%h %<(10)%as %<(20,trunc)%an(%<(15,trunc)%al) %<(70,trunc)%s" -- ' .. vim.fn.expand '%:p')
+end, { desc = '[b]uffer [c]ommits' })
+
 vim.keymap.set(
   'n',
   '<leader>rc',
