@@ -231,6 +231,37 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Map :tab split to <leader>ts<CR>
 vim.keymap.set('n', '<leader>ts', '<cmd>tab split<CR>', { desc = 'Tab split (open current buffer in new tab)' })
 
+-------------------- Quickfix list --------------------
+--- NOTE: This does not work. Cfilter is not a valid command in neovim.
+---
+--- Usecase: You search for reference using LSP (keybinding gr). You then open the list as quickfix
+---          list using C-q. You want to remove some of the references in the list based on manual
+---          inspection. Use <leader>cdd defined below to delete the current line.
+---
+--- <https://www.reddit.com/r/vim/comments/xeqdbb/keybinding_to_remove_a_quickfix_entry/>
+---
+-- matchstr({string}, {pattern})
+-- pattern = '.\{-}\ze<bar>'
+-- .: Matches any character except a newline.
+-- \{-}: Matches as few characters as possible (non-greedy match).
+-- \ze: "End match here." Everything before \ze is captured.
+-- <bar>: Matches the literal pipe character (|).
+
+-- nnoremap <leader>c<bs> <cmd>exe 'Cfilter! ' .. matchstr(getline('.'), '.\{-}\ze<bar>')<cr>
+-- nnoremap <leader>l<bs> <cmd>exe 'Lfilter! ' .. matchstr(getline('.'), '.\{-}\ze<bar>')<cr>
+
+vim.keymap.set('n', '<leader>cdd', function()
+  local line = vim.api.nvim_get_current_line()
+  -- () is a capture group, but in this case, it's capturing the position where the match occurs rather than a substring.
+  -- %| is to escape |.
+  local match = line:match '.*()%|' -- Lua pattern to match until the pipe symbol "|"
+  if match then
+    local command = 'Cfilter! ' .. line:sub(1, match - 1)
+    vim.cmd(command)
+  end
+end, { desc = 'Delete current entry in quickfix list', noremap = true, silent = true })
+-------------------------------------------------------
+
 -- Don't wrap around searches
 vim.opt.wrapscan = false
 
@@ -1829,6 +1860,51 @@ require('lazy').setup({
   -- Empty config function is required to avoid error while loading vim plugin
   -- https://www.reddit.com/r/AstroNvim/comments/17p224n/how_do_i_track_down_this_error_lua_module_not/
   { 'tpope/vim-fugitive', config = function() end, opts = {} },
+
+  -- For quickfix list shortcuts. Especially to delete an item on the list
+  -- Empty config function is required to avoid error while loading vim plugin
+  -- https://www.reddit.com/r/AstroNvim/comments/17p224n/how_do_i_track_down_this_error_lua_module_not/
+  {
+    'romainl/vim-qf',
+    config = function()
+      -- Original vimscript from
+      -- <https://www.reddit.com/r/vim/comments/xeqdbb/keybinding_to_remove_a_quickfix_entry/>
+      -- " Normal: `dd` removes item from the quickfix list.
+      -- " Visual: `d` removes all selected items, gk keeps all selected items
+      -- augroup custom_qf_mapping
+      --   autocmd!
+      --   autocmd FileType qf nnoremap <buffer> dd :.Reject<CR>
+      --   autocmd FileType qf xnoremap <buffer> d :'<,'>Reject<CR>
+      --   autocmd FileType qf nnoremap <buffer> gk :.Keep<CR>
+      --   autocmd FileType qf xnoremap <buffer> gk :'<,'>Keep<CR>
+      -- augroup END
+
+      -- Generated lua using ChatGPT and hand modified it.
+      -- Create an augroup for custom quickfix mappings
+      -- clear = true ensures that any previous autocommands in this group are cleared.
+      vim.api.nvim_create_augroup('custom_qf_mapping', { clear = true })
+
+      -- Define autocommands for FileType qf
+      vim.api.nvim_create_autocmd('FileType', {
+        group = 'custom_qf_mapping',
+        pattern = 'qf',
+        callback = function()
+          -- Normal mode
+          -- `dd` removes item from quickfix list
+          vim.api.nvim_buf_set_keymap(0, 'n', 'dd', ':.Reject<CR>', { noremap = true, silent = true })
+          -- `gk` keeps the current item
+          vim.api.nvim_buf_set_keymap(0, 'n', 'gk', ':.Keep<CR>', { noremap = true, silent = true })
+
+          -- Visual mode
+          -- `d` removes all selected items
+          vim.api.nvim_buf_set_keymap(0, 'x', 'd', ":'<,'>Reject<CR>", { noremap = true, silent = true })
+          -- `gk` keeps all selected items
+          vim.api.nvim_buf_set_keymap(0, 'x', 'gk', ":'<,'>Keep<CR>", { noremap = true, silent = true })
+        end,
+      })
+    end,
+    opts = {},
+  },
 
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
