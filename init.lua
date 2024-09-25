@@ -1372,6 +1372,12 @@ require('lazy').setup({
               cargo = {
                 ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
               },
+              cfg = {
+                -- When <https://github.com/rust-lang/rust-analyzer/pull/18085> is merged, this config
+                -- is necessary to unset tests. This will prevent rust analyzer from show test
+                -- references and will also dim the test code.
+                ['setTest'] = false,
+              },
               check = {
                 command = 'clippy', -- default is 'check' https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
               },
