@@ -608,6 +608,9 @@ local function get_lsp_handlers_with_border()
   }
 end
 
+-- true will use neovim's navtive inlay hints. Otherwise, it uses the now archived plugin lvimuser/lsp-inlayhints.nvim
+local use_native_inlay_hints = true
+
 -- rust toolchain to use
 -- Use "rustup toolchain list" to list all toolchains
 local use_nightly_toolchain = false
@@ -1140,6 +1143,9 @@ require('lazy').setup({
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client == nil then
+            return
+          end
           if client and client.server_capabilities.documentHighlightProvider then
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
@@ -1153,8 +1159,6 @@ require('lazy').setup({
           end
 
           local bufnr = event.buf
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          require('lsp-inlayhints').on_attach(client, bufnr)
           local signature_setup = {
             bind = true, -- This is mandatory, otherwise border config won't get registered.
             handler_opts = {
@@ -1181,8 +1185,14 @@ require('lazy').setup({
             require('nvim-navbuddy').attach(client, bufnr)
           end
 
-          -- Enable inlay hints (available in unstable nvim only
-          -- vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
+          if use_native_inlay_hints then
+            -- Enable inlay hints (available since Neovim 0.10)
+            -- <https://neovim.io/doc/user/lsp.html#vim.lsp.buf.inlay_hint%28%29>
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+          else
+            -- lsp-inlayhints is archived as of Feb 2024
+            require('lsp-inlayhints').on_attach(client, bufnr)
+          end
 
           -- Open floating preview
           -- https://neovim.io/doc/user/lsp.html#vim.lsp.util.open_floating_preview()
@@ -1603,9 +1613,11 @@ require('lazy').setup({
   },
 
   -- Show inlay hints using LSP server. This shows the parameter name on the right which is helpful while reading.
+  -- This is archived as of Feb 2024. Neovim 0.10 natively supports inlay hints.
   {
     'lvimuser/lsp-inlayhints.nvim',
     opts = {},
+    enabled = not use_native_inlay_hints,
   },
 
   -- Show signature of the method as you type the invocation. This is helpful while invoking the function.
