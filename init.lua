@@ -901,6 +901,9 @@ require('lazy').setup({
       -- Slightly advanced example of overriding default behavior and theme
       map_telescope_using_dropdown_theme('n', '<leader>/', builtin.current_buffer_fuzzy_find, { desc = '[/] Fuzzily search in current buffer' })
 
+      -- Search in quickfix list
+      map_telescope_using_dropdown_theme('n', '<leader>sq', builtin.quickfix, { desc = '[S]earch [Q]uickfix' })
+
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
       vim.keymap.set('n', '<leader>s/', function()
@@ -1966,6 +1969,7 @@ require('lazy').setup({
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [']quote
       --  - ci'  - [C]hange [I]nside [']quote
+      --  a and i here is around and inside text object. Don't confuse it with AI.
       require('mini.ai').setup { n_lines = 500 }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
