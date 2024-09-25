@@ -1928,6 +1928,12 @@ require('lazy').setup({
           vim.api.nvim_buf_set_keymap(0, 'x', 'd', ":'<,'>Reject<CR>", { noremap = true, silent = true })
           -- `gk` keeps all selected items
           vim.api.nvim_buf_set_keymap(0, 'x', 'gk', ":'<,'>Keep<CR>", { noremap = true, silent = true })
+
+          -- Do not auto resize the quickfix to 10 items
+          vim.g.qf_auto_resize = 0
+
+          -- Do not auto resize the quickfix to height of 10
+          vim.g.qf_max_height = 0
         end,
       })
     end,
