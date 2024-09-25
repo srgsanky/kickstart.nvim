@@ -1187,8 +1187,10 @@ require('lazy').setup({
 
           if use_native_inlay_hints then
             -- Enable inlay hints (available since Neovim 0.10)
-            -- <https://neovim.io/doc/user/lsp.html#vim.lsp.buf.inlay_hint%28%29>
-            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+            -- <https://neovim.io/doc/user/lsp.html#_lua-module:-vim.lsp.inlay_hint>
+            -- Native inlay shows up only on edit i.e. after inserting any char. Similar question
+            -- <https://www.reddit.com/r/neovim/comments/1fklbks/inlay_hints_only_appear_after_re_enabling_them/>
+            vim.lsp.inlay_hint.enable(true)
           else
             -- lsp-inlayhints is archived as of Feb 2024
             require('lsp-inlayhints').on_attach(client, bufnr)
