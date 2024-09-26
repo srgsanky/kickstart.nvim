@@ -280,7 +280,10 @@ vim.api.nvim_create_user_command('SaveQuickfix', function(opts)
   file:close()
 
   require 'notify'('Saved quickfix to ' .. filename, 'info')
-end, { nargs = 1 })
+end, {
+  nargs = 1,
+  complete = 'file', -- Enable filename completion
+})
 
 -- Function to load quickfix list from a file. Loading directly using :cfile does not make the list
 -- navigable. So, I have to manually read the file, parse it and add to quicklist using API.
@@ -323,11 +326,17 @@ end
 
 vim.api.nvim_create_user_command('LoadQuickfix', function(opts)
   LoadQuickfix(opts.args, 'r') -- r replaces the current list, using a fresh list
-end, { nargs = 1 })
+end, {
+  nargs = 1,
+  complete = 'file', -- Enable filename completion
+})
 
 vim.api.nvim_create_user_command('LoadAddQuickfix', function(opts)
   LoadQuickfix(opts.args, 'a') -- a adds to the current list
-end, { nargs = 1 })
+end, {
+  nargs = 1,
+  complete = 'file', -- Enable filename completion
+})
 
 -- Don't wrap around searches
 vim.opt.wrapscan = false
