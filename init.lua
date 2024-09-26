@@ -1798,10 +1798,20 @@ require('lazy').setup({
       options = {
         max_name_length = 30,
         diagnostics = 'nvim_lsp',
+        show_buffer_close_icons = false,
+        offsets = {
+          {
+            filetype = 'neo-tree', -- The filetype of the window you want to offset for
+            text = '', -- Text displayed in the bufferline when the offset is active
+            highlight = 'Directory', -- The highlight group for the text
+            text_align = 'left', -- Alignment of the text ("left", "center", "right")
+            separator = true, -- Show a separator between the offset and the buffers (optional)
+          },
+        },
       },
     },
-    config = function()
-      require('bufferline').setup {}
+    config = function(_, opts)
+      require('bufferline').setup(opts)
 
       -- Pick a buffer by typing the character shown (this is similar to the link navigation using Vimium in Chrome)
       -- Also see the telescope keybinding above to search and pick a buffer using <leader><leader>
