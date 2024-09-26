@@ -613,7 +613,9 @@ local function close_file_type_when_only_buffer(file_type_to_close)
 
             -- We only care about buffers that are listed or modified
             if loaded_buf_listed or loaded_buf_modified then
-              if not is_aux_window(loaded_buf_file_type) then
+              -- We don't care about aux windows.
+              -- We don't care about buffers that are of type that we want to close
+              if not is_aux_window(loaded_buf_file_type) and loaded_buf_file_type ~= file_type_to_close then
                 if is_buffer_visible(loaded_buf_number) then
                   if debug then
                     print('BufEnter: ' .. loaded_buf_file_type .. ' (len: ' .. string.len(loaded_buf_file_type) .. ') is still open')
@@ -1973,6 +1975,9 @@ require('lazy').setup({
   {
     'romainl/vim-qf',
     config = function()
+      -- If quickfix is the only visible buffer, close neovim
+      close_file_type_when_only_buffer 'qf'
+
       -- Original vimscript from
       -- <https://www.reddit.com/r/vim/comments/xeqdbb/keybinding_to_remove_a_quickfix_entry/>
       -- " Normal: `dd` removes item from the quickfix list.
