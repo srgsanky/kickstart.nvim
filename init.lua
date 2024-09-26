@@ -262,6 +262,73 @@ vim.keymap.set('n', '<leader>cdd', function()
 end, { desc = 'Delete current entry in quickfix list', noremap = true, silent = true })
 -------------------------------------------------------
 
+-- Function to save quickfix list
+vim.api.nvim_create_user_command('SaveQuickfix', function(opts)
+  local filename = opts.args
+
+  local qflist = vim.fn.getqflist()
+  local file = io.open(filename, 'w')
+  if file == nil then
+    require 'notify'('Could not open file ' .. filename .. ' for writing.', 'error')
+    return
+  end
+  for _, item in ipairs(qflist) do
+    -- If the entry has a bufnr (which is typically the case for search results from telescope), resolve it to a filename
+    local resolved_filename = item.filename or (item.bufnr and vim.fn.bufname(item.bufnr)) or '[No File]'
+    file:write(string.format('%s|%d col %d| %s\n', resolved_filename, item.lnum, item.col, item.text))
+  end
+  file:close()
+
+  require 'notify'('Saved quickfix to ' .. filename, 'info')
+end, { nargs = 1 })
+
+-- Function to load quickfix list from a file. Loading directly using :cfile does not make the list
+-- navigable. So, I have to manually read the file, parse it and add to quicklist using API.
+function LoadQuickfix(filename, mode)
+  local qf_entries = {}
+  local file = io.open(filename, 'r')
+
+  if not file then
+    require 'notify'('Could not open file ' .. filename .. ' for reading.', 'error')
+    return
+  end
+
+  for line in file:lines() do
+    -- Parse each line, splitting by the '|' character
+    -- e.g. line:
+    -- init.lua|272 col 10| function SaveQuickfix(filename)
+    local filepath, lnum, col, text = line:match '([^|]+)|(%d+)%s+col%s+(%d+)|%s(.+)'
+    if filepath and lnum and col and text then
+      table.insert(qf_entries, {
+        filename = filepath,
+        lnum = tonumber(lnum),
+        col = tonumber(col),
+        text = text,
+      })
+    end
+  end
+  file:close()
+
+  -- Populate the quickfix list using Neovim's API
+  -- r replaces the current list
+  -- a adds to the existing list
+  vim.fn.setqflist(qf_entries, mode)
+  if #qf_entries > 0 then
+    -- Open the quickfix if the list is not empty
+    vim.cmd 'copen'
+  end
+
+  require 'notify'('Loaded quickfix from ' .. filename, 'info')
+end
+
+vim.api.nvim_create_user_command('LoadQuickfix', function(opts)
+  LoadQuickfix(opts.args, 'r') -- r replaces the current list, using a fresh list
+end, { nargs = 1 })
+
+vim.api.nvim_create_user_command('LoadAddQuickfix', function(opts)
+  LoadQuickfix(opts.args, 'a') -- a adds to the current list
+end, { nargs = 1 })
+
 -- Don't wrap around searches
 vim.opt.wrapscan = false
 
