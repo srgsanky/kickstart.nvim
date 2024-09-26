@@ -1933,6 +1933,16 @@ require('lazy').setup({
   {
     'lewis6991/gitsigns.nvim',
     config = function()
+      -- gitsigns doees not handle mix of staged and unstaged hunks in the same block well
+      -- <https://github.com/lewis6991/gitsigns.nvim/issues/1102>
+      -- The workaround suggested in the above issue is to use two signcolumns - one for staged
+      -- (col 2) and another for unstaged (col 1). There is one glitch though - the signs can mix
+      -- i.e. the staged sign can end up showing in col1 when there is no unstaged sign available.
+      -- <https://neovim.io/doc/user/options.html#'signcolumn'>
+      -- auto:1-2 will use a second column only if there are both staged and unstaged changes in the
+      -- buffer. Otherwise, it will use a single column.
+      vim.o.signcolumn = 'auto:1-2'
+
       require('gitsigns').setup {
         linehl = true,
         numhl = true,
