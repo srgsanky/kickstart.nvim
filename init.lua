@@ -2030,10 +2030,20 @@ require('lazy').setup({
       vim.api.nvim_create_augroup('custom_qf_mapping', { clear = true })
 
       -- Define autocommands for FileType qf
+      -- first argument is the event. In this case when FileType is set on the buffer.
       vim.api.nvim_create_autocmd('FileType', {
         group = 'custom_qf_mapping',
         pattern = 'qf',
         callback = function()
+          -- Set height to be given number of lines
+          -- Vim quivalent is vim.cmd [[autocmd FileType qf wincmd J | resize 15]]
+          local qflist = vim.fn.getqflist()
+          if #qflist > 30 then
+            vim.cmd 'resize 30'
+          else
+            vim.cmd 'resize 15'
+          end
+
           -- Normal mode
           -- `dd` removes item from quickfix list
           vim.api.nvim_buf_set_keymap(0, 'n', 'dd', ':.Reject<CR>', { noremap = true, silent = true })
