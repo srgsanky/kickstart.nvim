@@ -98,6 +98,12 @@ if vim.loop.os_uname().sysname == 'Linux' then
   vim.g.python3_host_prog = '/usr/bin/python3'
 end
 
+-- Do not auto resize the quickfix to 10 items
+vim.g.qf_auto_resize = 1
+
+-- Set max height to be 30
+vim.g.qf_max_height = 30
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -336,6 +342,34 @@ vim.api.nvim_create_user_command('LoadAddQuickfix', function(opts)
 end, {
   nargs = 1,
   complete = 'file', -- Enable filename completion
+})
+
+-- Open specific quickfix item
+function OpenQuickfixEntry(index)
+  if type(index) ~= 'number' then
+    require 'notify'('Index provided to OpenQuickfixEntry is not a number ' .. index, 'error')
+    return
+  end
+
+  local qflist = vim.fn.getqflist()
+  if #qflist == 0 then
+    -- list is empty
+    return
+  end
+
+  -- If index is out of bounds, set it to 1 (the first entry)
+  if index < 1 or index > #qflist then
+    index = 1
+  end
+
+  -- Jump to the specified entry in the quickfix list
+  vim.cmd('cc ' .. index)
+end
+
+vim.api.nvim_create_user_command('OpenQuickfixEntry', function(opts)
+  OpenQuickfixEntry(tonumber(opts.args))
+end, {
+  nargs = 1,
 })
 
 -- Don't wrap around searches
@@ -2012,11 +2046,19 @@ require('lazy').setup({
           -- `gk` keeps all selected items
           vim.api.nvim_buf_set_keymap(0, 'x', 'gk', ":'<,'>Keep<CR>", { noremap = true, silent = true })
 
-          -- Do not auto resize the quickfix to 10 items
-          vim.g.qf_auto_resize = 0
+          -- The following allows opening the quickfix list location without moving focus away from
+          -- quicklist.
+          -- The keybinding of 'o' is inspired by the plugin hedyhli/outline.nvim
+          local bufnr = vim.api.nvim_get_current_buf()
+          vim.keymap.set('n', 'o', function()
+            local cursor_pos = vim.fn.getcurpos()
+            local current_cursor_line = cursor_pos[2]
+            OpenQuickfixEntry(current_cursor_line)
 
-          -- Do not auto resize the quickfix to height of 10
-          vim.g.qf_max_height = 0
+            -- Navigate back to the quickfix window
+            -- p here is previous window
+            vim.cmd 'wincmd p'
+          end, { buffer = bufnr, noremap = true, silent = true })
         end,
       })
     end,
