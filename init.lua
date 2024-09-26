@@ -269,7 +269,8 @@ end, { desc = 'Delete current entry in quickfix list', noremap = true, silent = 
 -------------------------------------------------------
 
 -- Function to save quickfix list
-vim.api.nvim_create_user_command('SaveQuickfix', function(opts)
+-- Using Csave as it is similar to cfile, caddfile
+vim.api.nvim_create_user_command('Csave', function(opts)
   local filename = opts.args
 
   local qflist = vim.fn.getqflist()
@@ -330,14 +331,18 @@ function LoadQuickfix(filename, mode)
   require 'notify'('Loaded quickfix from ' .. filename, 'info')
 end
 
-vim.api.nvim_create_user_command('LoadQuickfix', function(opts)
+-- I am using command names similar to the native commands :cfile and :caddfile.
+-- Neovim does not allow starting custom commands with lowercase, so I have not able to redefine
+-- :cfile and :caddfile
+-- <https://neovim.io/doc/user/quickfix.html>
+vim.api.nvim_create_user_command('Cfile', function(opts)
   LoadQuickfix(opts.args, 'r') -- r replaces the current list, using a fresh list
 end, {
   nargs = 1,
   complete = 'file', -- Enable filename completion
 })
 
-vim.api.nvim_create_user_command('LoadAddQuickfix', function(opts)
+vim.api.nvim_create_user_command('Caddfile', function(opts)
   LoadQuickfix(opts.args, 'a') -- a adds to the current list
 end, {
   nargs = 1,
