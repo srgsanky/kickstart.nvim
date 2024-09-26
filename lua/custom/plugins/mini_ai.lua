@@ -5,6 +5,13 @@ return {
   -- I copied configurations from the following places
   -- Copied from https://github.com/Allaman/nvim/blob/main/lua/core/plugins/mini.lua
   -- LazyVim https://github.com/LazyVim/LazyVim/blob/a1c3ec4cd43fe61e3b614237a46ac92771191c81/lua/lazyvim/plugins/coding.lua#L166
+  --
+  -- g[<text-object> Move cursor to start of text object. For e.g. g[f will go to start of function.
+  -- g]<text-object> Move cursor to end of text object. For e.g. g[f will go to end of function.
+  --
+  -- v[ai]<text-object> Visually select [a]round/[i]nside text object.
+  -- d[ai]<text-object> Delete [a]round/[i]nside text object.
+  -- c[ai]<text-object> Change [a]round/[i]nside text object.
   {
     'echasnovski/mini.ai',
     dependencies = {
