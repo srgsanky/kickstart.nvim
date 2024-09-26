@@ -1899,7 +1899,8 @@ require('lazy').setup({
               return ']c'
             end
             vim.schedule(function()
-              gs.next_hunk()
+              -- target = 'all' navigates to staged or unstaged changes. By default, it navigates only unstaged changes.
+              gs.next_hunk { target = 'all' }
             end)
             return '<Ignore>'
           end, { expr = true })
@@ -1909,7 +1910,8 @@ require('lazy').setup({
               return '[c'
             end
             vim.schedule(function()
-              gs.prev_hunk()
+              -- target = 'all' navigates to staged or unstaged changes. By default, it navigates only unstaged changes.
+              gs.prev_hunk { target = 'all' }
             end)
             return '<Ignore>'
           end, { expr = true })
