@@ -1934,6 +1934,8 @@ require('lazy').setup({
     'lewis6991/gitsigns.nvim',
     config = function()
       require('gitsigns').setup {
+        linehl = true,
+        numhl = true,
         on_attach = function(bufnr)
           local gs = package.loaded.gitsigns
 
