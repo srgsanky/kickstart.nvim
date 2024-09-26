@@ -1820,6 +1820,9 @@ require('lazy').setup({
   },
 
   -- File explorer on the left. Use :Neotree to open it
+  -- :Neotree
+  -- :Neotree buffers dir=/
+  -- :Neotree git_status
   {
     'nvim-neo-tree/neo-tree.nvim',
     branch = 'v3.x',
@@ -1844,6 +1847,15 @@ require('lazy').setup({
           },
           hijack_netrw_behavior = 'disabled',
           use_libuv_file_watcher = true,
+        },
+        buffers = {
+          -- https://github.com/nvim-neo-tree/neo-tree.nvim/discussions/1407
+          -- :Neotree buffers dir=/
+          leave_dirs_open = false,
+          follow_current_file = {
+            enabled = true,
+          },
+          bind_to_cwd = false,
         },
       }
 
