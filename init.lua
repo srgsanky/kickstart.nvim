@@ -2035,13 +2035,21 @@ require('lazy').setup({
         group = 'custom_qf_mapping',
         pattern = 'qf',
         callback = function()
-          -- Set height to be given number of lines
-          -- Vim quivalent is vim.cmd [[autocmd FileType qf wincmd J | resize 15]]
-          local qflist = vim.fn.getqflist()
-          if #qflist > 30 then
-            vim.cmd 'resize 30'
+          -- Use false to use the default behavior of showing quickfix at the bottom
+          local show_qf_on_the_right = true
+
+          if show_qf_on_the_right then
+            -- Move the quickfix window to the right
+            vim.cmd 'wincmd L'
           else
-            vim.cmd 'resize 15'
+            -- Set height to be given number of lines
+            -- Vim quivalent is vim.cmd [[autocmd FileType qf wincmd J | resize 15]]
+            local qflist = vim.fn.getqflist()
+            if #qflist > 30 then
+              vim.cmd 'resize 30'
+            else
+              vim.cmd 'resize 15'
+            end
           end
 
           -- Normal mode
