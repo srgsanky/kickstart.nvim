@@ -2030,7 +2030,7 @@ require('lazy').setup({
       -- earlier in this file.
 
       require('gitsigns').setup {
-        linehl = true,
+        linehl = false, -- When the line is highlighted green or red, it is hard to read code
         numhl = true,
         on_attach = function(bufnr)
           local gs = package.loaded.gitsigns
