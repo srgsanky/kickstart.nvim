@@ -1050,18 +1050,46 @@ require('lazy').setup({
   },
 
   -- For winbar (top) and status line (bottom)
+  --
+  --   a b c                                           x y z
+  -- ┌───────────────────────────────────────────────────────┐ tabline
+  -- ├───────────────────────────────────────────────────────┤
+  -- ├───────────────────────────────────────────────────────┤  winbar
+  -- │                                                       │
+  -- │                                                       │
+  -- │                                                       │
+  -- │                                                       │
+  -- │                                                       │
+  -- │                                                       │
+  -- │                                                       │
+  -- │                                                       │
+  -- │                                                       │
+  -- ├───────────────────────────────────────────────────────┤
+  -- └───────────────────────────────────────────────────────┘ statusline
   {
     'nvim-lualine/lualine.nvim',
     dependencies = {
       'arkav/lualine-lsp-progress', -- helps show lsp indexing progress
+      'SmiteshP/nvim-navic', -- breadcrumbs
     },
     config = function()
       require('lualine').setup {
         winbar = { -- configuring only the winbar
-          lualine_c = {
-            'navic',
-            color_correction = nil,
-            navic_opts = nil,
+          lualine_a = {
+            -- Always show the file name so that when there are no breadcrumbs the buffer won't jump
+            -- up and down
+            {
+              'filename',
+              path = 0, -- Just the filename
+            },
+          },
+          lualine_b = {
+            -- breadcrumbs using nvim-navic
+            {
+              'navic',
+              color_correction = nil,
+              navic_opts = nil,
+            },
           },
         },
         options = {
@@ -1113,10 +1141,10 @@ require('lazy').setup({
             'lsp_progress',
           },
           lualine_x = {
-            {
-              'filename',
-              path = 0, -- Just the filename
-            },
+            -- {
+            --   'filename',
+            --   path = 0, -- Just the filename
+            -- },
             -- 'encoding', -- UTF-8 etc. Not very useful. Removing to reduce noise
             -- 'fileformat', -- shows unix, dos, mac
             'filetype',
@@ -1128,13 +1156,6 @@ require('lazy').setup({
         },
       }
     end,
-    opts = {},
-  },
-
-  -- Breadcrumbs
-  {
-    'SmiteshP/nvim-navic',
-    requires = 'neovim/nvim-lspconfig',
     opts = {},
   },
 
@@ -1798,7 +1819,7 @@ require('lazy').setup({
       options = {
         max_name_length = 30,
         diagnostics = 'nvim_lsp',
-        show_buffer_close_icons = false,
+        show_buffer_close_icons = true,
         offsets = {
           {
             filetype = 'neo-tree', -- The filetype of the window you want to offset for
