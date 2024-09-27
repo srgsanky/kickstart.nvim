@@ -2181,6 +2181,8 @@ require('lazy').setup({
           if show_qf_on_the_right then
             -- Move the quickfix window to the right
             vim.cmd 'wincmd L'
+            -- I don't want quickfix to take up half of the screen. So limit it to 80 cols
+            vim.cmd 'vertical resize 80'
           else
             -- Set height to be given number of lines
             -- Vim quivalent is vim.cmd [[autocmd FileType qf wincmd J | resize 15]]
