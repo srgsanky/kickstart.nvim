@@ -2088,12 +2088,15 @@ require('lazy').setup({
           -- Actions
           map('n', '<leader>hs', gs.stage_hunk, { desc = '[h]unk [s]tage' })
           map('n', '<leader>hr', gs.reset_hunk, { desc = '[h]unk [r]eset' })
+
           map('v', '<leader>hs', function()
             gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
           end, { desc = '[h]unk [s]tage' })
+
           map('v', '<leader>hr', function()
             gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
           end, { desc = '[h]unk [r]eset' })
+
           -- I think this is whether to add to index and undo it
           map('n', '<leader>hS', gs.stage_buffer, { desc = 'Stage buffer' })
           map('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'Undo stage buffer' })
@@ -2104,6 +2107,7 @@ require('lazy').setup({
           map('n', '<leader>hb', function()
             gs.blame_line { full = true }
           end, { desc = '[h]unk [b]lame' })
+
           map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = '[t]oggle [b]lame for current line' })
           -- Diff views
           -- When you open a diff view, the file stays on the right. The left side shows the index or previous commit.
@@ -2112,7 +2116,19 @@ require('lazy').setup({
           map('n', '<leader>hD', function()
             gs.diffthis '~' -- this is the git notation for last commit
           end, { desc = '[h]unk [D]iff this (against last commit)' })
+
           map('n', '<leader>td', gs.toggle_deleted, { desc = '[t]oggle [d]eleted' })
+
+          -- List hunks in quickfix list
+          map('n', '<leader>hlb', function()
+            -- Hunks in current buffer only
+            require('gitsigns').setqflist 'attached'
+          end, { desc = '[h]unk [l]ist [b]uffer' })
+
+          map('n', '<leader>hla', function()
+            -- List all hunks - across files
+            require('gitsigns').setqflist 'attached'
+          end, { desc = '[h]unk [l]ist [a]ll' })
 
           -- Text object
           map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
