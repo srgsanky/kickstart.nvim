@@ -1913,6 +1913,67 @@ require('lazy').setup({
   },
 
   -- diff view
+  -- Commands:
+  --
+  -- :DiffviewOpen
+  -- :DiffviewFileHistory
+  -- :DiffviewFileHistory %
+  --
+  -- Keybindings:
+  -- See https://github.com/sindrets/diffview.nvim/blob/main/doc/diffview_defaults.txt
+  --   [x Previous conflict
+  --   x] Next conflict
+  --   dx Delete the conflict
+  --   dX Delete all conflicts
+  --
+  --
+  --                        <leader>cb
+  --                        <leader>cB
+  --
+  --                          ┌────┐
+  --                          │Base│
+  --                          └────┘
+  --                             │
+  --                  ┌──────────┼───────────┐
+  --                  │                      │
+  --                  ▼          │           ▼
+  --               ┌────┐                ┌──────┐
+  --               │Ours│        │       │Theirs│
+  --               └────┘                └──────┘
+  --                             │
+  --          ┌─────────────┐          ┌─────────────┐
+  --          │             │    │     │             │
+  --          │             │          │             │
+  --          │             │          │             │
+  --          │             │    │     │             │
+  --          └─────────────┘          └─────────────┘
+  --                             │
+  --                 └ ─ ─ ─ ─ ─ ┐─ ─ ─ ─ ─ ─ ┘
+  --  <leader>co                 ▼               <leader>ct
+  --  <leader>cO          ┌─────────────┐        <leader>cT
+  --                      │             │
+  --                      │             │
+  --                      │             │
+  --                      │             │
+  --                      └─────────────┘
+  --                         End result
+  --
+  --
+  -- From within the file explorer in the diff view
+  --  s stage/unstage (toggle staging)
+  --  S stage all
+  --  U unstage all
+  --  X restore from left
+  --
+  -- :h diff-mode
+  --   Works with ranges
+  --   :diffget
+  --   :diffput
+  --
+  --   Works without ranges
+  --   :diffobtain or :do
+  --   :diffput
+  --
   { 'sindrets/diffview.nvim', lazy = false, priority = 1000, opts = {} },
 
   -- Symbols outline's author has archived the repo due to lack of time
