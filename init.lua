@@ -2810,6 +2810,7 @@ require('lazy').setup({
   -- :SessionSave
   -- :SessionRestore
   -- :SessionSearch
+  -- :SessionDelete if you get error about restoring a session
   {
     'rmagatti/auto-session',
     lazy = false,
