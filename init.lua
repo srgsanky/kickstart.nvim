@@ -3158,26 +3158,54 @@ require('lazy').setup({
       },
     },
     config = function(_, opts)
-      vim.keymap.set('n', '<leader>ac', function()
-        -- WARN: The conflict highlight group is getting cleared for some reason. If I need the colors, I
-        -- have to manually setup the highlight groups again.
-        --
-        -- You can use :hi to show the current highlight groups and Avante* shows up as cleared
-        -- prematurely.
+      -- WARN: Workaround begin: The conflict highlight group is getting cleared when the color scheme is set after loading this plugin.
+      -- If I need the colors, I have to manually setup the highlight groups again.
+      if false then
+        local is_previous_filetype_avante = false
 
-        -- vim.cmd [[
-        --   hi! link AvanteConflictCurrent GitConflictCurrent
-        --   hi! link AvanteConflictIncoming GitConflictIncoming
-        --   hi! link AvanteConflictAncestor GitConflictAncestor
-        --   hi! link AvanteConflictCurrentLabel GitConflictCurrentLabel
-        --   hi! link AvanteConflictIncomingLabel GitConflictIncomingLabel
-        --   hi! link AvanteConflictAncestorLabel GitConflictAncestorLabel
-        -- ]]
+        -- Set up autocommand for BufLeave to track the previous buffer's filetype
+        vim.api.nvim_create_autocmd('BufLeave', {
+          pattern = '*', -- Match all buffers
+          callback = function()
+            is_previous_filetype_avante = vim.bo.filetype == 'Avante'
+          end,
+        })
 
-        -- https://github.com/yetone/avante.nvim/blob/main/lua/avante/highlights.lua
-        require('avante.highlights').setup()
-      end, { desc = '[A]vante [C]onflict', silent = true })
+        -- Set up autocommand for BufEnter to run setup when moving from avante to another filetype
+        vim.api.nvim_create_autocmd('BufEnter', {
+          pattern = '*', -- Match all buffers
+          callback = function()
+            if is_previous_filetype_avante and vim.bo.filetype ~= 'Avante' then
+              require('avante.highlights').setup()
+            end
+          end,
+        })
 
+        vim.keymap.set('n', '<leader>ac', function()
+          -- You can use :hi to show the current highlight groups and Avante* shows up as cleared prematurely.
+
+          -- vim.cmd [[
+          --   hi! link AvanteConflictCurrent GitConflictCurrent
+          --   hi! link AvanteConflictIncoming GitConflictIncoming
+          --   hi! link AvanteConflictAncestor GitConflictAncestor
+          --   hi! link AvanteConflictCurrentLabel GitConflictCurrentLabel
+          --   hi! link AvanteConflictIncomingLabel GitConflictIncomingLabel
+          --   hi! link AvanteConflictAncestorLabel GitConflictAncestorLabel
+          -- ]]
+
+          -- https://github.com/yetone/avante.nvim/blob/main/lua/avante/highlights.lua
+          require('avante.highlights').setup()
+        end, { desc = '[A]vante [C]onflict', silent = true })
+      end
+      -- WARN: Workaround Ends
+
+      -- Highlight groups have to be reinitialized after setting the color scheme
+      -- <https://github.com/yetone/avante.nvim/issues/654>
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        callback = function()
+          require('avante.highlights').setup()
+        end,
+      })
       require('avante').setup(opts)
     end,
   },
@@ -3193,6 +3221,9 @@ require('lazy').setup({
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
 }, {
+  config = function()
+    -- Logic to run after lazy is setup
+  end,
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
