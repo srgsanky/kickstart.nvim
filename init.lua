@@ -928,6 +928,16 @@ require('lazy').setup({
   --
   -- Use the `dependencies` key to specify the dependencies of a particular plugin
 
+  -- Telescope is the fuzzy finder. You can find almost anything with it.
+  --
+  -- Keybindings:
+  -- ============
+  --
+  -- <C-n>/<C-p>: Navigate between the search results.
+  -- Tab: Toggle selection of search result.
+  -- <C-q>: Open all search results in quickfix list.
+  -- <M-q>: Open only the selected search results in quickfix list. NOTE: it adds to the existing qf list
+  --
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
