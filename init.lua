@@ -2265,10 +2265,10 @@ require('lazy').setup({
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- <leader>saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+      -- <leader>sd'   - [S]urround [D]elete [']quotes
+      -- <leader>sr)'  - [S]urround [R]eplace [)] [']
+      -- require('mini.surround').setup()
 
       --  I am using https://github.com/nvim-lualine/lualine.nvim as this plugin throws an error when lsp is enabled in
       --  Linux. Didn't root cause it.
@@ -2623,12 +2623,53 @@ require('lazy').setup({
   -- No Neck pain - to center the buffer like Zen mode
   { 'shortcuts/no-neck-pain.nvim', version = '*' },
 
+  -- Surround text object with quotes.
+  -- I have disabled this as I don't get the shortcuts working very reliably. There is interference
+  -- from other plugins.
+  {
+    'kylechui/nvim-surround',
+    version = '*', -- Use for stability; omit to use `main` branch for the latest features
+    enabled = false,
+    event = 'VeryLazy',
+    config = function()
+      require('nvim-surround').setup {
+        -- Configuration here, or leave empty to use defaults
+        --
+        -- The three "core" operations of add/delete/change can be done with the keymaps
+        -- ys{motion}{char},
+        -- ds{char}, and
+        -- cs{target}{replacement}
+        --
+        -- https://github.com/kylechui/nvim-surround/blob/main/doc/nvim-surround.txt
+        -- y is used to yank only in visual mode, so the keybindings starting with y won't have
+        -- conflicts in normal mode.
+        --
+        -- insert = "<C-g>s",
+        -- insert_line = '<C-g>S',
+        --
+        -- normal = 'ys',
+        -- normal_cur = 'yss',
+        -- normal_line = 'yS',
+        -- normal_cur_line = 'ySS',
+        --
+        -- visual = 'S',
+        -- visual_line = 'gS',
+        --
+        -- delete = 'ds',
+        -- change = 'cs',
+        -- change_line = 'cS',
+      }
+    end,
+  },
+
   -- Search highlight. Highlight characters when using f, F, t, T. Also show visual hints using characters to jump to
   -- specific search locations
   -- This also makes f, F, t, T work across lines
   {
     'folke/flash.nvim',
-    enabled = not is_linux, -- This is very slow when using over ssh.
+    -- This is very slow when using over ssh.
+    -- The keybindings interfere with other usecases like surround and I don't find myself using this plugin a lot
+    enabled = false and not is_linux,
     event = 'VeryLazy',
     ---@type Flash.Config
     opts = {},
@@ -2725,7 +2766,9 @@ require('lazy').setup({
   -- S: search backward
   {
     'ggandor/leap.nvim',
-    enabled = not is_linux, -- This is very slow when using over ssh.
+    -- This is very slow when using over ssh.
+    -- The keybindings interfere with other usecases like surround and I don't find myself using this plugin a lot
+    enabled = false and not is_linux,
     opts = {},
     config = function(opts)
       -- leap's keybindings conflicts with lazy. This is taken from
