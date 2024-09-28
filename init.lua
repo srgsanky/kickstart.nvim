@@ -3012,6 +3012,176 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
 
+  -- AI plugin
+  --
+  -- API access is not free in claude. You have to prepay a certain amount to get access.
+  -- Set the API key using environment variable before opening nvim.
+  --
+  -- export ANTHROPIC_API_KEY=<your-api-key>
+  --
+  -- Remember chat history - I think this is implemented. If I scroll up, I do see the past chats.
+  -- <https://github.com/yetone/avante.nvim/issues/239>
+  -- <https://github.com/yetone/avante.nvim/issues/76>
+  -- <https://github.com/yetone/avante.nvim/issues/627>
+  {
+    'yetone/avante.nvim',
+    event = 'VeryLazy',
+    lazy = false,
+    version = false, -- set this if you want to always pull the latest change
+    opts = {
+      --@alias Provider "claude" | "openai" | "azure" | "gemini" | "cohere" | "copilot" | string
+      provider = 'claude', -- Recommend using Claude
+      -- Since auto-suggestions are a high-frequency operation and therefore expensive, it is recommended to specify an inexpensive provider or even a free provider: copilot
+      auto_suggestions_provider = 'claude',
+      claude = {
+        endpoint = 'https://api.anthropic.com',
+        model = 'claude-3-5-sonnet-20240620',
+        temperature = 0,
+        max_tokens = 4096,
+      },
+      behaviour = {
+        auto_suggestions = false, -- Experimental stage
+        auto_set_highlight_group = true,
+        auto_set_keymaps = true,
+        auto_apply_diff_after_generation = false,
+        support_paste_from_clipboard = false,
+      },
+      mappings = {
+        -- <Leader>aa    show sidebar
+        -- <Leader>ar    refresh sidebar
+        -- <Leader>ae    edit selected blocks
+        -- <Leader>ac    Avante Conflict (my custom keybinding to show highlights for conflicts)
+        -- co    choose ours
+        -- ct    choose theirs
+        -- ca    choose all theirs
+        -- c0    choose none
+        -- cb    choose both
+        -- cc    choose cursor
+        -- ]x    move to previous conflict
+        -- [x    move to next conflict
+        -- [[    jump to previous codeblocks (results window)
+        -- ]]    jump to next codeblocks (results windows)
+        --
+        --- @class AvanteConflictMappings
+        diff = {
+          -- These keybindings are similar to git diffview plugin
+          ours = 'co',
+          theirs = 'ct',
+          all_theirs = 'ca',
+          both = 'cb',
+          cursor = 'cc',
+          next = ']x', -- Previous conflict
+          prev = '[x', -- Next conflict
+        },
+        suggestion = {
+          -- FIXME: this is not working for me due to conflicts with aerospace
+          accept = '<M-l>',
+          next = '<M-]>',
+          prev = '<M-[>',
+          dismiss = '<C-]>',
+        },
+        jump = {
+          -- FIXME: this is not working for me due to conflicts in keymap
+          next = ']]',
+          -- FIXME: this is not working for me due to conflicts in keymap
+          prev = '[[',
+        },
+        submit = {
+          normal = '<CR>',
+          insert = '<C-s>',
+        },
+        sidebar = {
+          switch_windows = '<Tab>',
+          reverse_switch_windows = '<S-Tab>',
+        },
+      },
+      hints = { enabled = true },
+      windows = {
+        ---@type "right" | "left" | "top" | "bottom"
+        position = 'right', -- the position of the sidebar
+        wrap = true, -- similar to vim.o.wrap
+        width = 40, -- default % based on available width
+        sidebar_header = {
+          align = 'center', -- left, center, right for title
+          rounded = true,
+        },
+      },
+      highlights = {
+        ---@type AvanteConflictHighlights
+        diff = {
+          current = 'DiffText',
+          incoming = 'DiffAdd',
+        },
+      },
+      --- @class AvanteConflictUserConfig
+      diff = {
+        autojump = false,
+        ---@type string | fun(): any
+        list_opener = 'copen',
+      },
+    },
+    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+    build = 'make',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'stevearc/dressing.nvim',
+      'nvim-lua/plenary.nvim',
+      'MunifTanjim/nui.nvim',
+      --- The below dependencies are optional,
+      'nvim-tree/nvim-web-devicons', -- or echasnovski/mini.icons
+      'zbirenbaum/copilot.lua', -- for providers='copilot'
+      { 'akinsho/git-conflict.nvim', version = '*', config = true, opts = {} },
+      {
+        -- support for image pasting
+        'HakonHarnes/img-clip.nvim',
+        event = 'VeryLazy',
+        opts = {
+          -- recommended settings
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            -- required for Windows users
+            -- use_absolute_path = true,
+          },
+        },
+      },
+      {
+        -- Make sure to set this up properly if you have lazy=true
+        'MeanderingProgrammer/render-markdown.nvim',
+        opts = {
+          file_types = { 'markdown', 'Avante' },
+        },
+        ft = { 'markdown', 'Avante' },
+      },
+    },
+    config = function(_, opts)
+      vim.keymap.set('n', '<leader>ac', function()
+        -- WARN: The conflict highlight group is getting cleared for some reason. If I need the colors, I
+        -- have to manually setup the highlight groups again.
+        --
+        -- You can use :hi to show the current highlight groups and Avante* shows up as cleared
+        -- prematurely.
+
+        -- vim.cmd [[
+        --   hi! link AvanteConflictCurrent GitConflictCurrent
+        --   hi! link AvanteConflictIncoming GitConflictIncoming
+        --   hi! link AvanteConflictAncestor GitConflictAncestor
+        --   hi! link AvanteConflictCurrentLabel GitConflictCurrentLabel
+        --   hi! link AvanteConflictIncomingLabel GitConflictIncomingLabel
+        --   hi! link AvanteConflictAncestorLabel GitConflictAncestorLabel
+        -- ]]
+
+        -- https://github.com/yetone/avante.nvim/blob/main/lua/avante/highlights.lua
+        require('avante.highlights').setup()
+      end, { desc = '[A]vante [C]onflict', silent = true })
+
+      require('avante').setup(opts)
+    end,
+  },
+
   -- NOTE: I have kept this plugin in a separate file as the configuration contains a lot of brackets. This
   -- messes up with the vim features like % which jumps to the matching bracket.
   require 'custom.plugins.mini_ai',
