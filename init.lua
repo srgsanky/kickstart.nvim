@@ -2259,6 +2259,7 @@ require('lazy').setup({
   -- Preview:
   --    p: Toggle preview for current item only
   --    P: Toggle preview for all items
+  --    zp: Toggle preview window between normal and max size.
   --
   -- Filter items and create new list
   --    zf: Start fuzzy search using fzf. You can open the results in a new buffer using keybindings
@@ -2278,7 +2279,15 @@ require('lazy').setup({
   {
     'kevinhwang91/nvim-bqf',
     ft = 'qf',
-    opts = {},
+    opts = {
+      preview = {
+        -- The following is sued when qf list is at the bottom (default in neovim)
+        win_height = 12, -- The height of preview window for horizontal layout, large value (like 999) perform preview window as a "full" mode
+
+        -- The following is used when qf list is on the right, opened as a vertical split
+        win_vheight = 40, -- The height of preview window for vertical layout
+      },
+    },
     dependencies = {
       {
         'junegunn/fzf',
