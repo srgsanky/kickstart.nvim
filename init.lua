@@ -2238,6 +2238,7 @@ require('lazy').setup({
   -- Enhance the quickfix window
   -- Why?
   -- 1. Better looks
+  --    1. Highlights the currently selected item.
   -- 1. Search and filter the list using fzf
   -- 1. Preview window
   --
@@ -2268,6 +2269,7 @@ require('lazy').setup({
   --        C-x: Open in new horizontal split
   --        C-v: Open in new vertical split
   --
+  --        C-o: Select all items in the result.
   --        Tab: Toggle item selection and move to NEXT item.
   --        S-Tab: Toggle item selection and move to PREVIOUS item.
   --        C-n: When in search result, go to NEXT item
@@ -2275,6 +2277,10 @@ require('lazy').setup({
   --        Enter: When in search result, create a new list from the selected items.
   --               NOTE: when there is only one item in the search result, it will navigate to the result
   --               instead of creating a new list. See https://github.com/kevinhwang91/nvim-bqf/issues/153
+  --
+  --        For a single item in the result, there is a workaround. Navigate to the item in the
+  --        result, and hit ESCAPE. This will leave the cursor on the item. Now hit TAB and zn to
+  --        create a new list with the single item.
   --
   {
     'kevinhwang91/nvim-bqf',
