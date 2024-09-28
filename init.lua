@@ -2225,6 +2225,64 @@ require('lazy').setup({
     opts = {},
   },
 
+  -- Enhance the quickfix window
+  -- Why?
+  -- 1. Better looks
+  -- 1. Search and filter the list using fzf
+  -- 1. Preview window
+  --
+  -- Keybindings for common usecases:
+  -- ============
+  -- Navigation
+  --    j/k: Use j/k similar to vanila quickfix list
+  --    C-n/C-p: Navigate to next/previous file in quickfix list
+  --
+  -- Select items and create new list
+  --    Tab: Toggle item selection and move to NEXT item.
+  --    S-Tab: Toggle item selection and move to PREVIOUS item.
+  --    zn: Create a new list from the selected items.
+  --
+  -- When you create a new list, the follow helps with moving around lists
+  --    <: Previous quickfix list
+  --    >: Next quickfix list
+  --
+  -- Preview:
+  --    p: Toggle preview for current item only
+  --    P: Toggle preview for all items
+  --
+  -- Filter items and create new list
+  --    zf: Start fuzzy search using fzf. You can open the results in a new buffer using keybindings
+  --        that are similar to telescope.
+  --        C-t: Open in new tab
+  --        C-x: Open in new horizontal split
+  --        C-v: Open in new vertical split
+  --
+  --        Tab: Toggle item selection and move to NEXT item.
+  --        S-Tab: Toggle item selection and move to PREVIOUS item.
+  --        C-n: When in search result, go to NEXT item
+  --        C-p: When in search result, go to PREVIOUS item
+  --        Enter: When in search result, create a new list from the selected items.
+  --               NOTE: when there is only one item in the search result, it will navigate to the result
+  --               instead of creating a new list. See https://github.com/kevinhwang91/nvim-bqf/issues/153
+  --
+  {
+    'kevinhwang91/nvim-bqf',
+    ft = 'qf',
+    opts = {},
+    dependencies = {
+      {
+        'junegunn/fzf',
+        config = function()
+          -- Check if fzf is already installed
+          local fzf_path = vim.fn.exepath 'fzf'
+          if fzf_path == '' then
+            vim.fn['fzf#install']()
+          end
+        end,
+      },
+    },
+  },
+
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
