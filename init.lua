@@ -3290,6 +3290,10 @@ require('lazy').setup({
         end,
       })
       require('avante').setup(opts)
+
+      -- Remove the Copilot command introduced by this plugin. I am currently not using it. Since it
+      -- is shares the same prefix as :copen, it is getting on my way while trying to open qf list.
+      vim.api.nvim_del_user_command 'Copilot'
     end,
   },
 
