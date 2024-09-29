@@ -2282,6 +2282,9 @@ require('lazy').setup({
   --        result, and hit ESCAPE. This will leave the cursor on the item. Now hit TAB and zn to
   --        create a new list with the single item.
   --
+  --        Another workaround for a single item is to, hit <C-q> to add the item and exit fuzzy search.
+  --        Use zn to create a new list from the single item.
+  --
   {
     'kevinhwang91/nvim-bqf',
     ft = 'qf',
