@@ -2137,7 +2137,7 @@ require('lazy').setup({
 
           map('n', '<leader>hla', function()
             -- List all hunks - across files
-            require('gitsigns').setqflist 'attached'
+            require('gitsigns').setqflist 'all'
           end, { desc = '[h]unk [l]ist [a]ll' })
 
           -- Text object
