@@ -84,6 +84,12 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- nvim plugins and data are store in two directories (See also
+-- <https://neovim.io/doc/user/builtin.html#stdpath()>)
+--
+-- Plugin source: ~/.local/share/nvim/
+-- State (vim.fn.stdpath "data"): ~/.local/state/nvim/
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -2968,6 +2974,8 @@ require('lazy').setup({
 
   -- Automatically save and restore session. This remembers the open buffers, cursor position in
   -- each buffer along with folds etc.
+  --
+  -- Session files are stored in ~/.local/state/nvim/sessions
   --
   -- Usage:
   --  * Use "nvim" or "nvim <dir>" to start neovim. If you start with a specific file, auto-session
