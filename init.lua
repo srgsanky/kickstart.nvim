@@ -2999,6 +2999,10 @@ require('lazy').setup({
     ---@type AutoSession.Config
     opts = {
       suppressed_dirs = { '~/', '~/Downloads', '/' },
+
+      -- List of file types to bypass auto save when the only buffer open is one of the file types listed
+      bypass_save_filetypes = aux_windows,
+
       -- log_level = 'debug',
     },
   },
