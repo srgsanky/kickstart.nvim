@@ -2317,6 +2317,42 @@ require('lazy').setup({
     },
   },
 
+  ------------------------------------------------------------
+  -- Plugins to help focus on sections of code.
+  ------------------------------------------------------------
+  -- Works at paragraph level
+  -- :LimeLight 0.5 Use a value between 0.0 and 0.9 to dim the other text. 0.9 dims a lot.
+  -- :LimeLight!! Toggle
+  {
+    'junegunn/limelight.vim',
+    opts = {},
+    config = function() end, -- dummy config function for vimscript plugins
+  },
+
+  -- Works on treesitter objects
+  --
+  -- :Twilight toggles twilight
+  -- :TwilightEnable
+  -- :TwilightDisable
+  {
+    'folke/twilight.nvim',
+    opts = {
+      treesitter = true, -- use treesitter when available for the filetype
+      -- treesitter is used to automatically expand the visible text,
+      -- but you can further control the types of nodes that should always be fully expanded
+      expand = { -- for treesitter, we we always try to expand to the top-most ancestor with these types
+        'function',
+        'method',
+        'table',
+        'if_statement',
+      },
+      exclude = {}, -- exclude these filetypes
+    },
+  },
+
+  -- Zen mode <https://github.com/folke/zen-mode.nvim>
+  ------------------------------------------------------------
+
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
