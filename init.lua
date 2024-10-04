@@ -1452,6 +1452,7 @@ require('lazy').setup({
       --  You can press `g?` for help in this menu.
       require('mason').setup()
 
+      -- https://github.com/williamboman/mason.nvim/discussions/880
       if is_linux then
         local mason_registry = require 'mason-registry'
         local package = mason_registry.get_package 'lua-language-server'
@@ -1493,9 +1494,12 @@ require('lazy').setup({
         --toml
         'taplo',
       })
+      -- mason tool installer's ensure installed doesn't support version
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
+        -- This ensure installed supports version
+        ensure_installed = { 'lua_ls@3.7.4' },
         handlers = {
           function(server_name)
             -- Mason auto load clangd if it is installed in the system
