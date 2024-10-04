@@ -2337,14 +2337,23 @@ require('lazy').setup({
   {
     'folke/twilight.nvim',
     opts = {
+      -- 0 makes sure that no extra lines are highlighted outside of treesitter object. This helps
+      -- me focus better.
+      context = 0, -- amount of lines we will try to show around the current line
+
       treesitter = true, -- use treesitter when available for the filetype
       -- treesitter is used to automatically expand the visible text,
       -- but you can further control the types of nodes that should always be fully expanded
       expand = { -- for treesitter, we we always try to expand to the top-most ancestor with these types
+        -- text object names https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+        -- Look at ~/.local/share/nvim/lazy/nvim-treesitter/queries/rust/highlights.scm
         'function',
         'method',
-        'table',
-        'if_statement',
+        'block',
+        'class',
+        'comment',
+        -- 'table',
+        -- 'if_statement',
       },
       exclude = {}, -- exclude these filetypes
     },
