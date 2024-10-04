@@ -3162,6 +3162,8 @@ require('lazy').setup({
   --
   -- export ANTHROPIC_API_KEY=<your-api-key>
   --
+  -- export OPENAI_API_KEY=your-api-key
+  --
   -- Remember chat history - I think this is implemented. If I scroll up, I do see the past chats.
   -- <https://github.com/yetone/avante.nvim/issues/239>
   -- <https://github.com/yetone/avante.nvim/issues/76>
@@ -3179,6 +3181,12 @@ require('lazy').setup({
       claude = {
         endpoint = 'https://api.anthropic.com',
         model = 'claude-3-5-sonnet-20240620',
+        temperature = 0,
+        max_tokens = 4096,
+      },
+      openai = {
+        endpoint = 'https://api.openai.com/v1/',
+        model = 'gpt-4o',
         temperature = 0,
         max_tokens = 4096,
       },
