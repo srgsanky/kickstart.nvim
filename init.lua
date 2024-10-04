@@ -1452,6 +1452,28 @@ require('lazy').setup({
       --  You can press `g?` for help in this menu.
       require('mason').setup()
 
+      if is_linux then
+        local mason_registry = require 'mason-registry'
+        local package = mason_registry.get_package 'lua-language-server'
+        -- This is the last version that works with glibc 2.26 (AL2 has glibc 2.26 only)
+        -- Versions beyond 3.7.4 require glibc 2.26+
+        local lua_ls_version = '3.7.4'
+        if not package:is_installed() then
+          package:install { version = lua_ls_version }
+        else
+          -- If lua_ls got updated accidentally (say using the :Mason UI), downgrade it
+          package:get_installed_version(function(success, version_or_err)
+            if success then
+              local version = version_or_err
+              if version ~= lua_ls_version then
+                package:uninstall()
+                package:install { version = lua_ls_version }
+              end
+            end
+          end)
+        end
+      end
+
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
