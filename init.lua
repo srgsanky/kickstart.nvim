@@ -3272,7 +3272,8 @@ require('lazy').setup({
           reverse_switch_windows = '<S-Tab>',
         },
       },
-      hints = { enabled = true },
+      -- Whether to show the keybinding hint in visual mode? <https://github.com/yetone/avante.nvim/issues/682>
+      hints = { enabled = false },
       windows = {
         ---@type "right" | "left" | "top" | "bottom"
         position = 'right', -- the position of the sidebar
