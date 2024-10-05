@@ -1000,9 +1000,19 @@ require('lazy').setup({
         defaults = {
           -- Ignore files in specific paths from showing up in telescope
           file_ignore_patterns = { 'build/private/' },
-          --   mappings = {
-          --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-          --   },
+
+          mappings = {
+            -- Allow refining the search i.e. search on top of existing search results. I am using
+            -- ALT + ENTER. The default suggested in kickstart is C-Enter which is hard to type in
+            -- Kinesis keyboards.
+            --
+            -- Note the following conflicts in Mac:
+            -- ALT + ENTER: Fullscreen in wezterm by default. I have disabled it in wezterm.
+            -- ALT + SPACE: Open Alfred
+            -- CMD + SPACE: Open Alfred/spotlight
+            --
+            i = { ['<A-ENTER>'] = 'to_fuzzy_refine' },
+          },
         },
         -- pickers = {}
         extensions = {
