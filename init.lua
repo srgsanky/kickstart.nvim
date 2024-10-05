@@ -2796,6 +2796,24 @@ require('lazy').setup({
   -- No Neck pain - to center the buffer like Zen mode
   { 'shortcuts/no-neck-pain.nvim', version = '*' },
 
+  -- cs<current char><new char> - Change the surrounding char from current char to new char. Works.
+  -- ds<current char> - Delete the surrounding char. Works.
+  -- S<new text> - In visual mode this will surround the selection with new text. Works.
+  --
+  -- ys<motion><new char> - You surround. Surrounds the text objects with new char.
+  --  For e.g. ys$" will surround the text between cursor and end of line with "
+  --  NOTE: This works if you type the keybindings rapidly.
+  {
+    'tpope/vim-surround',
+    config = function() end,
+  },
+
+  -- Repeat keybindings from other plugins like vim-surround etc.
+  {
+    'tpope/vim-repeat',
+    config = function() end,
+  },
+
   -- Surround text object with quotes.
   -- I have disabled this as I don't get the shortcuts working very reliably. There is interference
   -- from other plugins.
