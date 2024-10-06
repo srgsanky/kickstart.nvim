@@ -3209,7 +3209,9 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
 
-  -- AI plugin
+  ----------------------------------------------------------------------------------------------------
+  -- AI plugins
+  ----------------------------------------------------------------------------------------------------
   --
   -- API access is not free in claude. You have to prepay a certain amount to get access.
   -- Set the API key using environment variable before opening nvim.
@@ -3218,10 +3220,20 @@ require('lazy').setup({
   --
   -- export OPENAI_API_KEY=your-api-key
   --
-  -- Remember chat history - I think this is implemented. If I scroll up, I do see the past chats.
-  -- <https://github.com/yetone/avante.nvim/issues/239>
-  -- <https://github.com/yetone/avante.nvim/issues/76>
-  -- <https://github.com/yetone/avante.nvim/issues/627>
+  -- Remember chat history:
+  -- The plugin tends to hide the previous chats whenever I ask new questions. But if I close and
+  -- open Avante, I am able to see past chats.
+  --
+  -- <https://github.com/yetone/avante.nvim/issues/239> Chat history is not remembered in the
+  -- ongoing conversation. So, there is a discussion that the AI services are not having the history
+  -- of the conversation.
+  --
+  -- <https://github.com/yetone/avante.nvim/issues/76> @codebase can be used to share the entire
+  -- codebase as context. There is a discussion on providing a way to share only the open buffers as
+  -- context instead of the entire workspace.
+  --
+  -- <https://github.com/yetone/avante.nvim/issues/627> Mentions that the plugin forgets the
+  -- previous chats when reopening Avante. I don't have this problem.
   {
     'yetone/avante.nvim',
     event = 'VeryLazy',
@@ -3255,7 +3267,6 @@ require('lazy').setup({
         -- <Leader>aa    show sidebar
         -- <Leader>ar    refresh sidebar
         -- <Leader>ae    edit selected blocks
-        -- <Leader>ac    Avante Conflict (my custom keybinding to show highlights for conflicts)
         -- co    choose ours
         -- ct    choose theirs
         -- ca    choose all theirs
@@ -3266,6 +3277,10 @@ require('lazy').setup({
         -- [x    move to next conflict
         -- [[    jump to previous codeblocks (results window)
         -- ]]    jump to next codeblocks (results windows)
+        --
+        -- /help      show help on slash commands
+        -- /clear     clears chat history
+        -- @codebase  Chat using the entire codebase.
         --
         --- @class AvanteConflictMappings
         diff = {
@@ -3387,6 +3402,7 @@ require('lazy').setup({
           end,
         })
 
+        -- <Leader>ac    Avante Conflict (my custom keybinding to show highlights for conflicts)
         vim.keymap.set('n', '<leader>ac', function()
           -- You can use :hi to show the current highlight groups and Avante* shows up as cleared prematurely.
 
