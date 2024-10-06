@@ -599,6 +599,7 @@ local aux_windows = {
   'dapui_stacks',
   'dap-repl',
   'neotest-summary',
+  'toggleterm',
 }
 local function is_aux_window(name)
   for i = 1, #aux_windows do
@@ -2651,10 +2652,22 @@ require('lazy').setup({
   -- If you accidentally clear the screen using cmd + k, you can redraw neovim
   -- using :mode or ctrl + L (i.e. ctrl + shift + L).
   -- https://neovim.io/doc/user/various.html
+  --
+  -- TIL: You can create a new terminal buffer in neovim using :terminal. It doesn't require toggle
+  --      term at all
+  --
+  -- <ESC>-<ESC> in quick succession to go to NORMAL mode. You can browse the previous output (similar to
+  -- COPY mode in tmux)
+  -- i will go to TERMINAL mode where you enter commands like a terminal.
   {
     'akinsho/toggleterm.nvim',
     opts = {},
     config = function()
+      -- zsh is run as a login shell with -l option, which will source ~/.zprofile automatically.
+      -- But this is slowing down the exit and also throws errors with StripWhitespace on write. So, I
+      -- have instead copied the sourcing of my custom configuration in ~/.zshrc itself.
+      -- vim.opt.shell = 'zsh -l'
+
       vim.keymap.set('n', '<leader>tt', ':ToggleTerm<CR>', { desc = 'Toggle terminal' })
       require('toggleterm').setup()
     end,
