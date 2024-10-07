@@ -3581,7 +3581,7 @@ require('lazy').setup({
     -- directly
     config = function()
       -- Notify when there is something written to lsp log. This helps surface errors in lsp logs
-      require('fwatch').watch('~/.local/state/nvim/lsp.log', {
+      require('fwatch').watch(vim.fn.fnamemodify('~/.local/state/nvim/lsp.log', ':p'), {
         on_event = function(filename, events, unwatch_cb)
           if events.change then
             -- TODO: Notify only if a new error was written in lsp.log
