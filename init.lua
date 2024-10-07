@@ -972,6 +972,9 @@ require('lazy').setup({
 
       -- use telescope for command prompt. With this, you can position the cmd prompt at the center of the screen.
       { 'jonarrien/telescope-cmdline.nvim' },
+
+      -- undo tree
+      'debugloop/telescope-undo.nvim',
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -1021,6 +1024,9 @@ require('lazy').setup({
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
           },
+          undo = {
+            -- telescope-undo.nvim config, see below
+          },
         },
       }
 
@@ -1028,6 +1034,7 @@ require('lazy').setup({
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
       pcall(require('telescope').load_extension, 'cmdline')
+      pcall(require('telescope').load_extension 'undo')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -1056,6 +1063,13 @@ require('lazy').setup({
 
       -- Search in quickfix list
       map_telescope_using_dropdown_theme('n', '<leader>sq', builtin.quickfix, { desc = '[S]earch [Q]uickfix' })
+
+      -- Search in undo tree
+      map_telescope_using_dropdown_theme('n', '<leader>u', function()
+        local opts = get_telescope_dropdown()
+        opts.side_by_side = true
+        require('telescope').extensions.undo.undo(opts)
+      end, { desc = '[u]ndo tree search' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
@@ -3260,6 +3274,12 @@ require('lazy').setup({
 
       require('trouble').setup(opts)
     end,
+  },
+
+  -- Undo tree
+  {
+    'mbbill/undotree',
+    config = function() end,
   },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
