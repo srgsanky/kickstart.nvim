@@ -3573,6 +3573,30 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
+
+  -- Notify on changes to files of interest (like lsp.log) from external processes.
+  {
+    'rktjmp/fwatch.nvim',
+    -- Don't call setup or use opts = {}. This plugin just brings in utility methods that you can call
+    -- directly
+    config = function()
+      -- Notify when there is something written to lsp log. This helps surface errors in lsp logs
+      require('fwatch').watch('~/.local/state/nvim/lsp.log', {
+        on_event = function(filename, events, unwatch_cb)
+          if events.change then
+            -- TODO: Notify only if a new error was written in lsp.log
+            require 'notify'(filename .. ' changed', 'error')
+          end
+          if events.rename then
+            unwatch_cb()
+          end
+        end,
+        on_error = function()
+          require 'notify'('Error trying to get notification for lsp.log', 'error')
+        end,
+      })
+    end,
+  },
 }, {
   config = function()
     -- Logic to run after lazy is setup
