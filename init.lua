@@ -3207,6 +3207,14 @@ require('lazy').setup({
     end,
   },
 
+  -- Indent guides similar to IDEs using virtual text
+  { -- Add indentation guides even on blank lines
+    'lukas-reineke/indent-blankline.nvim',
+    -- See `:help ibl`
+    main = 'ibl',
+    opts = {},
+  },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -3219,7 +3227,6 @@ require('lazy').setup({
   -- I find the debug plugin in neovim to be high effort low returns at this point in time.
   -- There are way too many failure points for a debugger. I may revisit these plugins later.
   require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
 
   ----------------------------------------------------------------------------------------------------
