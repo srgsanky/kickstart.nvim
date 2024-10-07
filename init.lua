@@ -1043,12 +1043,14 @@ require('lazy').setup({
       map_telescope_using_dropdown_theme('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       map_telescope_using_dropdown_theme('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       map_telescope_using_dropdown_theme('n', '<leader>su', builtin.grep_string, { desc = '[S]earch [U]sages for word under cursor' })
-      map_telescope_using_dropdown_theme('n', '<leader>sw', function()
+      map_telescope_using_dropdown_theme('n', '<leader>sw', function(opts)
         -- NOTE: lsp_workspace_symbols vs lsp_dynamic_workspace_symbols: Use the dynamic version for
         --       interactive search where you type in the symbols. The following is a static search
         --       that looks up the exact word and is also blocking. I have mapped the dynamic search
         --       to the keybinding <leader>ws.
-        builtin.lsp_workspace_symbols { query = vim.fn.expand '<cword>' }
+        opts = opts or {}
+        opts.query = vim.fn.expand '<cword>'
+        builtin.lsp_workspace_symbols(opts)
       end, { desc = '[S]earch [W]ord under cursor in workspace symbols' })
       map_telescope_using_dropdown_theme('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       map_telescope_using_dropdown_theme('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
@@ -1065,24 +1067,26 @@ require('lazy').setup({
       map_telescope_using_dropdown_theme('n', '<leader>sq', builtin.quickfix, { desc = '[S]earch [Q]uickfix' })
 
       -- Search in undo tree
-      map_telescope_using_dropdown_theme('n', '<leader>u', function()
-        local opts = get_telescope_dropdown()
+      map_telescope_using_dropdown_theme('n', '<leader>u', function(opts)
+        opts = opts or {}
         opts.side_by_side = true
         require('telescope').extensions.undo.undo(opts)
       end, { desc = '[u]ndo tree search' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set('n', '<leader>s/', function()
-        builtin.live_grep {
-          grep_open_files = true,
-          prompt_title = 'Live Grep in Open Files',
-        }
+      map_telescope_using_dropdown_theme('n', '<leader>s/', function(opts)
+        opts = opts or {}
+        opts.grep_open_files = true
+        opts.prompt_title = 'Live Grep in Open Files'
+        builtin.live_grep(opts)
       end, { desc = '[S]earch [/] in Open Files' })
 
       -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = vim.fn.stdpath 'config' }
+      map_telescope_using_dropdown_theme('n', '<leader>sn', function(opts)
+        opts = opts or {}
+        opts.cwd = vim.fn.stdpath 'config'
+        builtin.find_files(opts)
       end, { desc = '[S]earch [N]eovim files' })
     end,
     keys = {
