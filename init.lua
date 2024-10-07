@@ -600,6 +600,7 @@ local aux_windows = {
   'dap-repl',
   'neotest-summary',
   'toggleterm',
+  'trouble',
 }
 local function is_aux_window(name)
   for i = 1, #aux_windows do
@@ -3213,6 +3214,52 @@ require('lazy').setup({
     -- See `:help ibl`
     main = 'ibl',
     opts = {},
+  },
+
+  -- Show diagnostics by buffer and also at workspace level
+  -- Also has better view of qflist and location list
+  {
+    'folke/trouble.nvim',
+    opts = {}, -- for default options, refer to the configuration section for custom setup.
+    cmd = 'Trouble',
+    keys = {
+      {
+        '<leader>xx',
+        '<cmd>Trouble diagnostics toggle<cr>',
+        desc = 'Diagnostics (Trouble)',
+      },
+      {
+        '<leader>xX',
+        '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
+        desc = 'Buffer Diagnostics (Trouble)',
+      },
+      {
+        '<leader>cs',
+        '<cmd>Trouble symbols toggle focus=false<cr>',
+        desc = 'Symbols (Trouble)',
+      },
+      {
+        '<leader>cl',
+        '<cmd>Trouble lsp toggle focus=false win.position=right<cr>',
+        desc = 'LSP Definitions / references / ... (Trouble)',
+      },
+      {
+        '<leader>xL',
+        '<cmd>Trouble loclist toggle<cr>',
+        desc = 'Location List (Trouble)',
+      },
+      {
+        '<leader>xQ',
+        '<cmd>Trouble qflist toggle<cr>',
+        desc = 'Quickfix List (Trouble)',
+      },
+    },
+    config = function(_, opts)
+      -- If trouble is the only visible buffer, close neovim
+      close_file_type_when_only_buffer 'trouble'
+
+      require('trouble').setup(opts)
+    end,
   },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
