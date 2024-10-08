@@ -1088,6 +1088,9 @@ require('lazy').setup({
         opts.cwd = vim.fn.stdpath 'config'
         builtin.find_files(opts)
       end, { desc = '[S]earch [N]eovim files' })
+
+      -- Search messages (notifications from notify)
+      map_telescope_using_dropdown_theme('n', '<leader>sm', require('telescope').extensions.notify.notify, { desc = '[S]earch [M]essages' })
     end,
     keys = {
       -- Uncomment this to use telescope for cmdline instead of Noice
