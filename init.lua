@@ -3580,12 +3580,22 @@ require('lazy').setup({
     -- Don't call setup or use opts = {}. This plugin just brings in utility methods that you can call
     -- directly
     config = function()
+      require 'custom.plugins.file_watch'
+      local previous_line_with_error = nil
+      local lsp_log = vim.fn.fnamemodify('~/.local/state/nvim/lsp.log', ':p')
+
       -- Notify when there is something written to lsp log. This helps surface errors in lsp logs
-      require('fwatch').watch(vim.fn.fnamemodify('~/.local/state/nvim/lsp.log', ':p'), {
+      require('fwatch').watch(lsp_log, {
         on_event = function(filename, events, unwatch_cb)
           if events.change then
-            -- TODO: Notify only if a new error was written in lsp.log
-            require 'notify'(filename .. ' changed', 'error')
+            -- Notify only if a NEW error was written in lsp.log
+            local file_contains_error, last_line_with_match = FILE_CONTAINS_TEXT(lsp_log, 'ERROR')
+            if file_contains_error then
+              if not previous_line_with_error or previous_line_with_error < last_line_with_match then
+                previous_line_with_error = last_line_with_match
+                require 'notify'(filename .. ' contains new ERROR', 'error')
+              end
+            end
           end
           if events.rename then
             unwatch_cb()
