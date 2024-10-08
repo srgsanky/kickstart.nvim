@@ -1040,7 +1040,11 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       map_telescope_using_dropdown_theme('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       map_telescope_using_dropdown_theme('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      map_telescope_using_dropdown_theme('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      map_telescope_using_dropdown_theme('n', '<leader>sf', function(opts)
+        opts = opts or {}
+        opts.hidden = true -- show hidden files as well
+        builtin.find_files(opts)
+      end, { desc = '[S]earch [F]iles' })
       map_telescope_using_dropdown_theme('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       map_telescope_using_dropdown_theme('n', '<leader>su', builtin.grep_string, { desc = '[S]earch [U]sages for word under cursor' })
       map_telescope_using_dropdown_theme('n', '<leader>sw', function(opts)
