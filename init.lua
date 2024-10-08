@@ -3607,7 +3607,7 @@ require('lazy').setup({
 
                 local notification_opts = {
                   title = 'LSP log changed',
-                  timeout = 60000,
+                  timeout = 10000,
                   -- With icon, the text at the end is not colored correctly
                   on_open = function()
                     -- notification_open = true
