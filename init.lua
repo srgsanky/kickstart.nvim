@@ -3589,7 +3589,7 @@ require('lazy').setup({
       local lsp_log = vim.fn.fnamemodify('~/.local/state/nvim/lsp.log', ':p')
 
       local previous_notification = nil
-      local notification_open = false
+      -- local notification_open = false
 
       -- Notify when there is something written to lsp log. This helps surface errors in lsp logs
       require('fwatch').watch(lsp_log, {
@@ -3606,24 +3606,24 @@ require('lazy').setup({
                   timeout = 60000,
                   -- With icon, the text at the end is not colored correctly
                   on_open = function()
-                    notification_open = true
+                    -- notification_open = true
                   end,
                   on_close = function()
                     previous_notification = nil
-                    notification_open = false
+                    -- notification_open = false
                   end,
                 }
                 if previous_notification ~= nil then
                   notification_opts.replace = previous_notification
                 end
 
-                if not notification_open then
-                  line_contents = line_contents:gsub('\\n', '\n')
-                  previous_notification = require 'notify'(line_contents, 'error', notification_opts)
-                  -- print(vim.inspect(previous_notification))
-                  -- This is always returning nil. TODO: Investigate
-                  -- https://github.com/rcarriga/nvim-notify/blob/fbef5d32be8466dd76544a257d3f3dce20082a07/doc/nvim-notify.txt#L55
-                end
+                -- if not notification_open then
+                line_contents = line_contents:gsub('\\n', '\n')
+                previous_notification = require 'notify'(line_contents, 'error', notification_opts)
+                -- print(vim.inspect(previous_notification))
+                -- This is always returning nil. TODO: Investigate
+                -- https://github.com/rcarriga/nvim-notify/blob/fbef5d32be8466dd76544a257d3f3dce20082a07/doc/nvim-notify.txt#L55
+                -- end
               end
             end
           end
