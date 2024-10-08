@@ -3268,6 +3268,7 @@ require('lazy').setup({
   -- Indent guides similar to IDEs using virtual text
   { -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
+    enabled = not is_linux,
     -- See `:help ibl`
     main = 'ibl',
     opts = {},
