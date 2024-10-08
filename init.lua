@@ -3623,6 +3623,11 @@ require('lazy').setup({
 
                 -- if not notification_open then
                 line_contents = line_contents:gsub('\\n', '\n')
+                if line_contents:match 'taplo' then
+                  -- Ignore notifications from certain noisy lsps
+                  -- 1. taplo (toml)
+                  return
+                end
                 previous_notification = require 'notify'(line_contents, 'error', notification_opts)
                 -- print(vim.inspect(previous_notification))
                 -- This is always returning nil. TODO: Investigate
