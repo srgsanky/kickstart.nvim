@@ -10,6 +10,7 @@ function FILE_CONTAINS_TEXT(file_path, text)
   local file = io.open(abs_file_path, 'r')
 
   local last_line_with_match = nil
+  local line_contents = nil
   local found = false
   if file then
     local line_number = 0
@@ -18,6 +19,7 @@ function FILE_CONTAINS_TEXT(file_path, text)
       line_number = line_number + 1
       if line:match(text) then
         last_line_with_match = line_number
+        line_contents = line
         found = true
       end
     end
@@ -28,5 +30,5 @@ function FILE_CONTAINS_TEXT(file_path, text)
   end
 
   -- last_line_number is valid only if found=true
-  return found, last_line_with_match
+  return found, last_line_with_match, line_contents
 end

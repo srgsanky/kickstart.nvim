@@ -3596,7 +3596,7 @@ require('lazy').setup({
         on_event = function(filename, events, unwatch_cb)
           if events.change then
             -- Notify only if a NEW error was written in lsp.log
-            local file_contains_error, last_line_with_match = FILE_CONTAINS_TEXT(lsp_log, 'ERROR')
+            local file_contains_error, last_line_with_match, line_contents = FILE_CONTAINS_TEXT(lsp_log, 'ERROR')
             if file_contains_error then
               if not previous_line_with_error or previous_line_with_error < last_line_with_match then
                 previous_line_with_error = last_line_with_match
@@ -3618,7 +3618,8 @@ require('lazy').setup({
                 end
 
                 if not notification_open then
-                  previous_notification = require 'notify'(filename .. ' contains new ERROR', 'error', notification_opts)
+                  line_contents = line_contents:gsub('\\n', '\n')
+                  previous_notification = require 'notify'(line_contents, 'error', notification_opts)
                   -- print(vim.inspect(previous_notification))
                   -- This is always returning nil. TODO: Investigate
                   -- https://github.com/rcarriga/nvim-notify/blob/fbef5d32be8466dd76544a257d3f3dce20082a07/doc/nvim-notify.txt#L55
