@@ -3803,13 +3803,13 @@ require('lazy').setup({
   },
 })
 
-vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter' }, {
+vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'FocusGained' }, {
   callback = function()
     vim.cmd 'setlocal winhighlight=Normal:Normal'
   end,
 })
 
-vim.api.nvim_create_autocmd({ 'WinLeave', 'BufLeave' }, {
+vim.api.nvim_create_autocmd({ 'WinLeave', 'BufLeave', 'FocusLost' }, {
   callback = function()
     vim.cmd 'setlocal winhighlight=Normal:DimInactive'
   end,
@@ -3826,7 +3826,7 @@ local function initialize_highlight_groups()
   vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#3B3D43', fg = 'NONE', underline = false, bold = true, italic = true })
 
   -- Set the dim color for inactive buffers
-  vim.api.nvim_set_hl(0, 'DimInactive', { bg = '#1e1e2e', fg = '#888888' })
+  vim.api.nvim_set_hl(0, 'DimInactive', { bg = '#000000', fg = '#888888' })
 
   -- Add more highlight group configurations here
 end
