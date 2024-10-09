@@ -3343,6 +3343,69 @@ require('lazy').setup({
   -- Highlight cursor when it moved
   {
     'danilamihailov/beacon.nvim',
+    ft = function()
+      -- beacon doesn't provide a way to disable this plugin for specific filetypes
+      -- <https://github.com/DanilaMihailov/beacon.nvim/issues/26>
+      -- ft doesn't provide a way to specify file types to ignore. A workaround is to list all
+      -- common filetypes
+      return {
+        'c',
+        'cpp',
+        'rust',
+        'go',
+        'python',
+        'javascript',
+        'typescript',
+        'lua',
+        'vim',
+        'bash',
+        'html',
+        'css',
+        'scss',
+        'json',
+        'yaml',
+        'toml',
+        'xml',
+        'markdown',
+        'txt',
+        'sh',
+        'zsh',
+        'make',
+        'cmake',
+        'dockerfile',
+        'gitcommit',
+        'gitrebase',
+        'sql',
+        'perl',
+        'ruby',
+        'php',
+        'java',
+        'scala',
+        'haskell',
+        'elixir',
+        'erlang',
+        'r',
+        'latex',
+        'tex',
+        'perl',
+        'kotlin',
+        'dart',
+        'swift',
+        'racket',
+        'clojure',
+        'scheme',
+        'fsharp',
+        'ocaml',
+        'fortran',
+        'vim',
+        'help',
+        -- aux windows where I want this feature
+        'neo-tree',
+        'Outline',
+        'neotest-summary',
+        -- Add any other relevant filetypes here
+      }
+    end,
     config = function(opts)
       opts = opts or {}
       opts.width = 120
