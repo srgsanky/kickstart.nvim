@@ -2359,6 +2359,9 @@ require('lazy').setup({
     ft = 'qf',
     opts = {
       preview = {
+        -- Enable preview in quickfix window automatically
+        auto_preview = false,
+
         -- The following is sued when qf list is at the bottom (default in neovim)
         win_height = 12, -- The height of preview window for horizontal layout, large value (like 999) perform preview window as a "full" mode
 
