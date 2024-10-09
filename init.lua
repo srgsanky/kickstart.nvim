@@ -3617,8 +3617,9 @@ require('lazy').setup({
               if not previous_line_with_error or previous_line_with_error < last_line_with_match then
                 previous_line_with_error = last_line_with_match
 
+                --@type notify.Options
                 local notification_opts = {
-                  title = 'LSP log changed',
+                  title = 'LSP errors',
                   -- timeout = 10000,
                   -- With icon, the text at the end is not colored correctly
                   on_open = function()
@@ -3630,7 +3631,9 @@ require('lazy').setup({
                   end,
                 }
                 if previous_notification ~= nil then
-                  notification_opts.replace = previous_notification
+                  -- I get notifications about no existing notifications to replace. So, I have
+                  -- disabled this
+                  -- notification_opts.replace = previous_notification
                 end
 
                 -- if not notification_open then
@@ -3639,12 +3642,18 @@ require('lazy').setup({
                   -- Ignore notifications from certain noisy lsps
                   -- 1. taplo (toml)
                   return
+                elseif line_contents:match 'marksman' then
+                  return
+                elseif line_contents:match 'clangd' and string.find(line_contents, 'I%[') then
+                  -- Ignore info messages logged as error by clangd. Info messages start with I[. %
+                  -- is used to escape [ in the lua pattern string
+                  return
                 end
-                previous_notification = require 'notify'(line_contents, 'error', notification_opts)
-                -- print(vim.inspect(previous_notification))
-                -- This is always returning nil. TODO: Investigate
-                -- https://github.com/rcarriga/nvim-notify/blob/fbef5d32be8466dd76544a257d3f3dce20082a07/doc/nvim-notify.txt#L55
-                -- end
+
+                vim.schedule(function()
+                  -- https://github.com/rcarriga/nvim-notify/blob/fbef5d32be8466dd76544a257d3f3dce20082a07/doc/nvim-notify.txt#L55
+                  previous_notification = require('notify').notify(line_contents, vim.log.levels.ERROR, notification_opts)
+                end)
               end
             else
               if previous_line_with_error ~= nil then
