@@ -3803,6 +3803,18 @@ require('lazy').setup({
   },
 })
 
+vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter' }, {
+  callback = function()
+    vim.cmd 'setlocal winhighlight=Normal:Normal'
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'WinLeave', 'BufLeave' }, {
+  callback = function()
+    vim.cmd 'setlocal winhighlight=Normal:DimInactive'
+  end,
+})
+
 local function initialize_highlight_groups()
   -- Highlight cursor line using the following style
   -- Catppuccin mocha uses #1E1E2E as the background color. To contrast that, chatGPT recommended the following colors.
@@ -3812,6 +3824,9 @@ local function initialize_highlight_groups()
   -- #2E2E3E charcoal
   -- #2A2B3D dark slate
   vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#3B3D43', fg = 'NONE', underline = false, bold = true, italic = true })
+
+  -- Set the dim color for inactive buffers
+  vim.api.nvim_set_hl(0, 'DimInactive', { bg = '#1e1e2e', fg = '#888888' })
 
   -- Add more highlight group configurations here
 end
