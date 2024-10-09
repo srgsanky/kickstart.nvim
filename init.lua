@@ -3704,6 +3704,23 @@ require('lazy').setup({
   },
 })
 
+local function initialize_highlight_groups()
+  -- Highlight cursor line using the following style
+  -- #3A4A3D deep olive
+  -- #4E5D94 slate blue
+  -- #2F353B charcoal
+  -- #4B3B51 muted purple
+  -- #3C3C3C dark gray
+  vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#4B3B51', fg = 'NONE', underline = false, bold = true, italic = true })
+
+  -- Add more highlight group configurations here
+end
+
+-- Highlight groups have to be reinitialized after setting the color scheme
+vim.api.nvim_create_autocmd('ColorScheme', {
+  callback = initialize_highlight_groups,
+})
+
 -- slate does not color markdown well. So, I switched to catppuccin-mocha
 vim.cmd.colorscheme 'catppuccin-mocha' -- catppuccin-mocha (dark)/catppuccin-latte/catppuccin-frappe/catppuccin-latte (light)
 -- vim.cmd.colorscheme 'kanagawa-dragon' -- kanagawa-dragon (dark) / kanagawa-wave (mid - like tokyo night) / kanagawa-lotus (light)
