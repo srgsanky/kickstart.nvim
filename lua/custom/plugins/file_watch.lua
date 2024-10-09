@@ -1,4 +1,21 @@
+local function truncate_file(file_path)
+  local file = io.open(file_path, 'w+')
+
+  if not file then
+    require 'notify'('Could not truncate file ' .. file_path, 'error')
+    return
+  end
+
+  file:write ''
+  file:flush()
+  file:close()
+end
+
 function SEARCH_IN_FILE(file_path)
+  local abs_file_path = vim.fn.fnamemodify(file_path, ':p')
+  -- truncates the file for performance reasons. Reading a smaller file is faster.
+  truncate_file(abs_file_path)
+
   local file_offset = 0
 
   -- Check if the provided file contains the given text. The first return value indicates if the text
@@ -9,7 +26,6 @@ function SEARCH_IN_FILE(file_path)
   --
   -- If there is an error in opening the file for reading, the function returns false.
   return function(search_term)
-    local abs_file_path = vim.fn.fnamemodify(file_path, ':p')
     local file = io.open(abs_file_path, 'r')
 
     if not file then
