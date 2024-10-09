@@ -3251,6 +3251,14 @@ require('lazy').setup({
     },
     config = function()
       require('neotest').setup {
+        -- https://github.com/nvim-neotest/neotest/pull/437/files
+        run = {
+          augment = function(tree, args)
+            -- Set rust backtrace while running rust tests
+            args.env = { RUST_BACKTRACE = 1 }
+            return args
+          end,
+        },
         adapters = {
           require 'neotest-vim-test' {
             ignore_file_types = {}, -- You can adjust this for other languages if needed
