@@ -1004,7 +1004,14 @@ require('lazy').setup({
         --
         defaults = {
           -- Ignore files in specific paths from showing up in telescope
-          file_ignore_patterns = { 'build/private/' },
+          file_ignore_patterns = {
+            'build/private/',
+            -- Git files
+            '.git/',
+            -- Rust build files
+            'target/debug/',
+            'target/release/',
+          },
 
           mappings = {
             -- Allow refining the search i.e. search on top of existing search results. I am using
