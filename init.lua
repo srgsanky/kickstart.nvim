@@ -3706,12 +3706,13 @@ require('lazy').setup({
 
 local function initialize_highlight_groups()
   -- Highlight cursor line using the following style
-  -- #3A4A3D deep olive
-  -- #4E5D94 slate blue
-  -- #2F353B charcoal
-  -- #4B3B51 muted purple
-  -- #3C3C3C dark gray
-  vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#4B3B51', fg = 'NONE', underline = false, bold = true, italic = true })
+  -- Catppuccin mocha uses #1E1E2E as the background color. To contrast that, chatGPT recommended the following colors.
+  -- #394B59 smoky teal
+  -- #4C4F69 deep violet
+  -- #3B3D43 dark olive
+  -- #2E2E3E charcoal
+  -- #2A2B3D dark slate
+  vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#3B3D43', fg = 'NONE', underline = false, bold = true, italic = true })
 
   -- Add more highlight group configurations here
 end
