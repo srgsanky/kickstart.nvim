@@ -3591,6 +3591,7 @@ require('lazy').setup({
       require 'custom.plugins.file_watch'
       local previous_line_with_error = nil
       local lsp_log = vim.fn.fnamemodify('~/.local/state/nvim/lsp.log', ':p')
+      local search_fn = SEARCH_IN_FILE(lsp_log)
 
       local previous_notification = nil
       -- local notification_open = false
@@ -3600,14 +3601,22 @@ require('lazy').setup({
         on_event = function(filename, events, unwatch_cb)
           if events.change then
             -- Notify only if a NEW error was written in lsp.log
-            local file_contains_error, last_line_with_match, line_contents = FILE_CONTAINS_TEXT(lsp_log, 'ERROR')
+            local file_contains_error, last_line_with_match, line_contents = search_fn 'ERROR'
+
             if file_contains_error then
+              assert(line_contents ~= nil)
+
+              if previous_line_with_error ~= nil and previous_line_with_error > last_line_with_match then
+                -- The file got truncated
+                previous_line_with_error = nil
+              end
+
               if not previous_line_with_error or previous_line_with_error < last_line_with_match then
                 previous_line_with_error = last_line_with_match
 
                 local notification_opts = {
                   title = 'LSP log changed',
-                  timeout = 10000,
+                  -- timeout = 10000,
                   -- With icon, the text at the end is not colored correctly
                   on_open = function()
                     -- notification_open = true
@@ -3633,6 +3642,11 @@ require('lazy').setup({
                 -- This is always returning nil. TODO: Investigate
                 -- https://github.com/rcarriga/nvim-notify/blob/fbef5d32be8466dd76544a257d3f3dce20082a07/doc/nvim-notify.txt#L55
                 -- end
+              end
+            else
+              if previous_line_with_error ~= nil then
+                -- The file got truncated
+                previous_line_with_error = nil
               end
             end
           end
