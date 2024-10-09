@@ -2454,7 +2454,18 @@ require('lazy').setup({
   },
 
   -- Themes - from https://github.com/topics/neovim-colorscheme
-  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000, opts = {} },
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    priority = 1000,
+    opts = {
+      dim_inactive = {
+        enabled = true, -- dims the background color of inactive window
+        shade = 'dark',
+        percentage = 0, -- percentage of the shade to apply to the inactive window
+      },
+    },
+  },
   { 'rebelot/kanagawa.nvim', opts = {} },
   { 'kepano/flexoki-neovim', name = 'flexoki', opts = {} },
 
