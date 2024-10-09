@@ -2643,6 +2643,8 @@ require('lazy').setup({
           end
           return true
         end,
+        -- TS context needs to be per buffer. This is tracked in
+        -- <https://github.com/nvim-treesitter/nvim-treesitter-context/issues/31>.
       }
     end,
     opts = {},
