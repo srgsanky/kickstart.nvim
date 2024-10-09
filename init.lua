@@ -3340,6 +3340,23 @@ require('lazy').setup({
     config = function() end,
   },
 
+  -- Highlight cursor when it moved
+  {
+    'danilamihailov/beacon.nvim',
+    config = function(opts)
+      opts = opts or {}
+      opts.width = 120
+
+      -- Highlight groups have to be reinitialized after setting the color scheme
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        callback = function()
+          vim.api.nvim_set_hl(0, 'Beacon', { bg = 'white' })
+        end,
+      })
+      require('beacon').setup()
+    end,
+  },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
