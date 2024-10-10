@@ -541,6 +541,10 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Use jq for formatting json when using jq
+-- <https://www.reddit.com/r/neovim/comments/xa4ca6/best_way_to_validate_and_format_json_files/>
+vim.cmd [[autocmd! FileType json set formatprg=jq]]
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
