@@ -1025,6 +1025,10 @@ require('lazy').setup({
             --
             i = { ['<A-ENTER>'] = 'to_fuzzy_refine' },
           },
+
+          -- Default scroll_strategy is cycle which will go to the first result when you try to go
+          -- to next result from the last result. Limit will stay at the last result.
+          scroll_strategy = 'limit',
         },
         -- pickers = {}
         extensions = {
