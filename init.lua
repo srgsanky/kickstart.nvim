@@ -3434,6 +3434,7 @@ require('lazy').setup({
         'Outline',
         'neotest-summary',
         -- Add any other relevant filetypes here
+        'kdl',
       }
     end,
     config = function(opts)
@@ -3859,13 +3860,19 @@ end
 
 vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'FocusGained' }, {
   callback = function()
-    vim.cmd 'setlocal winhighlight=Normal:Normal'
+    local ft = vim.bo.filetype
+    if not is_aux_window(ft) then
+      vim.cmd 'setlocal winhighlight=Normal:Normal'
+    end
   end,
 })
 
 vim.api.nvim_create_autocmd({ 'WinLeave', 'BufLeave', 'FocusLost' }, {
   callback = function()
-    vim.cmd 'setlocal winhighlight=Normal:DimInactive'
+    local ft = vim.bo.filetype
+    if not is_aux_window(ft) then
+      vim.cmd 'setlocal winhighlight=Normal:DimInactive'
+    end
   end,
 })
 
