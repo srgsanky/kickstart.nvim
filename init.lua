@@ -3312,7 +3312,7 @@ require('lazy').setup({
   -- Indent guides similar to IDEs using virtual text
   { -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
-    enabled = not is_linux,
+    -- enabled = not is_linux,
     -- See `:help ibl`
     main = 'ibl',
     opts = {},
@@ -3821,15 +3821,8 @@ if is_linux then
   local function is_local_port_open(port)
     -- host is mandatory for nc command
     local command = string.format('nc -z localhost %d', port)
-    local cmd_handle = io.popen(command)
-    local result = 'Not open'
-    if cmd_handle then
-      -- *a is read all the data until the end of the file
-      result = cmd_handle:read '*a'
-      cmd_handle:close()
-    end
-    -- No output from nc -z means that the port is open
-    return result == ''
+    -- Successful execution of nc (return code 0) means the port is open
+    return os.execute(command) == 0
   end
 
   function YANK_AND_PIPE_TO_NC()
@@ -3849,15 +3842,15 @@ if is_linux then
       handle:write(yanked_text)
       handle:close()
     end
-    vim.notify('Copied!', 'info', { title = 'Yank and Pipe' })
+    require 'notify'('Copied!', 'info', { title = 'Yank and Pipe' })
   end
 
   if is_local_port_open(19999) then
     -- Map 'gy' to the custom function in normal and visual modes (without overriding regular 'y')
     vim.api.nvim_set_keymap('n', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { noremap = true, silent = true })
     vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { noremap = true, silent = true })
-
-    vim.notify('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
+  else
+    require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
   end
 end
 
