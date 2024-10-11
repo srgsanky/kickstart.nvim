@@ -3825,6 +3825,10 @@ if is_linux then
     return os.execute(command) == 0
   end
 
+  function YANK_AND_PIPE_TO_NC_SHOW_ERROR()
+    require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
+  end
+
   function YANK_AND_PIPE_TO_NC()
     local yanked_text = ''
 
@@ -3846,11 +3850,10 @@ if is_linux then
   end
 
   if is_local_port_open(19999) then
-    -- Map 'gy' to the custom function in normal and visual modes (without overriding regular 'y')
-    vim.api.nvim_set_keymap('n', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { noremap = true, silent = true })
+    -- Map 'gy' to the custom function in visual modes (without overriding regular 'y')
     vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { noremap = true, silent = true })
   else
-    require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
+    vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC_SHOW_ERROR()<CR>', { noremap = true, silent = true })
   end
 end
 
