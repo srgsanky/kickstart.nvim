@@ -2794,10 +2794,10 @@ require('lazy').setup({
   -- You can easily view the last errors using :NoiceErrors or :NoiceLast
   {
     'rcarriga/nvim-notify',
-    lazy = false,
+    lazy = true,
     opts = {
       stages = 'static', -- fade_in_slide_out, fade, slide, static
-      render = 'wrapped-compact', -- default, minimal, simple, compact, wrapped-compact
+      render = 'minimal', -- default, minimal, simple, compact, wrapped-compact
       timeout = 4000, -- ms
       minimum_width = 50,
       icons = { ERROR = '', WARN = '', INFO = '', DEBUG = '', TRACE = '✎' },
