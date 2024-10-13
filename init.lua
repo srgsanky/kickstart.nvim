@@ -765,6 +765,44 @@ end
 -- Currently I don't see the value add with rustacenavim, so configuring it behind a flag.
 local use_vanilla_rust_analyzer = true
 
+-- Ask rustup to run the rust-analyzer from stable toolchain
+RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
+RUST_ANALYZER_OPTIONS = {
+  server = {
+    extraEnv = {
+      -- ['foo'] = 'bar', -- placeholder env variables
+    },
+  },
+  cargo = {
+    -- This stopped working from rust toolchain 1.79.0.
+    -- It was removed by <https://github.com/rust-lang/rust-analyzer/pull/16726> and called out in <https://github.com/rust-lang/rust-analyzer/issues/17957>
+    -- ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
+
+    ['features'] = {},
+  },
+  cfg = {
+    -- When <https://github.com/rust-lang/rust-analyzer/pull/18085> is merged, this config
+    -- is necessary to unset tests. This will prevent rust analyzer from showing test
+    -- references and will also dim the test code.
+    ['setTest'] = false,
+  },
+  check = {
+    command = 'check', -- 'check' or 'clippy'. Default is 'check'. 'clippy' runs the linter as well. https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
+  },
+
+  linkedProjects = {},
+
+  -- diagnostics = {
+  --   enable = true,
+  --   experimental = {
+  --     enable = true,
+  --   },
+  -- },
+  -- log = {
+  --   level = "debug",
+  -- },
+}
+
 -- Logic to save only modified lines on save
 -- I don't like the way rustfmt formats ranges of lines. In rust, anyway you have to format the entire file.
 -- Update: this works great for python after I added the current buffer name in git diff command. So, I am giving it a
@@ -1621,44 +1659,9 @@ require('lazy').setup({
       if use_vanilla_rust_analyzer then
         -- LSP config for rust. Use rust-analyzer from the rustup toolchain.
         require('lspconfig').rust_analyzer.setup {
-          -- Ask rustup to run the rust-analyzer from stable toolchain
-          cmd = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' },
+          cmd = RUST_ANALYZER_CMD,
           settings = {
-            ['rust-analyzer'] = {
-              server = {
-                extraEnv = {
-                  -- ['foo'] = 'bar', -- placeholder env variables
-                },
-              },
-              cargo = {
-                -- This stopped working from rust toolchain 1.79.0.
-                -- It was removed by <https://github.com/rust-lang/rust-analyzer/pull/16726> and called out in <https://github.com/rust-lang/rust-analyzer/issues/17957>
-                -- ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
-
-                ['features'] = {},
-              },
-              cfg = {
-                -- When <https://github.com/rust-lang/rust-analyzer/pull/18085> is merged, this config
-                -- is necessary to unset tests. This will prevent rust analyzer from showing test
-                -- references and will also dim the test code.
-                ['setTest'] = false,
-              },
-              check = {
-                command = 'check', -- 'check' or 'clippy'. Default is 'check'. 'clippy' runs the linter as well. https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
-              },
-
-              linkedProjects = {},
-
-              -- diagnostics = {
-              --   enable = true,
-              --   experimental = {
-              --     enable = true,
-              --   },
-              -- },
-              -- log = {
-              --   level = "debug",
-              -- },
-            },
+            ['rust-analyzer'] = RUST_ANALYZER_OPTIONS,
           },
           capabilities = capabilities,
           handlers = get_lsp_handlers_with_border(),
@@ -1684,6 +1687,42 @@ require('lazy').setup({
           handlers = get_lsp_handlers_with_border(),
         }
       end
+    end,
+  },
+
+  -- Rust tools -> Rustacean vim
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^5', -- Recommended
+    lazy = false, -- this plugin is already lazy
+    ft = { 'rust' },
+    enabled = not use_vanilla_rust_analyzer,
+    config = function()
+      ---@type rustaceanvim.Opts
+      vim.g.rustaceanvim = {
+        -- Plugin configuration
+        ---@type rustaceanvim.tools.Opts
+        tools = {},
+
+        -- LSP configuration
+        ---@type rustaceanvim.lsp.ClientOpts
+        server = {
+          cmd = RUST_ANALYZER_CMD,
+
+          on_attach = function(client, bufnr)
+            -- you can also put keymaps in here
+          end,
+
+          default_settings = {
+            -- rust-analyzer language server configuration
+            ['rust-analyzer'] = RUST_ANALYZER_OPTIONS,
+          },
+        },
+
+        -- DAP configuration
+        ---@type rustaceanvim.dap.Opts
+        dap = {},
+      }
     end,
   },
 
@@ -1892,35 +1931,6 @@ require('lazy').setup({
     'ray-x/lsp_signature.nvim',
     event = 'VeryLazy',
     opts = {},
-  },
-
-  -- Rust tools -> Rustacean vim
-  {
-    'mrcjkb/rustaceanvim',
-    version = '^4', -- Recommended
-    ft = { 'rust' },
-    enabled = not use_vanilla_rust_analyzer,
-    config = function()
-      ---@type RustaceanOpts
-      vim.g.rustaceanvim = {
-        ---@type RustaceanLspClientOpts
-        server = {
-          cmd = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' },
-
-          -- rust-analyzer language server configuration
-          ['rust-analyzer'] = {
-            server = {
-              extraEnv = {
-                ['foo'] = 'bar', -- placeholder env variables
-              },
-            },
-            cargo = {
-              ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
-            },
-          },
-        },
-      }
-    end,
   },
 
   -- Show recent buffers as tabs at the top
