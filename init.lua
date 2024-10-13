@@ -1325,9 +1325,25 @@ require('lazy').setup({
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
-      -- Useful status updates for LSP.
+      -- Show LSP progress on the bottom right
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      {
+        'j-hui/fidget.nvim',
+        opts = {
+
+          progress = {
+            poll_rate = 0.2, -- Number of polls per second (0.2 = 1 poll every 5 second)
+            -- Suppress new messages while in insert mode
+            suppress_on_insert = true,
+            -- If a task is already done but we just found out about the task in the current poll,
+            -- ignore it.
+            ignore_done_already = true,
+            -- Ignore new tasks that don't contain a message
+            ignore_empty_message = true,
+            ignore = {}, -- List of LSP servers to ignore
+          },
+        },
+      },
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
@@ -1779,12 +1795,6 @@ require('lazy').setup({
         dap = {},
       }
     end,
-  },
-
-  -- Show LSP progress on the bottom right
-  {
-    'j-hui/fidget.nvim',
-    opts = {},
   },
 
   { -- Autoformat
