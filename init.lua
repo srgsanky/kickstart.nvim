@@ -3962,6 +3962,11 @@ if open_neo_tree_on_startup then
 end
 
 function FlipTestsInRustCommand()
+  if not vim.lsp.buf.server_ready() then
+    require 'notify'('LSP is not ready. Please try again later.', 'warn')
+    return
+  end
+
   local clients = vim.lsp.get_clients()
   for _, client in ipairs(clients) do
     if client.name == 'rust_analyzer' then
@@ -3976,6 +3981,7 @@ function FlipTestsInRustCommand()
       end
 
       -- Restart LSP with the new configuration
+      vim.lsp.stop_client(client.id)
       require('lspconfig').rust_analyzer.setup {
         cmd = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' },
         settings = client.config.settings,
