@@ -4077,7 +4077,7 @@ end
 function FlipTestsInRustCommand()
   local clients = vim.lsp.get_clients()
   for _, client in ipairs(clients) do
-    if client.name == 'rust_analyzer' then
+    if client.name == 'rust_analyzer' or client.name == 'rust-analyzer' then
       -- flip the current value
       local current_value = client.config.settings['rust-analyzer'].cfg.setTest
       client.config.settings['rust-analyzer'].cfg.setTest = not current_value
