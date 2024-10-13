@@ -2100,7 +2100,7 @@ require('lazy').setup({
   -- https://github.com/simrat39/symbols-outline.nvim/issues/143
   {
     'hedyhli/outline.nvim',
-    lazy = false,
+    lazy = true, -- This sets the proper highlight groups that will color the current item on the outline
     cmd = { 'Outline', 'OutlineOpen' },
     keys = { -- Example mapping to toggle outline
       -- With !, focus stays in the current buffer. Without it, focus moves to Outline.
@@ -2110,6 +2110,21 @@ require('lazy').setup({
       { '<leader>o', '<cmd>Outline<CR>', desc = 'Toggle outline' },
     },
     opts = {},
+    -- NOTE: I want to show test functions in rust with a different icon, but I couldn't get this
+    --       working.
+    -- opts = {
+    --   symbols = {
+    --     icon_fetcher = function(kind)
+    --       -- This method should return the icon to use for the passed in kind.
+    --       -- This is not getting called in my experience.
+    --       if kind == 'Method' or kind == 'Function' then
+    --         return '🧪'
+    --       end
+    --       return false -- fallback to icon_source
+    --     end,
+    --     icon_source = 'lspkind',
+    --   },
+    -- },
     config = function(opts)
       require('outline').setup(opts)
       -- Close if outline is the only buffer of interest
