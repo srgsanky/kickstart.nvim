@@ -778,11 +778,15 @@ local use_ra_multiplex = false
 -- Ask rustup to run the rust-analyzer from stable toolchain
 if use_ra_multiplex then
   if not is_local_port_open(27631) then
-    print 'Unable to connect to ra_multiplex: Unable to connect to 127.0.0.1:27631'
+    vim.schedule(function()
+      vim.notify('Unable to connect to ra_multiplex at 127.0.0.1:27631', 'error', { title = 'ra-multiplex' })
+    end)
+    -- Fallback to not use ra-multiplex
+    RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
+  else
+    -- RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
+    RUST_ANALYZER_CMD = vim.lsp.rpc.connect('127.0.0.1', 27631)
   end
-
-  -- RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
-  RUST_ANALYZER_CMD = vim.lsp.rpc.connect('127.0.0.1', 27631)
 else
   RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
 end
