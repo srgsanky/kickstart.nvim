@@ -755,11 +755,10 @@ local use_native_inlay_hints = true
 
 -- rust toolchain to use
 -- Use "rustup toolchain list" to list all toolchains
-local use_nightly_toolchain = false
-local rustup_toolchain = 'stable'
-if use_nightly_toolchain then
-  rustup_toolchain = 'nightly'
-end
+-- Using nightly for the time being to make use of setTest config. See
+-- <https://github.com/rust-lang/rust-analyzer/pull/18085>
+local use_nightly_toolchain = true
+local rustup_toolchain = use_nightly_toolchain and 'nightly' or 'stable'
 
 -- Use vanilla rust analyzer or rustacenavim (mrcjkb/rustaceanvim)
 -- Currently I don't see the value add with rustacenavim, so configuring it behind a flag.
