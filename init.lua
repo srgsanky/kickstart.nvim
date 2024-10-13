@@ -779,7 +779,9 @@ local use_ra_multiplex = false
 if use_ra_multiplex then
   if not is_local_port_open(27631) then
     vim.schedule(function()
-      vim.notify('Unable to connect to ra_multiplex at 127.0.0.1:27631', 'error', { title = 'ra-multiplex' })
+      if vim.bo.filetype == 'rust' then
+        vim.notify('Unable to connect to ra_multiplex at 127.0.0.1:27631', 'error', { title = 'ra-multiplex' })
+      end
     end)
     -- Fallback to not use ra-multiplex
     RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
