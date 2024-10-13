@@ -1332,7 +1332,7 @@ require('lazy').setup({
         opts = {
 
           progress = {
-            poll_rate = 0.2, -- Number of polls per second (0.2 = 1 poll every 5 second)
+            poll_rate = 0.1, -- Number of polls per second (0.1 = 1 poll every 10 second)
             -- Suppress new messages while in insert mode
             suppress_on_insert = true,
             -- If a task is already done but we just found out about the task in the current poll,
@@ -1341,6 +1341,11 @@ require('lazy').setup({
             -- Ignore new tasks that don't contain a message
             ignore_empty_message = true,
             ignore = {}, -- List of LSP servers to ignore
+
+            display = {
+              render_limit = 5, -- How many LSP messages to show at once
+              done_ttl = 1, -- In sec. How long a message should persist after completion
+            },
           },
         },
       },
