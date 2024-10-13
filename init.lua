@@ -1945,10 +1945,53 @@ require('lazy').setup({
             separator = true, -- Show a separator between the offset and the buffers (optional)
           },
         },
+        -- Hide any buffers in BufferLine. This only hides the buffer, the buffer may still be open
+        -- in the background.
+        -- NOTE: this will be called a lot so don't do any heavy processing here
+        -- custom_filter = function(buf_number, _)
+        --   if not vim.tbl_contains(aux_windows, vim.bo[buf_number].filetype) then
+        --     return true
+        --   end
+        -- end,
       },
     },
     config = function(_, opts)
-      require('bufferline').setup(opts)
+      opts = opts or {}
+
+      -- Show current buffer/tab in orange
+      local selected_buf_or_tab_color_config = {
+        fg = '#000000',
+        bg = '#FFA500',
+        bold = true,
+      }
+
+      opts.highlights = {
+        -- Buffers
+        buffer_selected = selected_buf_or_tab_color_config,
+        close_button_selected = selected_buf_or_tab_color_config,
+        modified_selected = selected_buf_or_tab_color_config,
+
+        hint_selected = selected_buf_or_tab_color_config,
+        info_selected = selected_buf_or_tab_color_config,
+        warning_selected = selected_buf_or_tab_color_config,
+        error_selected = selected_buf_or_tab_color_config,
+
+        diagnostic_selected = selected_buf_or_tab_color_config,
+        hint_diagnostic_selected = selected_buf_or_tab_color_config,
+        info_diagnostic_selected = selected_buf_or_tab_color_config,
+        warning_diagnostic_selected = selected_buf_or_tab_color_config,
+        error_diagnostic_selected = selected_buf_or_tab_color_config,
+
+        indicator_selected = selected_buf_or_tab_color_config,
+        duplicate_selected = selected_buf_or_tab_color_config,
+
+        -- Tabs
+        tab_selected = selected_buf_or_tab_color_config,
+      }
+
+      local bufferline = require 'bufferline'
+      opts.options.style_preset = bufferline.style_preset.default
+      bufferline.setup(opts)
 
       -- Pick a buffer by typing the character shown (this is similar to the link navigation using Vimium in Chrome)
       -- Also see the telescope keybinding above to search and pick a buffer using <leader><leader>
