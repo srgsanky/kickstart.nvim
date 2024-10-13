@@ -753,6 +753,16 @@ end
 -- true will use neovim's navtive inlay hints. Otherwise, it uses the now archived plugin lvimuser/lsp-inlayhints.nvim
 local use_native_inlay_hints = true
 
+local function is_local_port_open(port)
+  -- Mac: brew install nc
+  -- Linux: yum install nc -y
+
+  -- host is mandatory for nc command
+  local command = string.format('nc -z localhost %d', port)
+  -- Successful execution of nc (return code 0) means the port is open
+  return os.execute(command) == 0
+end
+
 -- rust toolchain to use
 -- Use "rustup toolchain list" to list all toolchains
 -- Using nightly for the time being to make use of setTest config. See
@@ -767,6 +777,10 @@ local use_ra_multiplex = false
 
 -- Ask rustup to run the rust-analyzer from stable toolchain
 if use_ra_multiplex then
+  if not is_local_port_open(27631) then
+    print 'Unable to connect to ra_multiplex: Unable to connect to 127.0.0.1:27631'
+  end
+
   -- RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
   RUST_ANALYZER_CMD = vim.lsp.rpc.connect('127.0.0.1', 27631)
 else
@@ -3956,44 +3970,35 @@ require('lazy').setup({
 -- This follows most of
 -- https://medium.com/hackernoon/tmux-in-practice-copy-text-from-remote-session-using-ssh-remote-tunnel-and-systemd-service-dd3c51bca1fa
 -- to allow copying text from remote nvim to Mac's clipboard
-if is_linux then
-  local function is_local_port_open(port)
-    -- host is mandatory for nc command
-    local command = string.format('nc -z localhost %d', port)
-    -- Successful execution of nc (return code 0) means the port is open
-    return os.execute(command) == 0
-  end
+function YANK_AND_PIPE_TO_NC_SHOW_ERROR()
+  require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
+end
 
-  function YANK_AND_PIPE_TO_NC_SHOW_ERROR()
-    require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
-  end
+function YANK_AND_PIPE_TO_NC()
+  local yanked_text = ''
 
-  function YANK_AND_PIPE_TO_NC()
-    local yanked_text = ''
-
-    local mode = vim.fn.mode()
-    if mode == 'v' or mode == 'V' then
-      -- Trigger yank, so register " is populated
-      vim.cmd 'normal! y'
-      yanked_text = vim.fn.getreg '"'
-    else
-      return
-    end
-
-    local handle = io.popen('nc localhost 19999', 'w')
-    if handle then
-      handle:write(yanked_text)
-      handle:close()
-    end
-    require 'notify'('Copied!', 'info', { title = 'Yank and Pipe' })
-  end
-
-  if is_local_port_open(19999) then
-    -- Map 'gy' to the custom function in visual modes (without overriding regular 'y')
-    vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { noremap = true, silent = true })
+  local mode = vim.fn.mode()
+  if mode == 'v' or mode == 'V' then
+    -- Trigger yank, so register " is populated
+    vim.cmd 'normal! y'
+    yanked_text = vim.fn.getreg '"'
   else
-    vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC_SHOW_ERROR()<CR>', { noremap = true, silent = true })
+    return
   end
+
+  local handle = io.popen('nc localhost 19999', 'w')
+  if handle then
+    handle:write(yanked_text)
+    handle:close()
+  end
+  require 'notify'('Copied!', 'info', { title = 'Yank and Pipe' })
+end
+
+if is_local_port_open(19999) then
+  -- Map 'gy' to the custom function in visual modes (without overriding regular 'y')
+  vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { noremap = true, silent = true })
+else
+  vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC_SHOW_ERROR()<CR>', { noremap = true, silent = true })
 end
 
 vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'FocusGained' }, {
