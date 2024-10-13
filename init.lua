@@ -1690,6 +1690,15 @@ require('lazy').setup({
   },
 
   -- Rust tools -> Rustacean vim
+  -- Why rustaceanvim?
+  -- It provides additional features listed in https://github.com/mrcjkb/rustaceanvim#books-usage--features
+  --
+  -- 1. Expand macro recursively. For e.g. hover over #[test] and run :RustLsp expandMacro
+  -- 2. Move item up/down. :RustLsp moveItem {up|down}. I already get this from navbuddy.
+  -- 3. Grouped code actions: :RustLsp codeAction
+  -- 4. Go to parent module. :RustLsp parentModule
+  -- 5. Open Cargo.toml. :RustLsp openCargo
+  -- 6. Structural search and replace. :RustLsp ssr {query}. vim.cmd.RustLsp { 'ssr', '<query>' --[[ optional ]] }. TODO: Try this.
   {
     'mrcjkb/rustaceanvim',
     version = '^5', -- Recommended
@@ -3361,7 +3370,7 @@ require('lazy').setup({
       -- 'rouge8/neotest-rust',
     },
     config = function()
-      require('neotest').setup {
+      local opts = {
         -- https://github.com/nvim-neotest/neotest/pull/437/files
         run = {
           augment = function(tree, args)
@@ -3370,19 +3379,32 @@ require('lazy').setup({
             return args
           end,
         },
-        adapters = {
-          require 'neotest-vim-test' {
-            ignore_file_types = {}, -- You can adjust this for other languages if needed
-          },
-
-          -- require 'neotest-rust',
-        },
         -- Floating window for test result is controlled by the property relative = "editor"
         -- <https://github.com/nvim-neotest/neotest/blob/6d6ad113f56edc7c3f2a77a0836ea8c1b955ebea/lua/neotest/lib/ui/float.lua#L33>
         -- I couldn't find a way to configure this using floating.options
         --
         -- For the default configuration values see ~/.local/share/nvim/lazy/neotest/lua/neotest/config/init.lua
       }
+
+      -- 'neotest-vim-test' delegates to 'vim-test'
+      --
+      -- 'neotest-rust' uses TS for test discovery and command construction. These are inferior
+      -- methods to using rust-analyzer.
+      --
+      -- 'rustaceanvim.neotest' uses rust-analyzer to parse tests
+      if use_vanilla_rust_analyzer then
+        opts.adapters = {
+          require 'neotest-vim-test' {
+            ignore_file_types = {}, -- You can adjust this for other languages if needed
+          },
+        }
+      else
+        opts.adapters = {
+          require 'rustaceanvim.neotest',
+        }
+      end
+
+      require('neotest').setup(opts)
 
       close_file_type_when_only_buffer 'neotest-summary'
 
