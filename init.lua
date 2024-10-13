@@ -421,6 +421,10 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagn
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- Previous/next buffer. These shortcuts were inspired by <https://github.com/neovide/neovide>
+vim.api.nvim_set_keymap('n', '[b', ':bprevious<CR>', { noremap = true, silent = true, desc = 'Previous [b]uffer' })
+vim.api.nvim_set_keymap('n', ']b', ':bnext<CR>', { noremap = true, silent = true, desc = 'Next [b]uffer' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
