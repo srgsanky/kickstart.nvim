@@ -3387,21 +3387,23 @@ require('lazy').setup({
         -- For the default configuration values see ~/.local/share/nvim/lazy/neotest/lua/neotest/config/init.lua
       }
 
-      -- 'neotest-vim-test' delegates to 'vim-test'
-      --
-      -- 'neotest-rust' uses TS for test discovery and command construction. These are inferior
-      -- methods to using rust-analyzer.
-      --
-      -- 'rustaceanvim.neotest' uses rust-analyzer to parse tests
-      if use_vanilla_rust_analyzer then
+      local curr_buf_ft = vim.api.nvim_get_option_value('filetype', { buf = 0 })
+      if curr_buf_ft == 'rust' then
+        -- 'neotest-vim-test' delegates to 'vim-test'
+        --
+        -- 'neotest-rust' uses TS for test discovery and command construction. These are inferior
+        -- methods to using rust-analyzer.
+        --
+        -- 'rustaceanvim.neotest' uses rust-analyzer to parse tests
+
+        opts.adapters = {
+          use_vanilla_rust_analyzer and require 'neotest-vim-test' or 'rustaceanvim.neotest',
+        }
+      else
         opts.adapters = {
           require 'neotest-vim-test' {
             ignore_file_types = {}, -- You can adjust this for other languages if needed
           },
-        }
-      else
-        opts.adapters = {
-          require 'rustaceanvim.neotest',
         }
       end
 
