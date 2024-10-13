@@ -3690,7 +3690,8 @@ require('lazy').setup({
       },
     },
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-    build = 'make BUILD_FROM_SOURCE=true',
+    -- Don't build from source in Mac. It is failing.
+    build = is_linux and 'make BUILD_FROM_SOURCE=true' or 'make',
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
       'stevearc/dressing.nvim',
