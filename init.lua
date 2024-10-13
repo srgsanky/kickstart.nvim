@@ -3440,6 +3440,7 @@ require('lazy').setup({
     config = function(opts)
       opts = opts or {}
       opts.width = 120
+      opts.window_events = { 'WinEnter', 'FocusGained', 'BufEnter', 'BufWinEnter', 'TabEnter' }
 
       -- Highlight groups have to be reinitialized after setting the color scheme
       vim.api.nvim_create_autocmd('ColorScheme', {
