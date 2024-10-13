@@ -1623,21 +1623,37 @@ require('lazy').setup({
             ['rust-analyzer'] = {
               server = {
                 extraEnv = {
-                  ['foo'] = 'bar', -- placeholder env variables
+                  -- ['foo'] = 'bar', -- placeholder env variables
                 },
               },
               cargo = {
-                ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
+                -- This stopped working from rust toolchain 1.79.0.
+                -- It was removed by <https://github.com/rust-lang/rust-analyzer/pull/16726> and called out in <https://github.com/rust-lang/rust-analyzer/issues/17957>
+                -- ['unsetTest'] = { 'mod1', 'mod2' }, -- placeholder modules where test config must be unset
+
+                ['features'] = {},
               },
               cfg = {
                 -- When <https://github.com/rust-lang/rust-analyzer/pull/18085> is merged, this config
-                -- is necessary to unset tests. This will prevent rust analyzer from show test
+                -- is necessary to unset tests. This will prevent rust analyzer from showing test
                 -- references and will also dim the test code.
                 ['setTest'] = false,
               },
               check = {
-                command = 'clippy', -- default is 'check' https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
+                command = 'check', -- 'check' or 'clippy'. Default is 'check'. 'clippy' runs the linter as well. https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
               },
+
+              linkedProjects = {},
+
+              -- diagnostics = {
+              --   enable = true,
+              --   experimental = {
+              --     enable = true,
+              --   },
+              -- },
+              -- log = {
+              --   level = "debug",
+              -- },
             },
           },
           capabilities = capabilities,
@@ -3944,6 +3960,32 @@ end
 if open_neo_tree_on_startup then
   open_neotree_on_startup()
 end
+
+function FlipTestsInRustCommand()
+  local clients = vim.lsp.get_clients()
+  for _, client in ipairs(clients) do
+    if client.name == 'rust_analyzer' then
+      -- flip the current value
+      local current_value = client.config.settings['rust-analyzer'].cfg.setTest
+      client.config.settings['rust-analyzer'].cfg.setTest = not current_value
+
+      if current_value then
+        require 'notify'('Disabling rust tests', 'info')
+      else
+        require 'notify'('Enabling rust tests', 'info')
+      end
+
+      -- Restart LSP with the new configuration
+      require('lspconfig').rust_analyzer.setup {
+        cmd = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' },
+        settings = client.config.settings,
+      }
+    end
+  end
+end
+
+-- Keymap to toggle tests
+vim.api.nvim_set_keymap('n', '<leader>ft', ':lua FlipTestsInRustCommand()<CR>', { noremap = true, silent = true, desc = '[F]lip [T]ests in rust' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
