@@ -1934,7 +1934,7 @@ require('lazy').setup({
     opts = {
       options = {
         max_name_length = 30,
-        diagnostics = 'nvim_lsp',
+        diagnostics = false, -- false turns off showing diagnostic info in bufferline. Use 'nvim_lsp' if you want to show it.
         show_buffer_close_icons = true,
         offsets = {
           {
