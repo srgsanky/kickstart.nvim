@@ -3976,7 +3976,7 @@ function FlipTestsInRustCommand()
       end
 
       -- Restart LSP with the new configuration
-      vim.lsp.stop_client(client.id)
+      vim.lsp.stop_client(client.id, true) -- second param is for force shutdown
       require('lspconfig').rust_analyzer.setup {
         cmd = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' },
         settings = client.config.settings,
