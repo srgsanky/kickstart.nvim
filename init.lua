@@ -763,6 +763,11 @@ local function is_local_port_open(port)
   return os.execute(command) == 0
 end
 
+-- fidget shows the LSP progress on the bottom right. The alternate option is to show the lsp
+-- progress on the bottom using lua line.
+-- Only one of them can show the progress at a time. This flag configures it.
+local use_fidget_for_lsp_progress = true
+
 -- rust toolchain to use
 -- Use "rustup toolchain list" to list all toolchains
 -- Using nightly for the time being to make use of setTest config. See
@@ -1221,7 +1226,7 @@ require('lazy').setup({
       'SmiteshP/nvim-navic', -- breadcrumbs
     },
     config = function()
-      require('lualine').setup {
+      opts = {
         winbar = { -- configuring only the winbar
           lualine_a = {
             -- Always show the file name so that when there are no breadcrumbs the buffer won't jump
@@ -1286,7 +1291,7 @@ require('lazy').setup({
                 newfile = '[New]', -- Text to show for newly created file before first write
               },
             },
-            'lsp_progress',
+            -- 'lsp_progress', -- will be added below based on a flag. See below
           },
           lualine_x = {
             -- {
@@ -1303,6 +1308,11 @@ require('lazy').setup({
           },
         },
       }
+
+      if not use_fidget_for_lsp_progress then
+        table.insert(opts.sections.lualine_c, 'lsp_progress')
+      end
+      require('lualine').setup(opts)
     end,
     opts = {},
   },
@@ -1769,6 +1779,12 @@ require('lazy').setup({
         dap = {},
       }
     end,
+  },
+
+  -- Show LSP progress on the bottom right
+  {
+    'j-hui/fidget.nvim',
+    opts = {},
   },
 
   { -- Autoformat
