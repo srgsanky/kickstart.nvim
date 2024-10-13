@@ -2801,9 +2801,10 @@ require('lazy').setup({
       timeout = 4000, -- ms
       minimum_width = 50,
       icons = { ERROR = '', WARN = '', INFO = '', DEBUG = '', TRACE = '✎' },
-      level = vim.log.levels.INFO,
+      -- Increasing the log level to WARN as I get too many notifications. For e.g. write etc.
+      level = vim.log.levels.WARN,
       fps = 20,
-      background_colour = '#000000',
+      background_colour = 'NotifyBackground',
       on_open = function(win)
         vim.api.nvim_win_set_config(win, { zindex = 100 })
       end,
