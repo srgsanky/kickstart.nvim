@@ -1016,6 +1016,7 @@ require('lazy').setup({
             -- Rust build files
             'target/debug/',
             'target/release/',
+            'Cargo.lock',
           },
 
           mappings = {
