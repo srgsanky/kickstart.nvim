@@ -2867,7 +2867,8 @@ require('lazy').setup({
       minimum_width = 50,
       icons = { ERROR = '', WARN = '', INFO = '', DEBUG = '', TRACE = '✎' },
       -- Increasing the log level to WARN as I get too many notifications. For e.g. write etc.
-      level = vim.log.levels.WARN,
+      -- You can configure the VIM messages using shortmess. See :h shortmess
+      level = vim.log.levels.INFO,
       fps = 20,
       background_colour = 'NotifyBackground',
       on_open = function(win)
