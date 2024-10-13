@@ -767,7 +767,8 @@ local use_ra_multiplex = false
 
 -- Ask rustup to run the rust-analyzer from stable toolchain
 if use_ra_multiplex then
-  RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
+  -- RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
+  RUST_ANALYZER_CMD = vim.lsp.rpc.connect('127.0.0.1', 27631)
 else
   RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
 end
@@ -807,6 +808,16 @@ RUST_ANALYZER_OPTIONS = {
   --   level = "debug",
   -- },
 }
+
+if use_ra_multiplex then
+  -- The following is a non-standard configuration specific to ra-multiplex. It is not provided by
+  -- rust-analyzer
+  RUST_ANALYZER_OPTIONS.lspMux = {
+    version = '1',
+    method = 'connect',
+    server = 'rust-analyzer',
+  }
+end
 
 -- Logic to save only modified lines on save
 -- I don't like the way rustfmt formats ranges of lines. In rust, anyway you have to format the entire file.
