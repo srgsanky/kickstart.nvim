@@ -763,9 +763,15 @@ local rustup_toolchain = use_nightly_toolchain and 'nightly' or 'stable'
 -- Use vanilla rust analyzer or rustacenavim (mrcjkb/rustaceanvim)
 -- Currently I don't see the value add with rustacenavim, so configuring it behind a flag.
 local use_vanilla_rust_analyzer = true
+local use_ra_multiplex = false
 
 -- Ask rustup to run the rust-analyzer from stable toolchain
-RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
+if use_ra_multiplex then
+  RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
+else
+  RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
+end
+
 RUST_ANALYZER_OPTIONS = {
   server = {
     extraEnv = {
@@ -3872,7 +3878,6 @@ require('lazy').setup({
                 end
 
                 -- if not notification_open then
-                line_contents = line_contents:gsub('\\n', '\n')
                 if line_contents:match 'taplo' then
                   -- Ignore notifications from certain noisy lsps
                   -- 1. taplo (toml)
@@ -3883,7 +3888,12 @@ require('lazy').setup({
                   -- Ignore info messages logged as error by clangd. Info messages start with I[. %
                   -- is used to escape [ in the lua pattern string
                   return
+                elseif line_contents:match 'ra%-multiplex' and string.find(line_contents, 'INFO') then
+                  -- Ignore info messages logged as error by ra-multiplex.
+                  -- % is used to escape - in ra-multiplex
+                  return
                 end
+                line_contents = line_contents:gsub('\\n', '\n')
 
                 vim.schedule(function()
                   -- https://github.com/rcarriga/nvim-notify/blob/fbef5d32be8466dd76544a257d3f3dce20082a07/doc/nvim-notify.txt#L55
