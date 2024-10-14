@@ -2805,8 +2805,8 @@ require('lazy').setup({
       require('treesitter-context').setup {
         enable = false, -- Enabled on startup?
         -- multiline_threshold = 2, -- Separator helps with the contrast, so not limiting multiline_threshold
-        max_lines = 10, -- How many lines the window should span. Values <= 0 mean no limit.
-        min_window_height = 80, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+        max_lines = 20, -- How many lines the window should span. Values <= 0 mean no limit.
+        min_window_height = 50, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
         trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
         separator = '─', -- Unicode U+2500: BOX DRAWINGS LIGHT HORIZONTAL. This will show as a solid line in terminals with ligature support.
         on_attach = function(buf)
