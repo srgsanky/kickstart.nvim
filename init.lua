@@ -576,6 +576,11 @@ local function dump(o)
   end
 end
 
+local function is_running_in_main_thread()
+  local _, is_main = coroutine.running()
+  return is_main
+end
+
 -- OS detection
 local is_linux = vim.loop.os_uname().sysname == 'Linux'
 local is_mac = vim.loop.os_uname().sysname == 'Darwin'
@@ -612,6 +617,7 @@ local aux_windows = {
   'trouble',
   'qf',
   'Avante',
+  'beacon',
 }
 local function is_aux_window(name)
   for i = 1, #aux_windows do
@@ -1320,6 +1326,9 @@ require('lazy').setup({
             -- 'lsp_progress', -- will be added below based on a flag. See below
           },
           lualine_x = {
+            function()
+              return 'session: ' .. require('auto-session.lib').current_session_name(true)
+            end,
             -- {
             --   'filename',
             --   path = 0, -- Just the filename
@@ -3397,23 +3406,70 @@ require('lazy').setup({
 
       -- List of file types to bypass auto save when the only buffer open is one of the file types listed
       bypass_save_filetypes = aux_windows,
+      -- This is the old config name
+      -- bypass_session_save_file_types = aux_windows,
 
-      auto_save = false, -- Enables/disables auto saving session on exit
-      auto_restore = false, -- Enables/disables auto restoring session on start
-      auto_create = false, -- Enables/disables auto creating new session files. Can take a function that should return true/false if a new session file should be created or not
+      auto_save = true, -- Enables/disables auto saving session on exit
+      auto_restore = true, -- Enables/disables auto restoring session on start
+      auto_create = true, -- Enables/disables auto creating new session files. Can take a function that should return true/false if a new session file should be created or not
 
       close_unsupported_windows = true, -- Close windows that aren't backed by normal file before autosaving a session
 
-      pre_save = {
-        'tabdo Neotree close', -- Close Neotree before saving session
-        -- 'tabdo OutlineClose', -- Close Outline
-        'cclose', -- Close qf list
-        'lclose', -- Close location list
+      pre_save_cmds = {
+        function()
+          -- local windows_to_close = {}
+          -- for _, winid in ipairs(vim.api.nvim_list_wins()) do
+          --   local bufnr = vim.api.nvim_win_get_buf(winid)
+          --   local file_type = vim.api.nvim_get_option_value('filetype', { buf = bufnr })
+          --
+          --   if is_aux_window(file_type) then
+          --     table.insert(windows_to_close, winid)
+          --   end
+          -- end
+          --
+          -- vim.schedule(function()
+          --   for _, winid in ipairs(windows_to_close) do
+          --     pcall(function()
+          --       if vim.api.nvim_win_is_valid(win_id) then
+          --         vim.api.nvim_win_close(winid, true) -- force
+          --       end
+          --     end)
+          --   end
+          -- end)
+
+          -- https://github.com/rmagatti/auto-session/issues/176#issuecomment-1278384005
+          -- https://github.com/rmagatti/auto-session/blob/1d3dd70a2d48e0f3441128eb4fb0b437a0bf2cc4/lua/auto-session.lua#L196
+          local buffers = vim.api.nvim_list_bufs()
+          for _, buffer in ipairs(buffers) do
+            local file_type = vim.api.nvim_get_option_value('filetype', { buf = buffer })
+
+            if is_aux_window(file_type) then
+              -- bwipeout vs bdelete
+              -- bwipeout remove all data about the buffer like undo history etc. It is a hard
+              -- delete of the buffer
+              -- vim.api.nvim_buf_delete(buffer, { force = true })
+              vim.api.nvim_command('bwipeout! ' .. buffer)
+            end
+          end
+
+          -- close qf list
+          vim.api.nvim_command 'cclose'
+          -- close location list
+          vim.api.nvim_command 'lclose'
+        end,
       },
 
+      post_restore_cmds = {
+        -- Trigger BufEnter so that the coloring returns to normal
+        'doautocmd BufEnter',
+      },
+
+      -- print statements in the cmd handler shows only when log_level is set to debug
       -- log_level = 'debug',
     },
     config = function(opts)
+      opts = opts or {}
+
       -- See :h sessionoptions
       vim.o.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions'
       require('auto-session').setup(opts)
@@ -3590,6 +3646,7 @@ require('lazy').setup({
   -- Highlight cursor when it moved
   {
     'danilamihailov/beacon.nvim',
+    lazy = true,
     ft = function()
       -- beacon doesn't provide a way to disable this plugin for specific filetypes
       -- <https://github.com/DanilaMihailov/beacon.nvim/issues/26>
@@ -4073,7 +4130,7 @@ else
   vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC_SHOW_ERROR()<CR>', { noremap = true, silent = true })
 end
 
-vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'FocusGained' }, {
+vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'BufWinEnter', 'FocusGained' }, {
   callback = function()
     local ft = vim.bo.filetype
     if not is_aux_window(ft) then
