@@ -4119,11 +4119,17 @@ function YANK_AND_PIPE_TO_NC()
     return
   end
 
+  -- popen just starts the process
   local handle = io.popen('nc localhost 19999', 'w')
   if handle then
     handle:write(yanked_text)
-    handle:close()
-    require 'notify'('Copied!', 'info', { title = 'Yank and Pipe' })
+    -- close here will complete the process
+    local _, _, exit_code = handle:close()
+    if exit_code == 0 then
+      require 'notify'('Copied!', 'info', { title = 'Yank and Pipe' })
+    else
+      require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
+    end
   else
     require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
   end
