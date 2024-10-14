@@ -4123,16 +4123,22 @@ function YANK_AND_PIPE_TO_NC()
   if handle then
     handle:write(yanked_text)
     handle:close()
+    require 'notify'('Copied!', 'info', { title = 'Yank and Pipe' })
+  else
+    require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
   end
-  require 'notify'('Copied!', 'info', { title = 'Yank and Pipe' })
 end
 
-if is_local_port_open(19999) then
-  -- Map 'gy' to the custom function in visual modes (without overriding regular 'y')
-  vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { noremap = true, silent = true })
-else
-  vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC_SHOW_ERROR()<CR>', { noremap = true, silent = true })
-end
+-- Checking if the port is open will write a null byte to the copy buffer, clearing the existing
+-- items. So, whenever you open nvim, it will clear the system buffer. This is not a good UX.
+-- TODO: Find a better UX while still showing error messages.
+--
+-- if is_local_port_open(19999) then
+-- Map 'gy' to the custom function in visual modes (without overriding regular 'y')
+vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { noremap = true, silent = true })
+-- else
+--   vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC_SHOW_ERROR()<CR>', { noremap = true, silent = true })
+-- end
 
 vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'BufWinEnter', 'FocusGained' }, {
   callback = function()
