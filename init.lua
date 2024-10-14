@@ -622,7 +622,13 @@ local function is_aux_window(name)
   return false
 end
 
-local function is_buffer_visible(bufnr)
+local function is_buffer_hidden(bufnr)
+  -- Check if the buffer is listed (exists in the buffer list) and not in any window
+  local num_windows_that_use_the_buf = #vim.fn.win_findbuf(bufnr)
+  return vim.fn.buflisted(bufnr) == 1 and num_windows_that_use_the_buf == 0
+end
+
+local function is_buffer_used_by_any_window(bufnr)
   for _, winid in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_buf(winid) == bufnr then
       return true
@@ -631,76 +637,94 @@ local function is_buffer_visible(bufnr)
   return false
 end
 
--- Create autocmd to close the given filetype if it is the only buffer
-local function close_file_type_when_only_buffer(file_type_to_close)
-  -- If this is the last buffer, it will automatically receive focus, triggering the BufEnter event.
-  -- So, we try to check if this is the only buffer of interest.
-  vim.api.nvim_create_autocmd('BufEnter', {
-    callback = function(e)
-      -- Set this to true to see what is keeping nvim from closing
-      local debug = false
-      local buf_num = e.buf
-      local file_type = vim.api.nvim_get_option_value('filetype', { buf = buf_num })
-      if debug then
-        print('BufEnter: ' .. file_type .. ' focused')
-      end
+-- Create autocmd to close vim if only aux windows are open.
+-- When any buffer is closed, existing open buffer will receive focus, triggering the BufEnter event.
+-- We quit nvim if there are no buffers of interest.
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+  -- NOTE: Specifying filetype as pattern does not work
+  -- pattern = aux_windows,
+  callback = function(e)
+    -- Set this to true to see what is keeping nvim from closing
+    local debug = false
+    local verbose = false
+    local buf_num = e.buf
+    local file_type = vim.api.nvim_get_option_value('filetype', { buf = buf_num })
+    -- We need to run a check only when aux window received focus
+    if not is_aux_window(file_type) then
+      return
+    end
 
-      if file_type == file_type_to_close then
-        local bufs = vim.api.nvim_list_bufs()
-        local loaded_bufs = 0
-        for buf_idx = 1, #bufs do
-          if vim.api.nvim_buf_is_loaded(bufs[buf_idx]) then
-            local loaded_buf_number = vim.api.nvim_buf_get_number(bufs[buf_idx])
+    if debug and verbose then
+      print('BufEnter: ' .. file_type .. ' focused')
+    end
 
-            -- https://neovim.io/doc/user/options.html
-            local loaded_buf_type = vim.api.nvim_get_option_value('buftype', { buf = loaded_buf_number })
-            local loaded_buf_listed = vim.api.nvim_get_option_value('buflisted', { buf = loaded_buf_number })
-            local loaded_buf_modified = vim.api.nvim_get_option_value('modified', { buf = loaded_buf_number })
-            local loaded_buf_modifiable = vim.api.nvim_get_option_value('modifiable', { buf = loaded_buf_number })
-            local loaded_buf_file_type = vim.api.nvim_get_option_value('filetype', { buf = loaded_buf_number })
+    -- bufs is a list of buffer handle (which is the buffer number)
+    local bufs = vim.api.nvim_list_bufs()
+    if debug then
+      print('Found ' .. tostring(#bufs) .. ' buffers')
+    end
+    local buffers_of_interest = 0
+    for buf_idx = 1, #bufs do
+      local loaded_buf_number = bufs[buf_idx]
 
+      -- When you do :q, the buffer is not deleted. This is required to check if the buffer is used by any window and not hidden.
+      if vim.api.nvim_buf_is_loaded(bufs[buf_idx]) and not is_buffer_hidden(loaded_buf_number) then
+        -- https://neovim.io/doc/user/options.html
+        local loaded_buf_type = vim.api.nvim_get_option_value('buftype', { buf = loaded_buf_number })
+        local loaded_buf_listed = vim.api.nvim_get_option_value('buflisted', { buf = loaded_buf_number })
+        local loaded_buf_modified = vim.api.nvim_get_option_value('modified', { buf = loaded_buf_number })
+        local loaded_buf_modifiable = vim.api.nvim_get_option_value('modifiable', { buf = loaded_buf_number })
+        local loaded_buf_file_type = vim.api.nvim_get_option_value('filetype', { buf = loaded_buf_number })
+
+        if debug and verbose then
+          print(
+            'Buffer='
+              .. loaded_buf_number
+              .. ', type='
+              .. loaded_buf_type
+              .. ', listed='
+              .. tostring(loaded_buf_listed)
+              .. ', modified='
+              .. tostring(loaded_buf_modified)
+              .. ', modifiable='
+              .. tostring(loaded_buf_modifiable)
+              .. ', filetype='
+              .. loaded_buf_file_type
+              .. ' is open'
+          )
+        end
+
+        -- We don't care about aux windows.
+        if not is_aux_window(loaded_buf_file_type) then
+          -- We only care about buffers that are listed
+          if loaded_buf_listed then
             if debug then
               print(
-                'Buffer='
-                  .. loaded_buf_number
-                  .. ', type='
+                'BufEnter: '
                   .. loaded_buf_type
-                  .. ', listed='
-                  .. tostring(loaded_buf_listed)
-                  .. ', modified='
-                  .. tostring(loaded_buf_modified)
-                  .. ', modifiable='
-                  .. tostring(loaded_buf_modifiable)
-                  .. ', filetype='
+                  .. ' '
                   .. loaded_buf_file_type
-                  .. ' is still open'
+                  .. ' (len: '
+                  .. string.len(loaded_buf_file_type)
+                  .. ') will prevent nvim from quiting'
               )
             end
-
-            -- We only care about buffers that are listed or modified
-            if loaded_buf_listed or loaded_buf_modified then
-              -- We don't care about aux windows.
-              -- We don't care about buffers that are of type that we want to close
-              if not is_aux_window(loaded_buf_file_type) and loaded_buf_file_type ~= file_type_to_close then
-                if is_buffer_visible(loaded_buf_number) then
-                  if debug then
-                    print('BufEnter: ' .. loaded_buf_file_type .. ' (len: ' .. string.len(loaded_buf_file_type) .. ') is still open')
-                  end
-                  loaded_bufs = loaded_bufs + 1
-                end
-              end
-            end
+            buffers_of_interest = buffers_of_interest + 1
           end
         end
-
-        if loaded_bufs == 0 then
-          -- Try to quit. This will fail if buffer is dirty
-          vim.cmd 'q'
-        end
       end
-    end,
-  })
-end
+    end
+
+    if buffers_of_interest == 0 then
+      -- Try to quit. This will fail if buffer is dirty
+      if debug then
+        print('QUIT QUIT. Will quit. Found ' .. tostring(#bufs) .. ' buffers')
+      else
+        vim.cmd 'q'
+      end
+    end
+  end,
+})
 
 local function get_telescope_dropdown()
   -- See help for telescope.layout.center()
@@ -2278,8 +2302,6 @@ require('lazy').setup({
     -- },
     config = function(opts)
       require('outline').setup(opts)
-      -- Close if outline is the only buffer of interest
-      close_file_type_when_only_buffer 'Outline'
     end,
   },
 
@@ -2411,9 +2433,6 @@ require('lazy').setup({
   {
     'romainl/vim-qf',
     config = function()
-      -- If quickfix is the only visible buffer, close neovim
-      close_file_type_when_only_buffer 'qf'
-
       -- Original vimscript from
       -- <https://www.reddit.com/r/vim/comments/xeqdbb/keybinding_to_remove_a_quickfix_entry/>
       -- " Normal: `dd` removes item from the quickfix list.
@@ -2897,9 +2916,6 @@ require('lazy').setup({
           vim.api.nvim_win_set_height(vim.api.nvim_get_current_win(), size)
         end,
       })
-
-      -- Close if call hierarchy is the only buffer of interest
-      close_file_type_when_only_buffer 'yggdrasil'
     end,
   },
 
@@ -3501,8 +3517,6 @@ require('lazy').setup({
 
       require('neotest').setup(opts)
 
-      close_file_type_when_only_buffer 'neotest-summary'
-
       -- keymap
       vim.keymap.set('n', '<leader>tn', '<cmd>lua require("neotest").run.run()<CR>', { desc = '[t]est [n]earest' })
       vim.keymap.set('n', '<leader>tf', '<cmd>lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { desc = '[t]est [f]ile' })
@@ -3563,9 +3577,6 @@ require('lazy').setup({
       },
     },
     config = function(_, opts)
-      -- If trouble is the only visible buffer, close neovim
-      close_file_type_when_only_buffer 'trouble'
-
       require('trouble').setup(opts)
     end,
   },
