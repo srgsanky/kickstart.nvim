@@ -610,6 +610,8 @@ local aux_windows = {
   'neotest-summary',
   'toggleterm',
   'trouble',
+  'qf',
+  'Avante',
 }
 local function is_aux_window(name)
   for i = 1, #aux_windows do
@@ -3380,8 +3382,26 @@ require('lazy').setup({
       -- List of file types to bypass auto save when the only buffer open is one of the file types listed
       bypass_save_filetypes = aux_windows,
 
+      auto_save = true, -- Enables/disables auto saving session on exit
+      auto_restore = true, -- Enables/disables auto restoring session on start
+      auto_create = true, -- Enables/disables auto creating new session files. Can take a function that should return true/false if a new session file should be created or not
+
+      close_unsupported_windows = true, -- Close windows that aren't backed by normal file before autosaving a session
+
+      pre_save = {
+        'tabdo Neotree close', -- Close Neotree before saving session
+        'tabdo OutlineClose', -- Close Outline
+        'cclose', -- Close qf list
+        'lclose', -- Close location list
+      },
+
       -- log_level = 'debug',
     },
+    config = function(opts)
+      -- See :h sessionoptions
+      vim.o.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions'
+      require('auto-session').setup(opts)
+    end,
   },
 
   -- Remember the last cursor position and open file in that position.
