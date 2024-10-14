@@ -3644,78 +3644,82 @@ require('lazy').setup({
   },
 
   -- Highlight cursor when it moved
+  -- Switching to my fork of beacon which has fixes for
+  -- 1. Ignoring given file types
+  -- 1. Set a file type on the fake buffer
   {
-    'danilamihailov/beacon.nvim',
-    lazy = true,
-    ft = function()
-      -- beacon doesn't provide a way to disable this plugin for specific filetypes
-      -- <https://github.com/DanilaMihailov/beacon.nvim/issues/26>
-      -- ft doesn't provide a way to specify file types to ignore. A workaround is to list all
-      -- common filetypes
-      return {
-        'c',
-        'cpp',
-        'rust',
-        'go',
-        'python',
-        'javascript',
-        'typescript',
-        'lua',
-        'vim',
-        'bash',
-        'html',
-        'css',
-        'scss',
-        'json',
-        'yaml',
-        'toml',
-        'xml',
-        'markdown',
-        'txt',
-        'sh',
-        'zsh',
-        'make',
-        'cmake',
-        'dockerfile',
-        'gitcommit',
-        'gitrebase',
-        'sql',
-        'perl',
-        'ruby',
-        'php',
-        'java',
-        'scala',
-        'haskell',
-        'elixir',
-        'erlang',
-        'r',
-        'latex',
-        'tex',
-        'perl',
-        'kotlin',
-        'dart',
-        'swift',
-        'racket',
-        'clojure',
-        'scheme',
-        'fsharp',
-        'ocaml',
-        'fortran',
-        'vim',
-        'help',
-        -- aux windows where I want this feature
-        'neo-tree',
-        'Outline',
-        'neotest-summary',
-        -- Add any other relevant filetypes here
-        'kdl',
-      }
-    end,
+    'srgsanky/beacon.nvim',
+    lazy = false,
+    -- ft = function()
+    --   -- beacon doesn't provide a way to disable this plugin for specific filetypes
+    --   -- <https://github.com/DanilaMihailov/beacon.nvim/issues/26>
+    --   -- ft doesn't provide a way to specify file types to ignore. A workaround is to list all
+    --   -- common filetypes
+    --   return {
+    --     'c',
+    --     'cpp',
+    --     'rust',
+    --     'go',
+    --     'python',
+    --     'javascript',
+    --     'typescript',
+    --     'lua',
+    --     'vim',
+    --     'bash',
+    --     'html',
+    --     'css',
+    --     'scss',
+    --     'json',
+    --     'yaml',
+    --     'toml',
+    --     'xml',
+    --     'markdown',
+    --     'txt',
+    --     'sh',
+    --     'zsh',
+    --     'make',
+    --     'cmake',
+    --     'dockerfile',
+    --     'gitcommit',
+    --     'gitrebase',
+    --     'sql',
+    --     'perl',
+    --     'ruby',
+    --     'php',
+    --     'java',
+    --     'scala',
+    --     'haskell',
+    --     'elixir',
+    --     'erlang',
+    --     'r',
+    --     'latex',
+    --     'tex',
+    --     'perl',
+    --     'kotlin',
+    --     'dart',
+    --     'swift',
+    --     'racket',
+    --     'clojure',
+    --     'scheme',
+    --     'fsharp',
+    --     'ocaml',
+    --     'fortran',
+    --     'vim',
+    --     'help',
+    --     -- aux windows where I want this feature
+    --     'neo-tree',
+    --     'Outline',
+    --     'neotest-summary',
+    --     -- Add any other relevant filetypes here
+    --     'kdl',
+    --   }
+    -- end,
     config = function(opts)
       opts = opts or {}
       opts.width = 120
       opts.window_events = { 'WinEnter', 'FocusGained', 'BufEnter', 'BufWinEnter', 'TabEnter' }
       opts.speed = 2
+      opts.beacon_ignore_filetypes = aux_windows
 
       -- Highlight groups have to be reinitialized after setting the color scheme
       vim.api.nvim_create_autocmd('ColorScheme', {
