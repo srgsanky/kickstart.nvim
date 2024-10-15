@@ -618,6 +618,8 @@ local aux_windows = {
   'qf',
   'Avante',
   'beacon',
+  'fugitiveblame',
+  'git',
 }
 local function is_aux_window(name)
   for i = 1, #aux_windows do
