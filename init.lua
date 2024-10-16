@@ -2647,6 +2647,7 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
+    enabled = false,
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
@@ -4243,6 +4244,8 @@ end
 
 -- Keymap to toggle tests
 vim.api.nvim_set_keymap('n', '<leader>ft', ':lua FlipTestsInRustCommand()<CR>', { noremap = true, silent = true, desc = '[F]lip [T]ests in rust' })
+
+require 'custom.plugins.vim_fugitive_blame_hlg'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
