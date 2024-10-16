@@ -98,7 +98,7 @@ local function highlight_same_commit()
             -- Replacing with space will reserve the space which looks better visually. Moreover,
             -- since the commit ids are removed, if you jump to next/previous from a commit id using
             -- */#, it will go to the next/previous chunk.
-            local spaces = string.rep(' ', #line_content)
+            local spaces = string.rep(em_space, #line_content)
 
             vim.api.nvim_buf_set_lines(current_buf, i - 1, i, false, { spaces })
           end
@@ -117,17 +117,17 @@ local function highlight_same_commit()
     if is_curr_buf_modifiable then
       vim.api.nvim_buf_set_option(current_buf, 'modifiable', false)
     end
+
+    -- Setting the width of buffer must be run on the main thread. So, it must be scheduled
+    vim.schedule(function()
+      -- Use vim fugitive's default keybinding to show till date column
+      -- This does not work
+      -- vim.api.nvim_feedkeys('D', 'n', false)
+
+      -- Shows only the commit id which is 8 chars
+      set_minwidth_for_buffer(current_buf, 8)
+    end)
   end
-
-  -- Setting the width of buffer must be run on the main thread. So, it must be scheduled
-  vim.schedule(function()
-    -- Use vim fugitive's default keybinding to show till date column
-    -- This does not work
-    -- vim.api.nvim_feedkeys('D', 'n', false)
-
-    -- Shows only the commit id which is 8 chars
-    set_minwidth_for_buffer(current_buf, 8)
-  end)
 end
 
 -- If I use Filetype auto cmd, the keybindings are not properly setup. So, I am sticking to
