@@ -1206,6 +1206,9 @@ require('lazy').setup({
       -- Search in quickfix list
       map_telescope_using_dropdown_theme('n', '<leader>sq', builtin.quickfix, { desc = '[S]earch [Q]uickfix' })
 
+      -- Search in cmds
+      map_telescope_using_dropdown_theme('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
+
       -- Search in undo tree
       map_telescope_using_dropdown_theme('n', '<leader>u', function(opts)
         opts = opts or {}
