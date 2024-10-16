@@ -620,7 +620,8 @@ local aux_windows = {
   'AvanteInput',
   'beacon',
   'fugitiveblame',
-  'git',
+  -- Don't add git. It will trigger a close when you try to open patches from vim fugitive
+  -- 'git',
 }
 local function is_aux_window(name)
   for i = 1, #aux_windows do
