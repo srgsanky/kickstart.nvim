@@ -1284,6 +1284,15 @@ require('lazy').setup({
             },
           },
         },
+        -- Set this to retain winbar on WinLeave
+        inactive_winbar = {
+          lualine_a = {
+            {
+              'filename',
+              path = 0, -- Just the filename
+            },
+          },
+        },
         options = {
           disabled_filetypes = { -- Filetypes to disable lualine for.
             statusline = aux_windows, -- statusline won't be drawn for these file types
