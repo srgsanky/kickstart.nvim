@@ -4149,7 +4149,7 @@ vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC()<CR>', { norem
 --   vim.api.nvim_set_keymap('v', 'gy', '<cmd>lua YANK_AND_PIPE_TO_NC_SHOW_ERROR()<CR>', { noremap = true, silent = true })
 -- end
 
-vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'BufWinEnter', 'FocusGained' }, {
+vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
   callback = function()
     local ft = vim.bo.filetype
     if not is_aux_window(ft) then
@@ -4158,7 +4158,7 @@ vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'BufWinEnter', 'FocusGaine
   end,
 })
 
-vim.api.nvim_create_autocmd({ 'WinLeave', 'BufLeave', 'FocusLost' }, {
+vim.api.nvim_create_autocmd({ 'WinLeave', 'FocusLost' }, {
   callback = function()
     local ft = vim.bo.filetype
     if not is_aux_window(ft) then
