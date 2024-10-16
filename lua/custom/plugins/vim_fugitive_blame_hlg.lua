@@ -116,8 +116,10 @@ local function highlight_same_commit()
       -- Don't show whitespace as dot
       vim.api.nvim_buf_set_option(current_buf, 'list', false)
     end
-    -- Add a line at the top to offset for breadcrumbs in the file
-    vim.api.nvim_buf_set_lines(current_buf, 0, 0, false, { ' ' })
+    -- Add a line at the top to offset for breadcrumbs in the file. This messes up with cursorbind
+    -- introducing off by one
+    -- This is no longer needed after adding inactive_winbar to lualine
+    -- vim.api.nvim_buf_set_lines(current_buf, 0, 0, false, { ' ' })
 
     if is_curr_buf_modifiable then
       vim.api.nvim_buf_set_option(current_buf, 'modifiable', false)
@@ -134,6 +136,13 @@ local function highlight_same_commit()
     end)
   end
 end
+
+-- This will keep the cursors in sync between the blame window and the editor
+vim.api.nvim_create_autocmd({ 'Filetype' }, {
+  callback = function()
+    vim.cmd [[ set cursorbind ]]
+  end,
+})
 
 -- If I use Filetype auto cmd, the keybindings are not properly setup. So, I am sticking to
 -- BufWinEnter.

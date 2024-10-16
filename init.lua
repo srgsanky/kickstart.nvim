@@ -1265,6 +1265,14 @@ require('lazy').setup({
       'SmiteshP/nvim-navic', -- breadcrumbs
     },
     config = function()
+      -- I want the winbar for fugitiveblame so that the blame align with editor lines
+      local cloned_aux_windows = {}
+      for key, value in pairs(aux_windows) do
+        if value ~= 'fugitiveblame' then
+          cloned_aux_windows[key] = value
+        end
+      end
+
       opts = {
         winbar = { -- configuring only the winbar
           lualine_a = {
@@ -1296,7 +1304,7 @@ require('lazy').setup({
         options = {
           disabled_filetypes = { -- Filetypes to disable lualine for.
             statusline = aux_windows, -- statusline won't be drawn for these file types
-            winbar = aux_windows, -- winbar won't be drawn for these file types
+            winbar = cloned_aux_windows, -- winbar won't be drawn for these file types
           },
           ignore_focus = aux_windows, -- When you focus the aux windows, they will continue to show the status from previous window
           globalstatus = true, -- Have a single status line across all windows instead of one per window
