@@ -127,8 +127,8 @@ local function highlight_same_commit()
       -- This does not work
       -- vim.api.nvim_feedkeys('D', 'n', false)
 
-      -- Shows only the commit id which is 8 chars
-      set_minwidth_for_buffer(current_buf, 8)
+      -- Shows only the commit id which is 8 chars. Show the space after 8 chars
+      set_minwidth_for_buffer(current_buf, 9)
     end)
   end
 end
