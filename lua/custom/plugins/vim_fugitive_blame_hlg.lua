@@ -137,10 +137,70 @@ local function highlight_same_commit()
   end
 end
 
--- This will keep the cursors in sync between the blame window and the editor
-vim.api.nvim_create_autocmd({ 'Filetype' }, {
-  callback = function()
-    vim.cmd [[ set cursorbind ]]
+-- vim.api.nvim_create_autocmd({ 'Filetype' }, {
+--   callback = function(e)
+--     if vim.bo.filetype == 'fugitiveblame' then
+--       local fugitive_buffer = e.buf
+--       local result = vim.fn['FugitiveResult'](e.buf)
+--
+--       local original_buffer = result.origin_bufnr
+--       local original_window = result.origin_winid
+--
+--       -- Close git blame when you leave original window
+--       -- Create an autocommand group to avoid duplicate commands
+--       vim.api.nvim_create_augroup('LeavingOriginalBuffer', { clear = true })
+--       vim.api.nvim_create_autocmd('WinLeave', {
+--         group = 'LeavingOriginalBuffer',
+--         pattern = '*',
+--         callback = function()
+--           if vim.api.nvim_get_current_win() == original_window then
+--             vim.schedule(function()
+--               if vim.api.nvim_buf_is_valid(fugitive_buffer) then
+--                 vim.api.nvim_buf_delete(fugitive_buffer, { force = false })
+--               end
+--             end)
+--           end
+--         end,
+--       })
+--       vim.api.nvim_create_autocmd('BufWinLeave', {
+--         group = 'LeavingOriginalBuffer',
+--         pattern = '*',
+--         callback = function()
+--           if vim.api.nvim_get_current_buf() == original_buffer then
+--             vim.schedule(function()
+--               if vim.api.nvim_buf_is_valid(fugitive_buffer) then
+--                 vim.api.nvim_buf_delete(fugitive_buffer, { force = false })
+--               end
+--             end)
+--           end
+--         end,
+--       })
+--     end
+--   end,
+-- })
+
+vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+  callback = function(e)
+    if vim.bo.filetype == 'fugitiveblame' then
+      -- This will keep the cursors in sync between the blame window and the editor
+      vim.cmd [[ setlocal cursorbind ]]
+
+      local result = vim.fn['FugitiveResult'](e.buf)
+      local original_buffer = result.origin_bufnr
+      vim.api.nvim_buf_set_option(original_buffer, 'cursorbind', true)
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'BufLeave' }, {
+  callback = function(e)
+    if vim.bo.filetype == 'fugitiveblame' then
+      vim.cmd [[ setlocal nocursorbind ]]
+
+      local result = vim.fn['FugitiveResult'](e.buf)
+      local original_buffer = result.origin_bufnr
+      vim.api.nvim_buf_set_option(original_buffer, 'cursorbind', false)
+    end
   end,
 })
 
