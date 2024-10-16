@@ -617,6 +617,7 @@ local aux_windows = {
   'trouble',
   'qf',
   'Avante',
+  'AvanteInput',
   'beacon',
   'fugitiveblame',
   'git',

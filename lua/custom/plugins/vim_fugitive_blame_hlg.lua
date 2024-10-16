@@ -40,10 +40,13 @@ local function set_minwidth_for_buffer(bufnr, minwidth)
   end
 end
 
+-- https://github.com/tpope/vim-fugitive/blob/d4877e54cef67f5af4f950935b1ade19ed6b7370/autoload/fugitive.vim#L6862
 local function highlight_same_commit()
   local ft = vim.bo.filetype
   -- This function is applicable only to fugitiveblame
-  if ft ~= 'fugitiveblame' then
+  -- g.loaded_fugitive is only whether the plugin is loaded. It does not mean that the fugitiveblame
+  -- is initialized.
+  if ft ~= 'fugitiveblame' or vim.g.loaded_fugitive == nil or vim.g.loaded_fugitive ~= 1 then
     return
   end
 
@@ -134,10 +137,7 @@ end
 -- BufWinEnter.
 vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   callback = function()
-    local ft = vim.bo.filetype
-    if ft == 'fugitiveblame' then
-      highlight_same_commit()
-    end
+    highlight_same_commit()
   end,
 })
 
