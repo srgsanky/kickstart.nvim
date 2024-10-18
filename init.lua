@@ -2872,8 +2872,9 @@ require('lazy').setup({
           end
           return true
         end,
-        -- TS context needs to be per buffer. This is tracked in
-        -- <https://github.com/nvim-treesitter/nvim-treesitter-context/issues/31>.
+        -- Enable TS context to be per buffer.
+        -- Enabled by <https://github.com/nvim-treesitter/nvim-treesitter-context/issues/31>.
+        multiwindow = true,
       }
     end,
     opts = {},
