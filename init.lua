@@ -4270,5 +4270,21 @@ vim.api.nvim_set_keymap('n', '<leader>ft', ':lua FlipTestsInRustCommand()<CR>', 
 
 require 'custom.plugins.vim_fugitive_blame_hlg'
 
+-- Visually indicate when you jump to a Rust library file.
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+  pattern = '*.rs',
+  callback = function()
+    local file_path = vim.fn.expand '%:p'
+    if file_path:match 'cargo/registry' or file_path:match 'rustup/toolchains' then
+      -- When you go to a rust library file, signify it by a change of color scheme. Also make the
+      -- buffer unmodifiable.
+      vim.cmd 'colorscheme flexoki-dark'
+      vim.api.nvim_buf_set_option(vim.api.nvim_get_current_buf(), 'modifiable', false)
+    else
+      vim.cmd 'colorscheme catppuccin-mocha'
+    end
+  end,
+})
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
