@@ -137,47 +137,37 @@ local function highlight_same_commit()
   end
 end
 
--- vim.api.nvim_create_autocmd({ 'Filetype' }, {
---   callback = function(e)
---     if vim.bo.filetype == 'fugitiveblame' then
---       local fugitive_buffer = e.buf
---       local result = vim.fn['FugitiveResult'](e.buf)
---
---       local original_buffer = result.origin_bufnr
---       local original_window = result.origin_winid
---
---       -- Close git blame when you leave original window
---       -- Create an autocommand group to avoid duplicate commands
---       vim.api.nvim_create_augroup('LeavingOriginalBuffer', { clear = true })
---       vim.api.nvim_create_autocmd('WinLeave', {
---         group = 'LeavingOriginalBuffer',
---         pattern = '*',
---         callback = function()
---           if vim.api.nvim_get_current_win() == original_window then
---             vim.schedule(function()
---               if vim.api.nvim_buf_is_valid(fugitive_buffer) then
---                 vim.api.nvim_buf_delete(fugitive_buffer, { force = false })
---               end
---             end)
---           end
---         end,
---       })
---       vim.api.nvim_create_autocmd('BufWinLeave', {
---         group = 'LeavingOriginalBuffer',
---         pattern = '*',
---         callback = function()
---           if vim.api.nvim_get_current_buf() == original_buffer then
---             vim.schedule(function()
---               if vim.api.nvim_buf_is_valid(fugitive_buffer) then
---                 vim.api.nvim_buf_delete(fugitive_buffer, { force = false })
---               end
---             end)
---           end
---         end,
---       })
---     end
---   end,
--- })
+vim.api.nvim_create_autocmd({ 'Filetype' }, {
+  callback = function(e)
+    if vim.bo.filetype == 'fugitiveblame' then
+      local fugitive_buffer = e.buf
+      local result = vim.fn['FugitiveResult'](e.buf)
+
+      local original_buffer = result.origin_bufnr
+      local original_window = result.origin_winid
+
+      -- Close git blame when you leave original window
+      -- Create an autocommand group to avoid duplicate commands
+      vim.api.nvim_create_augroup('LeavingOriginalBuffer', { clear = true })
+      -- 'WinLeave' or 'BufWinLeave' were causing the git blame to close when I navigate across
+      -- splits. BufHidden will only close git blame when a new buffer is opened in the original
+      -- window.
+      vim.api.nvim_create_autocmd({ 'BufHidden' }, {
+        group = 'LeavingOriginalBuffer',
+        pattern = '*',
+        callback = function(e1)
+          if e1.buf == original_buffer then
+            vim.schedule(function()
+              if vim.api.nvim_buf_is_valid(fugitive_buffer) then
+                vim.api.nvim_buf_delete(fugitive_buffer, { force = false })
+              end
+            end)
+          end
+        end,
+      })
+    end
+  end,
+})
 
 vim.api.nvim_create_autocmd({ 'BufEnter' }, {
   callback = function(e)
