@@ -4236,7 +4236,7 @@ local function initialize_highlight_groups()
   -- Set the dim color for inactive buffers
   vim.api.nvim_set_hl(0, 'DimInactive', { bg = '#000000', fg = '#888888' })
 
-  vim.api.nvim_set_hl(0, 'RustLibraryFile', { bg = '#333333' })
+  vim.api.nvim_set_hl(0, 'RustLibraryFile', { bg = '#292c3c' })
 
   -- Add more highlight group configurations here
 end
