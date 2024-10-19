@@ -816,32 +816,6 @@ local rustup_toolchain = use_nightly_toolchain and 'nightly' or 'stable'
 -- Use vanilla rust analyzer or rustacenavim (mrcjkb/rustaceanvim)
 -- Currently I don't see the value add with rustacenavim, so configuring it behind a flag.
 local use_vanilla_rust_analyzer = true
-local use_ra_multiplex = false
-
--- Ask rustup to run the rust-analyzer from stable toolchain
-if use_ra_multiplex and vim.bo.filetype == 'rust' then
-  local default_ra_multiplex_port = '27631'
-  local provided_ra_multiplex_port = vim.fn.input('Enter ra-multiplex port number: ', default_ra_multiplex_port)
-
-  if provided_ra_multiplex_port == '' or not tonumber(provided_ra_multiplex_port) then
-    provided_ra_multiplex_port = default_ra_multiplex_port
-  end
-
-  if not is_local_port_open(provided_ra_multiplex_port) then
-    vim.schedule(function()
-      if vim.bo.filetype == 'rust' then
-        vim.notify('Unable to connect to ra_multiplex at 127.0.0.1:' .. tostring(provided_ra_multiplex_port), 'error', { title = 'ra-multiplex' })
-      end
-    end)
-    -- Fallback to not use ra-multiplex
-    RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
-  else
-    -- RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
-    RUST_ANALYZER_CMD = vim.lsp.rpc.connect('127.0.0.1', provided_ra_multiplex_port)
-  end
-else
-  RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
-end
 
 RUST_ANALYZER_OPTIONS = {
   server = {
@@ -865,6 +839,11 @@ RUST_ANALYZER_OPTIONS = {
   checkOnSave = false,
   check = {
     command = 'check', -- 'check' or 'clippy'. Default is 'check'. 'clippy' runs the linter as well. https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
+    extraEnv = {},
+  },
+
+  procMacro = {
+    enable = true,
   },
 
   linkedProjects = {},
@@ -880,14 +859,54 @@ RUST_ANALYZER_OPTIONS = {
   -- },
 }
 
-if use_ra_multiplex then
+RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
+
+-- If RA_MULTIPLEX_PORT is set, use ra_multiplex. Otherwise, use rust-analyzer directly.
+-- export RA_MULTIPLEX_PORT=27631
+local ra_multiplex_port_env_var = vim.fn.getenv 'RA_MULTIPLEX_PORT'
+
+if ra_multiplex_port_env_var and ra_multiplex_port_env_var ~= '' then
+  local provided_ra_multiplex_port = ra_multiplex_port_env_var
+  -- RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
+  RUST_ANALYZER_CMD = vim.lsp.rpc.connect('127.0.0.1', tonumber(provided_ra_multiplex_port))
+
   -- The following is a non-standard configuration specific to ra-multiplex. It is not provided by
   -- rust-analyzer
   RUST_ANALYZER_OPTIONS.lspMux = {
     version = '1',
     method = 'connect',
-    server = 'rust-analyzer',
+    -- Use the output of rustup which --toolchain stable rust-analyzer. Remove trailing newlines
+    server = vim.fn.system('rustup which --toolchain ' .. rustup_toolchain .. ' rust-analyzer'):gsub('%s+$', ''),
+    cwd = vim.fn.getcwd(),
+    env = {},
   }
+
+  -- :h removes the last component in the file path. We have to do it twice, once to remove the
+  -- current file name and once to remove the current_directory name.
+  local current_file_path = vim.fn.expand '%:p:h'
+  local parent_dir = vim.fn.fnamemodify(current_file_path, ':h')
+  if vim.fn.filereadable(parent_dir .. '/packageInfo') == 1 then
+    local extra_env = RUST_ANALYZER_OPTIONS.lspMux.env
+    extra_env['CARGO_NET_OFFLINE'] = 'true'
+    extra_env['CARGO_TERM_QUIET'] = 'true'
+
+    -- Environment variables does not work for source.*
+    -- <https://doc.rust-lang.org/cargo/reference/config.html#source>
+
+    -- extra_env['CARGO_SOURCE_CRATES_IO_REPLACE_WITH'] = 'brazilcratesregistry'
+    -- extra_env['CARGO_SOURCE_BRAZILCRATESREGISTRY'] = parent_dir .. '/env/cargo-brazil/registry'
+
+    -- These are not valid arguments that you can pass to rust analyzer
+    RUST_ANALYZER_OPTIONS.lspMux.args = {}
+    -- local extra_args = RUST_ANALYZER_OPTIONS.lspMux.args;
+    --
+    -- table.insert(extra_args, "--config")
+    -- table.insert(extra_args, "source.crates-io.replace-with=\"brazil-crates-registry\"")
+    --
+    -- table.insert(extra_args, "--config")
+    -- table.insert(extra_args,
+    --   "source.brazil-crates-registry.local-registry=\"" .. parent_dir .. "/env/cargo-brazil/registry\"")
+  end
 end
 
 -- Logic to save only modified lines on save
