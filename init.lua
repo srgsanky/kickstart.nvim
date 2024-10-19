@@ -862,6 +862,7 @@ RUST_ANALYZER_OPTIONS = {
     -- references and will also dim the test code.
     ['setTest'] = false,
   },
+  checkOnSave = false,
   check = {
     command = 'check', -- 'check' or 'clippy'. Default is 'check'. 'clippy' runs the linter as well. https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
   },
