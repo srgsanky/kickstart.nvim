@@ -878,6 +878,7 @@ if ra_multiplex_port_env_var ~= vim.NIL and ra_multiplex_port_env_var ~= '' then
     method = 'connect',
     -- Use the output of rustup which --toolchain stable rust-analyzer. Remove trailing newlines
     server = vim.fn.system('rustup which --toolchain ' .. rustup_toolchain .. ' rust-analyzer'):gsub('%s+$', ''),
+    -- This is used only when root_dir is not passed in rust-analyzer setup
     cwd = vim.fn.getcwd(),
     env = {},
   }
@@ -1836,8 +1837,7 @@ require('lazy').setup({
       end
 
       if use_vanilla_rust_analyzer then
-        -- LSP config for rust. Use rust-analyzer from the rustup toolchain.
-        require('lspconfig').rust_analyzer.setup {
+        local rust_analyzer_setup_options = {
           cmd = RUST_ANALYZER_CMD,
           settings = {
             ['rust-analyzer'] = RUST_ANALYZER_OPTIONS,
@@ -1845,6 +1845,20 @@ require('lazy').setup({
           capabilities = capabilities,
           handlers = get_lsp_handlers_with_border(),
         }
+
+        local current_directory = vim.fn.expand '%:p:h'
+        if vim.fn.filereadable(current_directory .. '/Config.toml') == 1 then
+          -- https://github.com/neovim/nvim-lspconfig/blob/fd49d5863e873891be37afac79b1f56fb34bb5d3/lua/lspconfig/configs/rust_analyzer.lua#L40
+          -- This is important when ra-multiplexer is used. Otherwise it tries to autodetect the
+          -- root_dir based on the current file which is not what I want in workspace based
+          -- projects.
+          rust_analyzer_setup_options['root_dir'] = function()
+            return vim.fn.getcwd()
+          end
+        end
+
+        -- LSP config for rust. Use rust-analyzer from the rustup toolchain.
+        require('lspconfig').rust_analyzer.setup(rust_analyzer_setup_options)
       end
 
       -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#ruff_lsp
