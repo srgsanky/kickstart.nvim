@@ -124,7 +124,9 @@ vim.opt.relativenumber = false
 -- Enable mouse mode, can be useful for resizing splits for example!
 -- If mouse is not working when using iTerm, check
 -- https://stackoverflow.com/questions/77560255/set-mouse-a-not-working-on-vim-neovim-in-iterm2
-vim.opt.mouse = 'a'
+-- If mouse is enabled and I use trackpad to move between windows, I tend to accidentally double
+-- press the trackpad which causes which key to open. This was annoying. So, I am disabling mouse.
+vim.opt.mouse = ''
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
