@@ -1198,7 +1198,16 @@ require('lazy').setup({
       map_telescope_using_dropdown_theme('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       -- Pick a buffer by searching. Also see the bufferline keybinding below which uses <leader>bp to
       -- pick a buffer by typing characters.
-      map_telescope_using_dropdown_theme('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      map_telescope_using_dropdown_theme('n', '<leader><leader>', function(opts)
+        opts = opts or {}
+        -- Sort by most recently used.
+        opts.sort_mru = true
+        -- Select the last used. You can press double space enter to switch to last used buffer
+        -- (like cmd + tab to switch between apps)
+        opts.sort_lastused = true
+        opts.ignore_current_buffer = true
+        builtin.buffers(opts)
+      end, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
       map_telescope_using_dropdown_theme('n', '<leader>/', builtin.current_buffer_fuzzy_find, { desc = '[/] Fuzzily search in current buffer' })
