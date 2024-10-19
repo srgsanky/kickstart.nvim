@@ -1847,7 +1847,7 @@ require('lazy').setup({
         }
 
         -- Look for Config.toml in the cwd (not the currrent buffer's directory)
-        if vim.fn.filereadable(vim.fn.getcwd() .. '/Config.toml') == 1 then
+        if vim.fn.filereadable(vim.fn.getcwd() .. '/Cargo.toml') == 1 then
           -- https://github.com/neovim/nvim-lspconfig/blob/fd49d5863e873891be37afac79b1f56fb34bb5d3/lua/lspconfig/configs/rust_analyzer.lua#L40
           -- This is important when ra-multiplexer is used. Otherwise it tries to autodetect the
           -- root_dir based on the current file which is not what I want in workspace based
