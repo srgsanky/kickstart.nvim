@@ -4235,6 +4235,8 @@ local function initialize_highlight_groups()
   -- Set the dim color for inactive buffers
   vim.api.nvim_set_hl(0, 'DimInactive', { bg = '#000000', fg = '#888888' })
 
+  vim.api.nvim_set_hl(0, 'RustLibraryFile', { bg = '#333333' })
+
   -- Add more highlight group configurations here
 end
 
@@ -4303,17 +4305,22 @@ vim.api.nvim_set_keymap('n', '<leader>ft', ':lua FlipTestsInRustCommand()<CR>', 
 require 'custom.plugins.vim_fugitive_blame_hlg'
 
 -- Visually indicate when you jump to a Rust library file.
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+-- I added FocusGained as I have logic to turn it back to normal on FocusGained above.
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter', 'FocusGained' }, {
   pattern = '*.rs',
   callback = function()
     local file_path = vim.fn.expand '%:p'
     if file_path:match 'cargo/registry' or file_path:match 'rustup/toolchains' then
-      -- When you go to a rust library file, signify it by a change of color scheme. Also make the
-      -- buffer unmodifiable.
-      vim.cmd 'colorscheme flexoki-dark'
-      vim.api.nvim_buf_set_option(vim.api.nvim_get_current_buf(), 'modifiable', false)
+      -- When you go to a rust library file, signify it by a change of background color.
+      -- I originally tried changing colorscheme, but it is a heavy weight operation and it changes
+      -- other visuals when I move back.
+      vim.cmd 'setlocal winhighlight=Normal:RustLibraryFile'
+
+      -- Also make the buffer unmodifiable.
+      vim.api.nvim_set_option_value('modifiable', false, { scope = 'local', buf = vim.api.nvim_get_current_buf() })
+      -- vim.api.nvim_buf_set_option(vim.api.nvim_get_current_buf(), 'modifiable', false)
     else
-      vim.cmd 'colorscheme catppuccin-mocha'
+      vim.cmd 'setlocal winhighlight=Normal:Normal'
     end
   end,
 })
