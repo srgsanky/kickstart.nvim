@@ -4318,7 +4318,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter', 'FocusGained' }, {
       vim.cmd 'setlocal winhighlight=Normal:RustLibraryFile'
 
       -- Also make the buffer unmodifiable.
-      vim.api.nvim_set_option_value('modifiable', false, { scope = 'local', buf = vim.api.nvim_get_current_buf() })
+      vim.api.nvim_set_option_value('modifiable', false, { buf = vim.api.nvim_get_current_buf() })
       -- vim.api.nvim_buf_set_option(vim.api.nvim_get_current_buf(), 'modifiable', false)
     else
       vim.cmd 'setlocal winhighlight=Normal:Normal'
