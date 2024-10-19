@@ -865,7 +865,8 @@ RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
 -- export RA_MULTIPLEX_PORT=27631
 local ra_multiplex_port_env_var = vim.fn.getenv 'RA_MULTIPLEX_PORT'
 
-if ra_multiplex_port_env_var and ra_multiplex_port_env_var ~= '' then
+-- vim.fn.getenv returns vim.NIL if the env var is not set
+if ra_multiplex_port_env_var ~= vim.NIL and ra_multiplex_port_env_var ~= '' then
   local provided_ra_multiplex_port = ra_multiplex_port_env_var
   -- RUST_ANALYZER_CMD = { '/Users/sanka/.cargo/bin/ra-multiplex' }
   RUST_ANALYZER_CMD = vim.lsp.rpc.connect('127.0.0.1', tonumber(provided_ra_multiplex_port))
