@@ -72,6 +72,16 @@ local function highlight_same_commit()
       -- Regex to match a commit hash
       local commit = line:match '^%x%x%x%x%x%x%x%x'
 
+      if not commit then
+        commit = line:match '^%^%x%x%x%x%x%x%x'
+
+        if commit then
+          -- Remove the leading ^. It cannot be used in color calculation and it is not a valid highlight
+          -- group name char
+          commit = string.sub(commit, 2)
+        end
+      end
+
       if commit then
         if not commit_hash_to_hl_group_map[commit] then
           -- Using the commit id to generate color will produce the same color for the same hash.
@@ -134,6 +144,29 @@ local function highlight_same_commit()
       -- Shows only the commit id which is 8 chars. Show the space after 8 chars
       set_minwidth_for_buffer(current_buf, 9)
     end)
+
+    -- Add key bindings for A, C and D for the current buffer, so that it works even when you are in
+    -- a blank line.
+    -- vim.api.nvim_buf_set_keymap(0, 'n', 'A', '', {
+    --   noremap = true,
+    --   silent = true,
+    --   callback = function()
+    --     local first_line = vim.api.nvim_buf_get_lines(current_buf, 0, 1, false)[1]
+    --
+    --     if first_line then
+    --       -- TODO: The logic that goes here is made hard by the following facts
+    --       -- 1. The line contains hidden numbers for the line number.
+    --       -- 2. Can't separate by space as author part can contains spaces
+    --       -- 3. Need to do regex match. Coming up with a regex that works for all cases needs to be
+    --       --    iterated upon.
+    --
+    --       print(first_line)
+    --
+    --       -- For now the workaround is - go to non-blank line and then press the key binding, it
+    --       -- delegates to vim fugitive.
+    --     end
+    --   end,
+    -- })
   end
 end
 
