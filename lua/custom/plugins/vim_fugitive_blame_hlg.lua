@@ -63,9 +63,9 @@ local function highlight_same_commit()
     local commit_hash_to_hl_group_map = {}
     local last_commit = nil
 
-    local is_curr_buf_modifiable = vim.api.nvim_buf_get_option(current_buf, 'modifiable')
+    local is_curr_buf_modifiable = vim.api.nvim_get_option_value('modifiable', { buf = current_buf })
     if not is_curr_buf_modifiable then
-      vim.api.nvim_buf_set_option(current_buf, 'modifiable', true)
+      vim.api.nvim_set_option_value('modifiable', true, { buf = current_buf })
     end
 
     for i, line in ipairs(lines) do
@@ -114,7 +114,7 @@ local function highlight_same_commit()
       end
 
       -- Don't show whitespace as dot
-      vim.api.nvim_buf_set_option(current_buf, 'list', false)
+      vim.api.nvim_set_option_value('list', false, { win = vim.api.nvim_get_current_win() })
     end
     -- Add a line at the top to offset for breadcrumbs in the file. This messes up with cursorbind
     -- introducing off by one
@@ -122,7 +122,7 @@ local function highlight_same_commit()
     -- vim.api.nvim_buf_set_lines(current_buf, 0, 0, false, { ' ' })
 
     if is_curr_buf_modifiable then
-      vim.api.nvim_buf_set_option(current_buf, 'modifiable', false)
+      vim.api.nvim_set_option_value('modifiable', false, { buf = current_buf })
     end
 
     -- Setting the width of buffer must be run on the main thread. So, it must be scheduled
@@ -177,7 +177,9 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
 
       local result = vim.fn['FugitiveResult'](e.buf)
       local original_buffer = result.origin_bufnr
-      vim.api.nvim_buf_set_option(original_buffer, 'cursorbind', true)
+      local original_window = result.origin_winid
+
+      vim.api.nvim_set_option_value('cursorbind', true, { win = original_window })
     end
   end,
 })
@@ -189,7 +191,9 @@ vim.api.nvim_create_autocmd({ 'BufLeave' }, {
 
       local result = vim.fn['FugitiveResult'](e.buf)
       local original_buffer = result.origin_bufnr
-      vim.api.nvim_buf_set_option(original_buffer, 'cursorbind', false)
+      local original_window = result.origin_winid
+
+      vim.api.nvim_set_option_value('cursorbind', false, { win = original_window })
     end
   end,
 })
