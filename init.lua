@@ -891,6 +891,7 @@ if ra_multiplex_port_env_var ~= vim.NIL and ra_multiplex_port_env_var ~= '' then
     local extra_env = RUST_ANALYZER_OPTIONS.lspMux.env
     extra_env['CARGO_NET_OFFLINE'] = 'true'
     extra_env['CARGO_TERM_QUIET'] = 'true'
+    extra_env['RUSTUP_TOOLCHAIN'] = rustup_toolchain
 
     -- Environment variables does not work for source.*
     -- <https://doc.rust-lang.org/cargo/reference/config.html#source>
