@@ -3402,6 +3402,7 @@ require('lazy').setup({
   -- image from rendering.
   {
     'iamcco/markdown-preview.nvim',
+    -- Lazy loading based on commands: When any of these commands are triggered, the plugin is loaded.
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
     ft = { 'markdown' },
     build = function()
