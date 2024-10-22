@@ -1860,6 +1860,29 @@ require('lazy').setup({
 
         -- LSP config for rust. Use rust-analyzer from the rustup toolchain.
         require('lspconfig').rust_analyzer.setup(rust_analyzer_setup_options)
+
+        -- Keymap to toggle tests in rust
+        vim.keymap.set('n', '<leader>ft', function()
+          local clients = vim.lsp.get_clients()
+          for _, client in ipairs(clients) do
+            if client.name == 'rust_analyzer' or client.name == 'rust-analyzer' then
+              -- flip the current value
+              local current_value = client.config.settings['rust-analyzer'].cfg.setTest
+              client.config.settings['rust-analyzer'].cfg.setTest = not current_value
+
+              if current_value then
+                require 'notify'('Disabling rust tests', 'info')
+              else
+                require 'notify'('Enabling rust tests', 'info')
+              end
+
+              -- Restart LSP with the new configuration
+              vim.lsp.stop_client(client.id, true) -- second param is for force shutdown
+              rust_analyzer_setup_options.settings = client.config.settings
+              require('lspconfig').rust_analyzer.setup(rust_analyzer_setup_options)
+            end
+          end
+        end, { noremap = true, silent = true, desc = '[F]lip [T]ests in rust' })
       end
 
       -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#ruff_lsp
@@ -4311,33 +4334,6 @@ end
 if open_neo_tree_on_startup then
   open_neotree_on_startup()
 end
-
-function FlipTestsInRustCommand()
-  local clients = vim.lsp.get_clients()
-  for _, client in ipairs(clients) do
-    if client.name == 'rust_analyzer' or client.name == 'rust-analyzer' then
-      -- flip the current value
-      local current_value = client.config.settings['rust-analyzer'].cfg.setTest
-      client.config.settings['rust-analyzer'].cfg.setTest = not current_value
-
-      if current_value then
-        require 'notify'('Disabling rust tests', 'info')
-      else
-        require 'notify'('Enabling rust tests', 'info')
-      end
-
-      -- Restart LSP with the new configuration
-      vim.lsp.stop_client(client.id, true) -- second param is for force shutdown
-      require('lspconfig').rust_analyzer.setup {
-        cmd = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' },
-        settings = client.config.settings,
-      }
-    end
-  end
-end
-
--- Keymap to toggle tests
-vim.api.nvim_set_keymap('n', '<leader>ft', ':lua FlipTestsInRustCommand()<CR>', { noremap = true, silent = true, desc = '[F]lip [T]ests in rust' })
 
 require 'custom.plugins.vim_fugitive_blame_hlg'
 
