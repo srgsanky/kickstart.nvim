@@ -3511,6 +3511,7 @@ require('lazy').setup({
   -- :SessionDelete if you get error about restoring a session
   {
     'rmagatti/auto-session',
+    enabled = false,
     lazy = false,
     dependencies = {
       'nvim-telescope/telescope.nvim', -- Only needed if you want to use session lens
