@@ -2782,11 +2782,50 @@ require('lazy').setup({
     name = 'catppuccin',
     priority = 1000,
     opts = {
+      flavour = 'mocha', -- latte, frappe, macchiato, mocha
       dim_inactive = {
         enabled = true, -- dims the background color of inactive window
         shade = 'dark',
-        percentage = 0, -- percentage of the shade to apply to the inactive window
+        percentage = 0.05, -- percentage of the shade to apply to the inactive window
       },
+      styles = { -- Handles the styles of general hi groups (see `:h highlight-args`):
+        comments = { 'italic' }, -- Change the style of comments
+      },
+      custom_highlights = function(colors)
+        -- https://github.com/catppuccin/nvim/blob/main/lua/catppuccin/palettes/mocha.lua
+        -- local colors = {
+        --   rosewater = '#f5e0dc',
+        --   flamingo = '#f2cdcd',
+        --   pink = '#f5c2e7',
+        --   mauve = '#cba6f7',
+        --   red = '#f38ba8',
+        --   maroon = '#eba0ac',
+        --   peach = '#fab387',
+        --   yellow = '#f9e2af',
+        --   green = '#a6e3a1',
+        --   teal = '#94e2d5',
+        --   sky = '#89dceb',
+        --   sapphire = '#74c7ec',
+        --   blue = '#89b4fa',
+        --   lavender = '#b4befe',
+        --   text = '#cdd6f4',
+        --   subtext1 = '#bac2de',
+        --   subtext0 = '#a6adc8',
+        --   overlay2 = '#9399b2',
+        --   overlay1 = '#7f849c',
+        --   overlay0 = '#6c7086',
+        --   surface2 = '#585b70',
+        --   surface1 = '#45475a',
+        --   surface0 = '#313244',
+        --   base = '#1e1e2e',
+        --   mantle = '#181825',
+        --   crust = '#11111b',
+        -- }
+        return {
+          -- Using a lighter color for comments
+          Comment = { fg = colors.surface2 },
+        }
+      end,
     },
   },
   { 'rebelot/kanagawa.nvim', opts = {} },
