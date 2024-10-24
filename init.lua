@@ -115,6 +115,9 @@ vim.g.qf_max_height = 30
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
+-- Required for norcalli/nvim-colorizer.lua
+vim.opt.termguicolors = true
+
 -- Make line numbers default
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
@@ -2788,6 +2791,16 @@ require('lazy').setup({
   },
   { 'rebelot/kanagawa.nvim', opts = {} },
   { 'kepano/flexoki-neovim', name = 'flexoki', opts = {} },
+
+  -- Show colors next to hex color values
+  {
+    'norcalli/nvim-colorizer.lua',
+    opts = {
+      '*', -- Highlight all files, but customize some others.
+      '!vim', -- Exclude vim from highlighting.
+      -- Exclusion Only makes sense if '*' is specified!
+    },
+  },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
