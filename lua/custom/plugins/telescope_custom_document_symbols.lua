@@ -164,3 +164,5 @@ exported_symbols.custom_document_symbols = function(opts)
     pickers.new(opts, picker_options):find()
   end)
 end
+
+return exported_symbols
