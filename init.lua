@@ -1554,7 +1554,11 @@ require('lazy').setup({
             opts = opts or {}
             -- extend it
             opts.symbol_width = 50
-            telescope_builtin.lsp_document_symbols(opts)
+
+            -- Use custom version of document symbols. This was added to not show symbol type for
+            -- markdown headers.
+            require('custom.plugins.telescope_custom_document_symbols').custom_document_symbols(opts)
+            -- telescope_builtin.lsp_document_symbols(opts)
           end, '[D]ocument [S]ymbols')
 
           -- Fuzzy find all the symbols in your current workspace.
