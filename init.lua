@@ -124,6 +124,11 @@ vim.opt.number = true
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = false
 
+-- Ignore white spaces in diff
+-- :windo set diffopt+=iwhite | diffthis
+-- The following is the equivalent of set diffopt+=iwhite
+vim.opt.diffopt:append 'iwhite'
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 -- If mouse is not working when using iTerm, check
 -- https://stackoverflow.com/questions/77560255/set-mouse-a-not-working-on-vim-neovim-in-iterm2
