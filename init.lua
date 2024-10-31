@@ -1139,6 +1139,14 @@ require('lazy').setup({
 
       -- undo tree
       'debugloop/telescope-undo.nvim',
+
+      -- Clipboard searcher and picker
+      {
+        'AckslD/nvim-neoclip.lua',
+        config = function()
+          require('neoclip').setup()
+        end,
+      },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -1211,6 +1219,7 @@ require('lazy').setup({
       pcall(require('telescope').load_extension, 'ui-select')
       pcall(require('telescope').load_extension, 'cmdline')
       pcall(require('telescope').load_extension 'undo')
+      pcall(require('telescope').load_extension 'neoclip')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -1264,6 +1273,12 @@ require('lazy').setup({
         opts.side_by_side = true
         require('telescope').extensions.undo.undo(opts)
       end, { desc = '[u]ndo tree search' })
+
+      -- Search yanks
+      map_telescope_using_dropdown_theme('n', '<leader>sy', function(opts)
+        opts = opts or {}
+        require('telescope').extensions.neoclip.default()
+      end, { desc = '[S]earch [Y]anks' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
