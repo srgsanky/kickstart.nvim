@@ -972,6 +972,13 @@ vim.cmd [[autocmd! VimLeave * :!clear]]
 -- -- Call the function on exit
 -- vim.api.nvim_create_autocmd('VimLeave', { callback = clear_terminal_scrollback })
 
+vim.filetype.add {
+  extension = {
+    -- Set filetype as swift when opening swiftinterface files
+    swiftinterface = 'swift',
+  },
+}
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
