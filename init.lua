@@ -1748,6 +1748,15 @@ require('lazy').setup({
         servers.clangd = {}
       end
 
+      if is_mac then
+        require('lspconfig').sourcekit.setup {
+          -- Invoke the wrapper script that won't throw error when trying to use --version
+          cmd = { vim.fn.stdpath 'config' .. '/start_sourcekit_lsp.sh' },
+          filetypes = { 'swift', 'objc', 'objcpp', 'c', 'cpp' },
+          root_dir = require('lspconfig.util').root_pattern('*.xcodeproj', '*.swift'),
+        }
+      end
+
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
       --  other tools, you can run
