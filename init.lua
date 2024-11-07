@@ -3323,6 +3323,10 @@ require('lazy').setup({
   -- cs<current char><new char> - Change the surrounding char from current char to new char. Works.
   -- ds<current char> - Delete the surrounding char. Works.
   -- S<new text> - In visual mode this will surround the selection with new text. Works.
+  --  Use S> to surround a link with <> in markdown.
+  --  S is taking only a single character. So, I am not able to use S** to surround the selection
+  --  with two asterisks. A work around is to use gv to reselect the last selection and use S* to
+  --  surround it again with asterisk.
   --
   -- ys<motion><new char> - You surround. Surrounds the text objects with new char.
   --  For e.g. ys$" will surround the text between cursor and end of line with "
