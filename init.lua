@@ -994,6 +994,21 @@ require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
+  -- Startup experience
+  -- Alternatives
+  -- 1. https://github.com/echasnovski/mini.starter
+  -- 2. https://github.com/max397574/startup.nvim
+  {
+    'nvimdev/dashboard-nvim',
+    event = 'VimEnter',
+    config = function()
+      require('dashboard').setup {
+        -- config
+      }
+    end,
+    dependencies = { { 'nvim-tree/nvim-web-devicons' } },
+  },
+
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
   -- keys can be used to configure plugin behavior/loading/etc.
@@ -2479,6 +2494,8 @@ require('lazy').setup({
   {
     'ntpeters/vim-better-whitespace',
     config = function()
+      -- Don't show trailing whitespaces in aux filetypes
+      vim.g.better_whitespace_filetypes_blacklist = { 'diff', 'git', 'gitcommit', 'unite', 'qf', 'help', 'markdown', 'fugitive', 'dashboard' }
       vim.g.better_whitespace_enabled = 1
 
       -- For this to work in Mac, make sure to install GNU diff using brew install diffutils
