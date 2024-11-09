@@ -1004,6 +1004,7 @@ require('lazy').setup({
     config = function()
       require('dashboard').setup {
         -- config
+        shortcut_type = 'number',
       }
     end,
     dependencies = { { 'nvim-tree/nvim-web-devicons' } },
