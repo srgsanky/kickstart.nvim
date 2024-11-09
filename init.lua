@@ -4014,7 +4014,8 @@ require('lazy').setup({
       auto_suggestions_provider = 'claude',
       claude = {
         endpoint = 'https://api.anthropic.com',
-        model = 'claude-3-5-sonnet-20240620',
+        -- Find the latest model from https://console.anthropic.com/settings/limits
+        model = 'claude-3-5-sonnet-20241022',
         temperature = 0,
         max_tokens = 4096,
       },
