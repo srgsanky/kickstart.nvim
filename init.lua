@@ -2964,7 +2964,6 @@ require('lazy').setup({
         'ruby',
         'rust',
         'sql',
-        'swift',
         'ssh_config',
         'tmux',
         'toml',
@@ -2984,6 +2983,16 @@ require('lazy').setup({
       indent = { enable = true, disable = { 'ruby' } },
     },
     config = function(_, opts)
+      if vim.fn.executable 'swift' == 1 and vim.fn.executable 'tree-sitter' == 1 then
+        -- Ensure that swift is installed only when swift cli is present. It also requires
+        -- tree-sitter cli.
+        --
+        -- Follow <https://www.swift.org/install/linux/tarball/> to install swift.
+        -- Install tree-sitter using
+        -- cargo install tree-sitter-cli
+        table.insert(opts.ensure_installed, 'swift')
+      end
+
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
       ---@diagnostic disable-next-line: missing-fields
