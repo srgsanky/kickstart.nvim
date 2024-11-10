@@ -190,7 +190,22 @@ vim.opt.shiftwidth = 4 -- Num of spaces to use for each step of (auto)indent. Us
 vim.opt.softtabstop = 4 -- Num of spaces that a tab accounts for while performing editing operations.
 
 -- Line length above which to break a line. Whether to break a line or not is controlled by formatoptions
-vim.opt.textwidth = 100
+local text_width = 120
+-- Start neovim with not breaking lines.
+vim.opt.textwidth = 0
+
+-- Mnemonic - Toggle Text Wrap
+vim.api.nvim_create_user_command('TTextWrap', function()
+  -- vim.opt.wrap controls soft wrap on the screen (without affecting the line on the backing file)
+  local curr_text_width = vim.opt.textwidth:get()
+  if curr_text_width == text_width then
+    vim.opt.textwidth = 0
+    vim.opt.wrap = false
+  else
+    vim.opt.textwidth = text_width
+    vim.opt.wrap = true
+  end
+end, {})
 
 -- default formatoptions (Use :set formatoptions? to find out)
 -- jcroql
