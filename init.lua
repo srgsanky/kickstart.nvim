@@ -2511,7 +2511,8 @@ require('lazy').setup({
     'ntpeters/vim-better-whitespace',
     config = function()
       -- Don't show trailing whitespaces in aux filetypes
-      vim.g.better_whitespace_filetypes_blacklist = { 'diff', 'git', 'gitcommit', 'unite', 'qf', 'help', 'markdown', 'fugitive', 'dashboard' }
+      -- Also, don't show trailing whitespaces when the filetype is not set. This prevents the red highlights when viewing terminal buffer in nvim while using zellij.
+      vim.g.better_whitespace_filetypes_blacklist = { 'diff', 'git', 'gitcommit', 'unite', 'qf', 'help', 'markdown', 'fugitive', 'dashboard', '' }
       vim.g.better_whitespace_enabled = 1
 
       -- For this to work in Mac, make sure to install GNU diff using brew install diffutils
