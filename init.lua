@@ -833,7 +833,7 @@ local use_fidget_for_lsp_progress = true
 -- Use "rustup toolchain list" to list all toolchains
 -- Using nightly for the time being to make use of setTest config. See
 -- <https://github.com/rust-lang/rust-analyzer/pull/18085>
-local use_nightly_toolchain = true
+local use_nightly_toolchain = false
 local rustup_toolchain = use_nightly_toolchain and 'nightly' or 'stable'
 
 -- Use vanilla rust analyzer or rustacenavim (mrcjkb/rustaceanvim)
