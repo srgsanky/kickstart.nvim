@@ -1011,19 +1011,20 @@ require('lazy').setup({
 
   -- Startup experience
   -- Alternatives
-  -- 1. https://github.com/echasnovski/mini.starter
+  -- 1. https://github.com/echasnovski/mini.starter (Using this as it is easier to dismiss the startup screen with C-c and see an empty buffer.
+  --    With dashboard-nvim, you have to either pick something from the list or move to the top and press enter to see a blank buffer)
   -- 2. https://github.com/max397574/startup.nvim
-  {
-    'nvimdev/dashboard-nvim',
-    event = 'VimEnter',
-    config = function()
-      require('dashboard').setup {
-        -- config
-        shortcut_type = 'number',
-      }
-    end,
-    dependencies = { { 'nvim-tree/nvim-web-devicons' } },
-  },
+  -- {
+  --   'nvimdev/dashboard-nvim',
+  --   event = 'VimEnter',
+  --   config = function()
+  --     require('dashboard').setup {
+  --       -- config
+  --       shortcut_type = 'number',
+  --     }
+  --   end,
+  --   dependencies = { { 'nvim-tree/nvim-web-devicons' } },
+  -- },
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -2929,6 +2930,8 @@ require('lazy').setup({
       --  - ci'  - [C]hange [I]nside [']quote
       --  a and i here is around and inside text object. Don't confuse it with AI.
       require('mini.ai').setup { n_lines = 500 }
+      -- Startup screen
+      require('mini.starter').setup()
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
