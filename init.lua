@@ -840,6 +840,8 @@ local rustup_toolchain = use_nightly_toolchain and 'nightly' or 'stable'
 -- Currently I don't see the value add with rustacenavim, so configuring it behind a flag.
 local use_vanilla_rust_analyzer = true
 
+-- Default config can be found at <https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/rust_analyzer.lua#L36>
+-- <https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#rust_analyzer>
 RUST_ANALYZER_OPTIONS = {
   server = {
     extraEnv = {
@@ -883,6 +885,8 @@ RUST_ANALYZER_OPTIONS = {
 }
 
 RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
+-- You can specify custom binary path as the cmd
+-- RUST_ANALYZER_CMD = { '/path/to/rust-analyzer' }
 
 -- If RA_MULTIPLEX_PORT is set, use ra_multiplex. Otherwise, use rust-analyzer directly.
 -- export RA_MULTIPLEX_PORT=27631
