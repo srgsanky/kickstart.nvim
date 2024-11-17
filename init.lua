@@ -4521,5 +4521,12 @@ if vim.g.neovide then
   vim.keymap.set('i', '<D-v>', '<ESC>l"+Pli') -- Paste insert mode
 end
 
+-- Workarounds for zellij. Map C-t to noop.
+-- By default it was jumping the tag stack. Here is the corresponding text from the help.
+--
+-- CTRL-T            Jump to [count] older entry in the tag stack (default 1).
+vim.api.nvim_set_keymap('i', '<C-t>', '<Nop>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-t>', '<Nop>', { noremap = true, silent = true })
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
