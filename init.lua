@@ -96,6 +96,9 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Disable startup message. This will show a blank screen on startup.
+vim.opt.shortmess:append 'I'
+
 -- Set to true if you have a Nerd Font installed
 vim.g.have_nerd_font = true
 
