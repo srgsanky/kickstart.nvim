@@ -2937,7 +2937,7 @@ require('lazy').setup({
       --  a and i here is around and inside text object. Don't confuse it with AI.
       require('mini.ai').setup { n_lines = 500 }
       -- Startup screen
-      require('mini.starter').setup()
+      -- require('mini.starter').setup()
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
