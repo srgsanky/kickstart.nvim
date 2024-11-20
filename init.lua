@@ -2147,9 +2147,11 @@ require('lazy').setup({
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
+      -- Completion of file paths
       'hrsh7th/cmp-path',
     },
     config = function()
+      local WIDE_HEIGHT = 40
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
@@ -2161,9 +2163,31 @@ require('lazy').setup({
             luasnip.lsp_expand(args.body)
           end,
         },
+        -- window = {
+        --   completion = cmp.config.window.bordered(),
+        --   documentation = cmp.config.window.bordered(),
+        -- },
         window = {
-          completion = cmp.config.window.bordered(),
-          documentation = cmp.config.window.bordered(),
+          -- Set zindex of completion to be higher than the documentation. This prevents doc popup from hiding the completion popup.
+          completion = {
+            border = 'rounded',
+            winhighlight = 'Normal:Pmenu,FloatBorder:Pmenu,CursorLine:PmenuSel,Search:None',
+            winblend = vim.o.pumblend,
+            scrolloff = 0,
+            col_offset = 0,
+            side_padding = 1,
+            scrollbar = true,
+            zindex = 2000,
+          },
+          -- https://github.com/hrsh7th/nvim-cmp/blob/40a03dc225383c4f6256596c2cdf27e03b8119b5/lua/cmp/view/docs_view.lua
+          documentation = {
+            border = 'rounded',
+            winhighlight = 'FloatBorder:NormalFloat',
+            winblend = vim.o.pumblend,
+            max_height = math.floor(WIDE_HEIGHT * (WIDE_HEIGHT / vim.o.lines)),
+            max_width = math.floor((WIDE_HEIGHT * 2) * (vim.o.columns / (WIDE_HEIGHT * 2 * 16 / 9))),
+            zindex = 50,
+          },
         },
         completion = { completeopt = 'menu,menuone,noinsert' },
 
