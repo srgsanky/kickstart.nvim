@@ -201,7 +201,9 @@ return {
     vim.keymap.set('n', '<F1>', dap.step_into, { desc = 'Debug: Step Into' })
     vim.keymap.set('n', '<F2>', dap.step_over, { desc = 'Debug: Step Over' })
     vim.keymap.set('n', '<F3>', dap.step_out, { desc = 'Debug: Step Out' })
-    vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint, { desc = 'Debug: Toggle Breakpoint' })
+    -- If there are other keybindings with the same prefix, a key binding gets triggered with <keybinding><space>
+    -- Note: Switched from <leader>b to <leader>fb since there are other keybindings with prefix <leader>b
+    vim.keymap.set('n', '<leader>fb', dap.toggle_breakpoint, { desc = '[f]lip [b]reakpoint' })
     vim.keymap.set('n', '<leader>B', function()
       dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
     end, { desc = 'Debug: Set Breakpoint' })
