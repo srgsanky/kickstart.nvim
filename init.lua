@@ -4530,6 +4530,7 @@ end
 -- CTRL-T            Jump to [count] older entry in the tag stack (default 1).
 vim.api.nvim_set_keymap('i', '<C-t>', '<Nop>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<C-t>', '<Nop>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-t>', '<Nop>', { noremap = true, silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
