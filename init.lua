@@ -882,6 +882,7 @@ RUST_ANALYZER_OPTIONS = {
   -- checkOnSave = true,
   check = {
     command = 'clippy', -- 'check' or 'clippy'. Default is 'check'. 'clippy' runs the linter as well. https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
+    extraArgs = {}, -- Pass extra args to the above command
     extraEnv = {},
   },
 
