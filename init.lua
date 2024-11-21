@@ -876,7 +876,8 @@ RUST_ANALYZER_OPTIONS = {
   },
   checkOnSave = {
     command = 'clippy',
-    extraArgs = { '--fix', '--allow-dirty', '--allow-staged' },
+    -- I need the allow-no-vcs when I use a dummy cargo workspace at the top in a multi-package workspace. This dummy workspace does not have a VCS.
+    extraArgs = { '--fix', '--allow-dirty', '--allow-staged', '--allow-no-vcs' },
   },
   -- checkOnSave = true,
   check = {
