@@ -2944,7 +2944,8 @@ require('lazy').setup({
         -- }
         return {
           -- Using a lighter color for comments
-          Comment = { fg = colors.surface2 },
+          -- Uncomment this to dim comments
+          -- Comment = { fg = colors.surface2 },
         }
       end,
     },
