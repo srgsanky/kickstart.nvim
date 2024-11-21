@@ -497,6 +497,14 @@ vim.keymap.set('n', '<leader>nb', '<cmd>Navbuddy<CR>', { desc = 'Open [N]av [B]u
 -- Conform toggle format on save
 -- See <https://github.com/stevearc/conform.nvim/blob/master/doc/recipes.md#command-to-toggle-format-on-save>
 --------------------------------------------------------------------
+-- Enable auto-format for rust
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'rs',
+  callback = function()
+    vim.b.disable_autoformat = false
+  end,
+})
+
 vim.api.nvim_create_user_command('FormatDisable', function(args)
   if args.bang then
     -- FormatDisable! will disable formatting just for this buffer
@@ -866,7 +874,11 @@ RUST_ANALYZER_OPTIONS = {
     -- references and will also dim the test code.
     ['setTest'] = false,
   },
-  checkOnSave = true,
+  checkOnSave = {
+    command = 'clippy',
+    extraArgs = { '--fix', '--allow-dirty', '--allow-staged' },
+  },
+  -- checkOnSave = true,
   check = {
     command = 'clippy', -- 'check' or 'clippy'. Default is 'check'. 'clippy' runs the linter as well. https://users.rust-lang.org/t/how-to-use-clippy-in-vs-code-with-rust-analyzer/41881
     extraEnv = {},
