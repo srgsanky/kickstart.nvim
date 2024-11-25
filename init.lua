@@ -194,19 +194,21 @@ vim.opt.softtabstop = 4 -- Num of spaces that a tab accounts for while performin
 
 -- Line length above which to break a line. Whether to break a line or not is controlled by formatoptions
 local text_width = 120
--- Start neovim with not breaking lines.
-vim.opt.textwidth = 0
+-- Hardwrap: The underlying line in the buffer/file is modified. So, the display of the line is also affected.
+-- A longer line will be broken after white space to get this width.  A zero value disables this.
+vim.opt.textwidth = 120
+-- Softwrap: The underlying line is not modified in the buffer/file. Only the display of the line is affected.
+--
+-- When on, lines longer than the width of the window will wrap and displaying continues on the next line.  When off
+-- lines will not wrap and only part of long lines will be displayed.
+vim.opt.wrap = true
 
--- Mnemonic - Toggle Text Wrap
-vim.api.nvim_create_user_command('TTextWrap', function()
-  -- vim.opt.wrap controls soft wrap on the screen (without affecting the line on the backing file)
-  local curr_text_width = vim.opt.textwidth:get()
+vim.api.nvim_create_user_command('HardWrap', function()
+  local curr_text_width = vim.bo.textwidth
   if curr_text_width == text_width then
     vim.opt.textwidth = 0
-    vim.opt.wrap = false
   else
     vim.opt.textwidth = text_width
-    vim.opt.wrap = true
   end
 end, {})
 
@@ -1486,6 +1488,15 @@ require('lazy').setup({
             -- 'encoding', -- UTF-8 etc. Not very useful. Removing to reduce noise
             -- 'fileformat', -- shows unix, dos, mac
             'filetype',
+            -- Show the current textwidth configuration
+            {
+              function()
+                local tw = vim.bo.textwidth
+                -- tw > 0 implies that hardwrap is on
+                return tw > 0 and 'wrap on' or 'wrap off'
+              end,
+              color = { fg = '#89b4fa', gui = '' },
+            },
           },
           lualine_z = {
             'location',
