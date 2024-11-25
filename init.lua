@@ -197,10 +197,12 @@ vim.opt.shiftwidth = 4 -- Num of spaces to use for each step of (auto)indent. Us
 vim.opt.softtabstop = 4 -- Num of spaces that a tab accounts for while performing editing operations.
 
 -- Line length above which to break a line. Whether to break a line or not is controlled by formatoptions
-local text_width = 120
+local text_width = 140
 -- Hardwrap: The underlying line in the buffer/file is modified. So, the display of the line is also affected.
 -- A longer line will be broken after white space to get this width.  A zero value disables this.
-vim.opt.textwidth = 120
+vim.opt.textwidth = text_width
+-- Color the column of the hard wrap
+vim.wo.colorcolumn = tostring(text_width)
 -- Softwrap: The underlying line is not modified in the buffer/file. Only the display of the line is affected.
 --
 -- When on, lines longer than the width of the window will wrap and displaying continues on the next line.  When off
@@ -211,8 +213,10 @@ vim.api.nvim_create_user_command('HardWrap', function()
   local curr_text_width = vim.bo.textwidth
   if curr_text_width == text_width then
     vim.opt.textwidth = 0
+    vim.wo.colorcolumn = ''
   else
     vim.opt.textwidth = text_width
+    vim.wo.colorcolumn = tostring(text_width)
   end
 end, {})
 
