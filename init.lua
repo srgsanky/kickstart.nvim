@@ -83,6 +83,10 @@ I hope you enjoy your Neovim journey,
 
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
+--
+-- vim.wo is window local options
+-- vim.bo is buffer local options
+-- vim.opt Higher level api for managing global, buffer-local and window-local options.
 
 -- nvim plugins and data are store in two directories (See also
 -- <https://neovim.io/doc/user/builtin.html#stdpath()>)
