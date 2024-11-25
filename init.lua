@@ -1908,7 +1908,7 @@ require('lazy').setup({
         [[autocmd FileType sql setlocal formatprg=sql-formatter\ --config\ %s]],
         -- :p gives abs path
         -- :h removes the last component, in this case it will remove init.lua
-        vim.fn.fnamemodify(vim.fn.stdpath 'config', ':p:h') .. '/.sql-formatter.json'
+        vim.fn.fnamemodify(vim.fn.stdpath 'config', ':p:h') .. '/sql-formatter.json'
       )
       vim.cmd(sql_formatter_command)
 
