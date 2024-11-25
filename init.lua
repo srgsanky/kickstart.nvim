@@ -1889,9 +1889,28 @@ require('lazy').setup({
 
         --toml
         'taplo',
+
+        -- sql specific
+        -- Web UI: <https://sql-formatter-org.github.io/sql-formatter/>
+        'sql-formatter',
       })
       -- mason tool installer's ensure installed doesn't support version
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+      -- https://www.npmjs.com/package/sql-formatter
+      -- Web UI: <https://sql-formatter-org.github.io/sql-formatter/>
+      --
+      -- I tried passing JSON string as config, but couldn't get it to work. So, I am using the configuration json file.
+      --
+      -- Configure one of the sql languages in the file ./.sql-formatter.json
+      -- bigquery,db2,db2i,hive,mariadb,mysql,n1ql,plsql,postgresql,redshift,singlestoredb,snowflake,spark,sql,sqlite,tidb,transactsql,trino,tsql
+      local sql_formatter_command = string.format(
+        [[autocmd FileType sql setlocal formatprg=sql-formatter\ --config\ %s]],
+        -- :p gives abs path
+        -- :h removes the last component, in this case it will remove init.lua
+        vim.fn.fnamemodify(vim.fn.stdpath 'config', ':p:h') .. '/.sql-formatter.json'
+      )
+      vim.cmd(sql_formatter_command)
 
       require('mason-lspconfig').setup {
         -- This ensure installed supports version
