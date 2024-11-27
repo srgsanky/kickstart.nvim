@@ -871,6 +871,15 @@ RUST_ANALYZER_OPTIONS = {
   server = {
     extraEnv = {
       -- ['foo'] = 'bar', -- placeholder env variables
+
+      -- This does not work for Rust analyzer
+      -- RUST_LOG = 'debug',
+
+      -- This works. See <https://rust-analyzer.github.io/manual.html#troubleshooting>. The logs appear in LSP logs ~/.local/state/nvim/lsp.log
+      -- This needs the related setting vim.lsp.set_log_level 'debug'
+      -- RA_LOG = 'debug'
+      -- This is to debug project model
+      -- RA_LOG = 'project_model=debug',
     },
   },
   cargo = {
@@ -2042,6 +2051,9 @@ require('lazy').setup({
           handlers = get_lsp_handlers_with_border(),
         }
       end
+
+      -- Enable debug logs for lsp
+      -- vim.lsp.set_log_level 'debug'
     end,
   },
 
