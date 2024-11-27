@@ -913,12 +913,14 @@ RUST_ANALYZER_OPTIONS = {
 
   linkedProjects = {},
 
-  -- diagnostics = {
-  --   enable = true,
-  --   experimental = {
-  --     enable = true,
-  --   },
-  -- },
+  -- https://rust-analyzer.github.io/manual.html#diagnostics
+  -- Whether to show native rust-analyzer diagnostics.
+  diagnostics = {
+    enable = true,
+    experimental = {
+      enable = true,
+    },
+  },
   -- log = {
   --   level = "debug",
   -- },
