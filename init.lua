@@ -2415,6 +2415,7 @@ require('lazy').setup({
       require('neo-tree').setup {
         close_if_last_window = true,
         enable_git_status = true,
+        enable_diagnostics = false,
         filesystem = {
           filtered_items = {
             hide_dotfiles = false,
