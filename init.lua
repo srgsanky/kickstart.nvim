@@ -3013,7 +3013,9 @@ require('lazy').setup({
         -- }
         return {
           -- Using a lighter color for comments
-          -- Uncomment this to dim comments
+          -- Uncomment this to fade comments (make the comment fade so that you can focus on the non-comment code)
+          -- Whiter colors (for e.g. colors.text) will make the comments more prominent in mocha flavor. Darker colors (for e.g.
+          -- colors.surface0) will make theh comments less prominent.
           -- Comment = { fg = colors.surface2 },
         }
       end,
