@@ -917,9 +917,11 @@ RUST_ANALYZER_OPTIONS = {
   -- Whether to show native rust-analyzer diagnostics.
   diagnostics = {
     enable = true,
-    experimental = {
-      enable = true,
-    },
+
+    -- Enabling experimental diagnostics shows some false positives that build ok with cargo in command line. So, disabling this.
+    -- experimental = {
+    --   enable = true,
+    -- },
   },
   -- log = {
   --   level = "debug",
