@@ -1522,7 +1522,17 @@ require('lazy').setup({
             },
           },
           lualine_z = {
+            {
             'location',
+              -- Custom formatter to also show the total lines in the current buffer
+              fmt = function(location_str)
+                -- :h line()
+                -- $	    the last line in the current buffer
+                local last_line_in_current_buffer = vim.fn.line '$'
+                return location_str .. '/' .. last_line_in_current_buffer
+              end,
+            },
+            -- Shows the selection count only when visual selection is active. Otherwise, it shows nothing.
             'selectioncount',
           },
         },
