@@ -3218,6 +3218,7 @@ require('lazy').setup({
   },
 
   -- Show call hierarchy
+  -- See also LspSaga which can show call hiearchy for rust.
   {
     'm-pilia/vim-ccls',
     opts = {},
@@ -3578,12 +3579,24 @@ require('lazy').setup({
   -- Lspsaga has a call hierarchy view which is amazing for browsing rust
   -- https://nvimdev.github.io/lspsaga/callhierarchy/#default-keymaps
   --
+  -- See also vim-ccls which can show call hiearchy for C.
+  --
   -- Usage: Move over the symbol and invoke the command
-  -- :Lspsaga incoming_calls
+  -- :Lspsaga incoming_calls (<leader>ci)
+  -- :Lspsage outgoing_calls (<leader>co)
   --
   -- Default key bindings:
-  -- q: quit the layout
-  -- u: toggle a hierarchy
+  -- My top uses:
+  -- quit = 'q' quit layout
+  -- toggle_or_req = 'u' toggle or do request (toggle a hierarchy)
+  -- edit = 'e' edit (open) file
+  --
+  -- vsplit = 's' vsplit
+  -- split = 'i' split
+  --
+  -- tabe = 't' open in new tab
+  -- shuttle = '[w' shuttle bettween the layout left and right
+  -- close = '<C-c>k' close layout
   {
     'nvimdev/lspsaga.nvim',
     config = function()
@@ -3601,10 +3614,10 @@ require('lazy').setup({
       }
 
       -- Show incoming calls to the method
-      vim.keymap.set('n', '<leader>ci', '<cmd>Lspsaga incoming_calls<CR>', { silent = true })
+      vim.keymap.set('n', '<leader>ci', '<cmd>Lspsaga incoming_calls<CR>', { silent = true, desc = '[c]alls [i]ncoming' })
 
       -- Show outgoing calls from the method
-      vim.keymap.set('n', '<leader>co', '<cmd>Lspsaga outgoing_calls<CR>', { silent = true })
+      vim.keymap.set('n', '<leader>co', '<cmd>Lspsaga outgoing_calls<CR>', { silent = true, desc = '[c]alls [o]utgoing' })
     end,
     dependencies = {
       'nvim-treesitter/nvim-treesitter', -- optional
