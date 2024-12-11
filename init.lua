@@ -94,6 +94,10 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- Plugin source: ~/.local/share/nvim/
 -- State (vim.fn.stdpath "data"): ~/.local/state/nvim/
 
+-- Use vim.notify to send notification. <https://neovim.io/doc/user/lua.html#vim.notify()>
+-- This will use the appropriate plugin like rcarriga/nvim-notify or folke/snacks.nvim
+-- vim.notify({msg}, {level}, {opts})
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -331,7 +335,7 @@ vim.api.nvim_create_user_command('Csave', function(opts)
   local qflist = vim.fn.getqflist()
   local file = io.open(filename, 'w')
   if file == nil then
-    require 'notify'('Could not open file ' .. filename .. ' for writing.', 'error')
+    vim.notify('Could not open file ' .. filename .. ' for writing.', 'error')
     return
   end
   for _, item in ipairs(qflist) do
@@ -341,7 +345,7 @@ vim.api.nvim_create_user_command('Csave', function(opts)
   end
   file:close()
 
-  require 'notify'('Saved quickfix to ' .. filename, 'info')
+  vim.notify('Saved quickfix to ' .. filename, 'info')
 end, {
   nargs = 1,
   complete = 'file', -- Enable filename completion
@@ -354,7 +358,7 @@ function LoadQuickfix(filename, mode)
   local file = io.open(filename, 'r')
 
   if not file then
-    require 'notify'('Could not open file ' .. filename .. ' for reading.', 'error')
+    vim.notify('Could not open file ' .. filename .. ' for reading.', 'error')
     return
   end
 
@@ -383,7 +387,7 @@ function LoadQuickfix(filename, mode)
     vim.cmd 'copen'
   end
 
-  require 'notify'('Loaded quickfix from ' .. filename, 'info')
+  vim.notify('Loaded quickfix from ' .. filename, 'info')
 end
 
 -- I am using command names similar to the native commands :cfile and :caddfile.
@@ -407,7 +411,7 @@ end, {
 -- Open specific quickfix item
 function OpenQuickfixEntry(index)
   if type(index) ~= 'number' then
-    require 'notify'('Index provided to OpenQuickfixEntry is not a number ' .. index, 'error')
+    vim.notify('Index provided to OpenQuickfixEntry is not a number ' .. index, 'error')
     return
   end
 
@@ -2032,9 +2036,9 @@ require('lazy').setup({
               client.config.settings['rust-analyzer'].cfg.setTest = not current_value
 
               if current_value then
-                require 'notify'('Disabling rust tests', 'info')
+                vim.notify('Disabling rust tests', 'info')
               else
-                require 'notify'('Enabling rust tests', 'info')
+                vim.notify('Enabling rust tests', 'info')
               end
 
               -- Restart LSP with the new configuration
@@ -4451,7 +4455,7 @@ require('lazy').setup({
 
                 vim.schedule(function()
                   -- https://github.com/rcarriga/nvim-notify/blob/fbef5d32be8466dd76544a257d3f3dce20082a07/doc/nvim-notify.txt#L55
-                  previous_notification = require('notify').notify(line_contents, vim.log.levels.ERROR, notification_opts)
+                  previous_notification = vim.notify(line_contents, vim.log.levels.ERROR, notification_opts)
                 end)
               end
             else
@@ -4466,7 +4470,7 @@ require('lazy').setup({
           end
         end,
         on_error = function()
-          require 'notify'('Error trying to get notification for lsp.log', 'error')
+          vim.notify('Error trying to get notification for lsp.log', 'error')
         end,
       })
     end,
@@ -4500,7 +4504,7 @@ require('lazy').setup({
 -- https://medium.com/hackernoon/tmux-in-practice-copy-text-from-remote-session-using-ssh-remote-tunnel-and-systemd-service-dd3c51bca1fa
 -- to allow copying text from remote nvim to Mac's clipboard
 function YANK_AND_PIPE_TO_NC_SHOW_ERROR()
-  require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
+  vim.notify('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
 end
 
 function YANK_AND_PIPE_TO_NC()
@@ -4522,12 +4526,12 @@ function YANK_AND_PIPE_TO_NC()
     -- close here will complete the process
     local success = handle:close()
     if success then
-      require 'notify'('Copied!', 'info', { title = 'Yank and Pipe' })
+      vim.notify('Copied!', 'info', { title = 'Yank and Pipe' })
     else
-      require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
+      vim.notify('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
     end
   else
-    require 'notify'('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
+    vim.notify('No service listening on port 19999', 'error', { title = 'Yank and Pipe' })
   end
 end
 
