@@ -932,9 +932,14 @@ RUST_ANALYZER_OPTIONS = {
   -- },
 }
 
-RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
 -- You can specify custom binary path as the cmd
 -- RUST_ANALYZER_CMD = { '/path/to/rust-analyzer' }
+local rust_analyzer_from_toolbox = vim.fn.expand '$HOME/.toolbox/bin/rust-analyzer'
+if vim.fn.filereadable(rust_analyzer_from_toolbox) == 1 then
+  RUST_ANALYZER_CMD = { '/home/sanka/.toolbox/bin/rust-analyzer' }
+else
+  RUST_ANALYZER_CMD = { 'rustup', 'run', rustup_toolchain, 'rust-analyzer' }
+end
 
 -- If RA_MULTIPLEX_PORT is set, use ra_multiplex. Otherwise, use rust-analyzer directly.
 -- export RA_MULTIPLEX_PORT=27631
