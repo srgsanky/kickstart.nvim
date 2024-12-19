@@ -1099,6 +1099,7 @@ require('lazy').setup({
   -- Visual mode:
   --  Line comment: gc
   --  Block comment: gb
+  --  Related to this plugin: https://github.com/tpope/vim-commentary
   { 'numToStr/Comment.nvim', opts = {} },
 
   -- Here is a more advanced example where we pass configuration
@@ -1418,6 +1419,8 @@ require('lazy').setup({
   -- │                                                       │
   -- ├───────────────────────────────────────────────────────┤
   -- └───────────────────────────────────────────────────────┘ statusline
+  --
+  -- Related to this plugin: https://github.com/vim-airline/vim-airline, https://github.com/powerline/powerline
   {
     'nvim-lualine/lualine.nvim',
     dependencies = {
@@ -2458,6 +2461,8 @@ require('lazy').setup({
   -- :Neotree
   -- :Neotree buffers dir=/
   -- :Neotree git_status
+  --
+  -- Related to this plugin: NERDTree, nvim tree, netrw, oil.nvim
   {
     'nvim-neo-tree/neo-tree.nvim',
     branch = 'v3.x',
