@@ -1639,6 +1639,28 @@ require('lazy').setup({
       --
       -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
       -- and elegantly composed help section, `:help lsp-vs-treesitter`
+      --
+      -- | ------------ | ------------------------------------------------------------ |
+      -- | Keybinding   | Desc                                                         |
+      -- | ------------ | ------------------------------------------------------------ |
+      -- | `gI`         | Go to implementation of trait                                |
+      -- | `gr`         | Go to references                                             |
+      -- | `gd`         | Go to definition                                             |
+      -- | `gD`         | Go to declaration                                            |
+      -- | `<leader>D`  | Go to the type of the variable under cursor                  |
+      -- | `<leader>ds` | Document symbols (go to symbols in current document)         |
+      -- | `<leader>ws` | Workspace symbols (go to symbols in current workspace) - DYNAMIC |
+      -- |              |                                                              |
+      -- | `K`          | Show hover documentation                                     |
+      -- |              |                                                              |
+      -- | `<leader>rn` | Rename                                                       |
+      -- | `<leader>ca` | Code actions                                                 |
+      -- |              |                                                              |
+      -- | `<leader>/`  | Search using grep in current file - DYNAMIC                  |
+      -- | `<leader>sg` | Search using grep across files in workspace - DYNAMIC        |
+      -- | `<leader>su` | Search word under cusor (grep) - STATIC                      |
+      -- | `<leader>sw` | Search word under cusor in workspace symbols - STATIC        |
+      -- | ------------ | ------------------------------------------------------------ |
 
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
