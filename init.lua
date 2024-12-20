@@ -2008,10 +2008,16 @@ require('lazy').setup({
         local compile_commands_json_dir = find_path_to_file 'compile_commands.json'
 
         local lspconfig = require 'lspconfig'
+        -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#ccls
         lspconfig.ccls.setup {
           -- See https://github.com/MaskRay/ccls/wiki/Customization for options.
           -- The only way to set the log file location is via the command line argument
           cmd = { 'ccls', '--log-file=' .. vim.fn.expand '$HOME/ccls-log.log', '-v=1' },
+
+          -- With sqlite, I get the following error. I haven't found a config to avoid it.
+          -- LSP[ccls]: Error INVALID_SERVER_JSON: "Found too many nested data structures (1001) at character 1731514"
+
+          -- Initialization options are defined in https://github.com/MaskRay/ccls/blob/master/src/config.hh
           init_options = {
             index = {
               threads = 0,
