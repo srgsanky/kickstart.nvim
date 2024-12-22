@@ -1950,6 +1950,9 @@ require('lazy').setup({
         -- sql specific
         -- Web UI: <https://sql-formatter-org.github.io/sql-formatter/>
         'sql-formatter',
+
+        -- texlab for Latex <https://github.com/latex-lsp/texlab>
+        'texlab',
       })
       -- mason tool installer's ensure installed doesn't support version
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -4511,6 +4514,59 @@ require('lazy').setup({
           vim.notify('Error trying to get notification for lsp.log', 'error')
         end,
       })
+    end,
+  },
+
+  -- Latex support (:h vimtex)
+  --
+  -- \ is the default localleader in vim. This file overrides the local leader to <space>.
+  -- The default value of g:vimtex_mappings_prefix is \l. With the override, the prefix becomes <space>l.
+  --
+  -- type <leader>li to view the system commands that were executed to start them.
+  -- To inspect the compiler output, use <leader>lo.
+  --
+  -- <leader>ll - start/stop compilation
+  -- <leader>lk - stop compilation
+  -- <leader>lc - clear auxiliary files
+  -- <leader>le - show errors in quickfix window
+  --
+  -- <leader>lv - search forward in the pdf viewer
+  -- <leader>lt - Show a window with a table of contents of your document (also shows labels, references, TODOs).
+  --
+  -- Motions and text objects
+  -- Move between section boundaries using
+  -- [[
+  -- []
+  -- ][
+  -- ]]
+  --
+  -- ic - refers to a LaTex command excluding the backslash.
+  -- ac - includes the backslash
+  {
+    'lervag/vimtex',
+    lazy = false, -- we don't want to lazy load VimTeX
+    -- tag = "v2.15", -- uncomment to pin to a specific release
+    init = function()
+      -- VimTeX configuration goes here, e.g.
+      vim.g.vimtex_view_method = 'zathura'
+
+      -- For forward search to work: Ensure Zathura is compiled with synctex support
+      -- brew install synctex
+      --
+      -- Check if zathura supports synctex
+      -- zathura --synctex-forward 18:18:small2e.tex small2e.pdf
+      -- error: Built without synctex support, but synctex specific option was specified.
+      --
+      -- brew reinstall girara
+      -- brew reinstall zathura --with-synctex
+      -- brew reinstall dbus
+      -- brew services start dbus
+      vim.g.vimtex_view_general_viewer = 'zathura'
+      vim.g.vimtex_view_general_options = '--synctex-forward @line:@col:@tex --synctex-editor-command "nvim --headless -c "VimtexInverseSearch %l" %f" @pdf'
+
+      -- Many of the mappings use `<localleader>l` as a common prefix, where the
+      -- default |<localleader>| is `\`. Thus, `<localleader>ll` will for most people
+      -- mean `\ll`. The prefix may be changed with |g:vimtex_mappings_prefix|.
     end,
   },
 }, {
