@@ -2275,6 +2275,9 @@ require('lazy').setup({
       'hrsh7th/cmp-nvim-lsp',
       -- Completion of file paths
       'hrsh7th/cmp-path',
+
+      -- For latex completions
+      'micangl/cmp-vimtex',
     },
     config = function()
       local WIDE_HEIGHT = 40
@@ -2375,6 +2378,15 @@ require('lazy').setup({
           { name = 'path' },
         },
       }
+
+      -- :h vimtex-complete-nvim-cmp
+      -- https://github.com/micangl/cmp-vimtex/blob/master/doc/TUTORIAL.md
+      cmp.setup.filetype('tex', {
+        sources = {
+          { name = 'vimtex' },
+          { name = 'buffer' },
+        },
+      })
     end,
   },
 
