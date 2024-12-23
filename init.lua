@@ -1953,6 +1953,9 @@ require('lazy').setup({
 
         -- texlab for Latex <https://github.com/latex-lsp/texlab>
         'texlab',
+
+        -- Offline grammar and spell-checking using language tool - <https://valentjn.github.io/ltex/>
+        'ltex-ls',
       })
       -- mason tool installer's ensure installed doesn't support version
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -4498,6 +4501,13 @@ require('lazy').setup({
                 elseif line_contents:match 'ra%-multiplex' and string.find(line_contents, 'INFO') then
                   -- Ignore info messages logged as error by ra-multiplex.
                   -- % is used to escape - in ra-multiplex
+                  return
+                elseif line_contents:match 'ltex-ls' and (string.find(line_contents, 'INFO') or string.find(line_contents, 'SLF4J')) then
+                  -- Grammar/syntax checker
+                  -- Ignore SLF4J initialization errors like
+                  -- [ERROR][2024-12-23 12:03:36] .../vim/lsp/rpc.lua:770	"rpc"	"ltex-ls"	"stderr"	"
+                  -- SLF4J: Defaulting to no-operation (NOP) logger implementation
+                  -- SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details."
                   return
                 end
                 line_contents = line_contents:gsub('\\n', '\n')
