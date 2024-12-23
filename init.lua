@@ -4549,6 +4549,8 @@ require('lazy').setup({
 
   -- Latex support (:h vimtex)
   --
+  -- See :h vimtex-usage
+  --
   -- \ is the default localleader in vim. This file overrides the local leader to <space>.
   -- The default value of g:vimtex_mappings_prefix is \l. With the override, the prefix becomes <space>l.
   --
@@ -4565,18 +4567,50 @@ require('lazy').setup({
   --
   -- Motions and text objects
   -- Move between section boundaries using
-  -- [[
-  -- []
-  -- ][
-  -- ]]
+  -- [[ - START of previous section
+  -- [] - END of previous section
+  -- ][ - END of next section
+  -- ]] - START of next section
   --
   -- ic - refers to a LaTex command excluding the backslash.
   -- ac - includes the backslash
+  --
+  -- Forward search (vimtex-synctex-forward-search): Highlight the text in the PDF that corresponds to the line where the cursor is
+  -- positioned in the editor. (Use <leader>lv)
+  -- Reverse search (vimtex-synctex-inverse-search): Position the cursor in the editor that corresponds to the line in the PDF viewer.
+  -- (In zathura, use ctrl + click)
+  --
+  -- :VimtexCountWords - count number of words. The count is created with `texcount`
   {
     'lervag/vimtex',
     lazy = false, -- we don't want to lazy load VimTeX
     -- tag = "v2.15", -- uncomment to pin to a specific release
     init = function()
+      vim.g.vimtex_compiler_method = 'latexmk'
+
+      -- :h g:vimtex_compiler_latexmk
+      --
+      -- cat > ~/.latexmkrc <<'EOF'
+      -- $pdf_previewer = 'zathura';
+      -- $pdf_update_method = 2;
+      -- EOF
+      --
+      -- Synctex is a tool that enables synchronization of the text editor position and the pdf viewer position.
+      vim.g.vimtex_compiler_latexmk = {
+        aux_dir = '', -- directory for auxiliary output files
+        out_dir = '', -- directory for the compilation output files
+        callback = 1, -- run |vimtex#compiler#callback| after compilation is finished
+        continuous = 1, -- `latexmk` will run in continuous mode, i.e. with the `-pvc` argument
+        executable = 'latexmk', -- The name/path to the `latexmk` executable
+        hooks = {},
+        options = { -- This is a list of options that are passed to `latexmk`. See latexmk -help
+          '-verbose',
+          '-file-line-error',
+          '-synctex=1',
+          '-interaction=nonstopmode',
+        },
+      }
+
       -- VimTeX configuration goes here, e.g.
       vim.g.vimtex_view_method = 'zathura'
 
@@ -4592,11 +4626,17 @@ require('lazy').setup({
       -- brew reinstall dbus
       -- brew services start dbus
       vim.g.vimtex_view_general_viewer = 'zathura'
+      -- `@pdf`    Path to pdf file
+      -- `@tex`    Path to tex file
+      -- `@line`   Current line number
+      -- `@col`    Current column number
       vim.g.vimtex_view_general_options = '--synctex-forward @line:@col:@tex --synctex-editor-command "nvim --headless -c "VimtexInverseSearch %l" %f" @pdf'
+      vim.g.vimtex_view_zathura_options = '-c ' .. vim.fn.expand '$HOME/.config/zathura/zathurarc'
 
       -- Many of the mappings use `<localleader>l` as a common prefix, where the
       -- default |<localleader>| is `\`. Thus, `<localleader>ll` will for most people
       -- mean `\ll`. The prefix may be changed with |g:vimtex_mappings_prefix|.
+      -- vim.g.vimtex_mappings_prefix = '<localleader>l'
     end,
   },
 }, {
