@@ -4514,7 +4514,9 @@ require('lazy').setup({
                   -- Ignore info messages logged as error by ra-multiplex.
                   -- % is used to escape - in ra-multiplex
                   return
-                elseif line_contents:match 'ltex-ls' and (string.find(line_contents, 'INFO') or string.find(line_contents, 'SLF4J')) then
+                elseif line_contents:match 'ltex%-ls' and (string.find(line_contents, 'INFO') or string.find(line_contents, 'SLF4J')) then
+                  -- Need to escape - with %.
+                  --
                   -- Grammar/syntax checker
                   -- Ignore SLF4J initialization errors like
                   -- [ERROR][2024-12-23 12:03:36] .../vim/lsp/rpc.lua:770	"rpc"	"ltex-ls"	"stderr"	"
