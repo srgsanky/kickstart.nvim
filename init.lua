@@ -3177,6 +3177,14 @@ require('lazy').setup({
 
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
+      -- Use syntax highlighting for latex using VimTex. See :h vimtex-faq-treesitter
+      -- Latex syntax has lots of quirks and VimTex is better prepared to handle this compared to treesitter.
+      opts.ignore_install = { 'latex' }
+      opts.highlight = {
+        enable = true,
+        disable = { 'latex' },
+      }
+
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
 
