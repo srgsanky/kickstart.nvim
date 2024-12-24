@@ -4639,6 +4639,20 @@ require('lazy').setup({
       -- default |<localleader>| is `\`. Thus, `<localleader>ll` will for most people
       -- mean `\ll`. The prefix may be changed with |g:vimtex_mappings_prefix|.
       -- vim.g.vimtex_mappings_prefix = '<localleader>l'
+
+      -- The following is required to focus neovim on inverse search.
+      -- Got the logic from https://ejmastnak.com/tutorials/vim-latex/pdf-reader/
+      -- Converted it to Lua using chatGPT.
+      vim.api.nvim_create_augroup('vimtex_event_focus', { clear = true })
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'VimtexEventViewReverse',
+        callback = function()
+          -- In case you don't use WezTerm, use the name of the terminal that you use.
+          vim.fn.system 'open -a WezTerm'
+          vim.cmd 'redraw!'
+        end,
+        group = 'vimtex_event_focus',
+      })
     end,
   },
 }, {
