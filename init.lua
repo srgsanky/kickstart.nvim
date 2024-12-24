@@ -4580,7 +4580,8 @@ require('lazy').setup({
   -- Forward search (vimtex-synctex-forward-search): Highlight the text in the PDF that corresponds to the line where the cursor is
   -- positioned in the editor. (Use <leader>lv)
   -- Reverse search (vimtex-synctex-inverse-search): Position the cursor in the editor that corresponds to the line in the PDF viewer.
-  -- (In zathura, use ctrl + click)
+  -- (In zathura, use ctrl + click. This is controlled by the configuration synctex-edit-modifier which is set to ctrl by default.)
+  -- <https://github.com/pwmt/zathura/blob/2ee20abc9aaffc0393aecddf18227a0c2eac4278/doc/man/zathurarc.5.rst?plain=1#L987>
   --
   -- :VimtexCountWords - count number of words. The count is created with `texcount`
   {
