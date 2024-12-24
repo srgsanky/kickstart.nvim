@@ -4663,9 +4663,10 @@ require('lazy').setup({
   -- csv support
   --
   -- Equivalent of vscode's rainbow csv plugin (maintained by the same author).
-  -- This works only if I move cursor over comma and invoke the command :RainbowDelimSimple.
-  -- That switches the filetype to rcsv_2c_simple_, so any other plugin that relies on filetype csv stops working. Use :RainbowNoDelim to
-  -- revert back to the csv filetype.
+  -- This works only if I move cursor over comma and invoke the command :RainbowDelimSimple. Alternatively, it works if I use
+  -- :set ft=rcsv_2c_simple_
+  -- That switches the filetype to rcsv_2c_simple_, so any other plugin that relies on filetype csv stops working. Use :RainbowNoDelim or
+  -- :set ft=csv to revert back to the csv filetype.
   {
     'mechatroner/rainbow_csv',
     lazy = true,
@@ -4786,6 +4787,9 @@ local function initialize_highlight_groups()
   vim.api.nvim_set_hl(0, 'DimInactive', { bg = '#000000', fg = '#888888' })
 
   vim.api.nvim_set_hl(0, 'RustLibraryFile', { bg = '#292c3c' })
+
+  -- Configure highlight group for highlighting the current CSV column. See chrisbra/csv.vim
+  vim.api.nvim_set_hl(0, 'WildMenu', { bg = '#FFD580', fg = 'black' })
 
   -- Add more highlight group configurations here
 end
