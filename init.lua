@@ -3030,7 +3030,10 @@ require('lazy').setup({
   {
     'catppuccin/nvim',
     name = 'catppuccin',
-    priority = 1000,
+    priority = 1000, -- Make sure to load this plugin before other plugins
+    init = function()
+      vim.cmd.colorscheme 'catppuccin-mocha' -- catppuccin-mocha (dark)/catppuccin-latte/catppuccin-frappe/catppuccin-latte (light)
+    end,
     opts = {
       flavour = 'mocha', -- latte, frappe, macchiato, mocha
       dim_inactive = {
@@ -4800,7 +4803,7 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 })
 
 -- slate does not color markdown well. So, I switched to catppuccin-mocha
-vim.cmd.colorscheme 'catppuccin-mocha' -- catppuccin-mocha (dark)/catppuccin-latte/catppuccin-frappe/catppuccin-latte (light)
+-- vim.cmd.colorscheme 'catppuccin-mocha' -- catppuccin-mocha (dark)/catppuccin-latte/catppuccin-frappe/catppuccin-latte (light)
 -- vim.cmd.colorscheme 'kanagawa-dragon' -- kanagawa-dragon (dark) / kanagawa-wave (mid - like tokyo night) / kanagawa-lotus (light)
 -- vim.cmd.colorscheme 'flexoki-dark' -- flexoki-dark/flexoki-light
 
