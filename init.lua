@@ -3165,6 +3165,7 @@ require('lazy').setup({
         'rust',
         'sql',
         'ssh_config',
+        'tlaplus',
         'tmux',
         'toml',
         'vim',
