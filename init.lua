@@ -4571,7 +4571,13 @@ require('lazy').setup({
   -- <leader>lc - clear auxiliary files
   -- <leader>le - show errors in quickfix window
   --
-  -- <leader>lv - search forward in the pdf viewer
+  -- <leader>lv - search forward in the pdf viewer.
+  --              If this does not work, make sure you export the DBUS address, i.e.
+  --              export DBUS_SESSION_BUS_ADDRESS="unix:path=$DBUS_LAUNCHD_SESSION_BUS_SOCKET"
+  --
+  --              and make sure DBUS is running based on the output of
+  --              brew services info dbus
+  --
   -- <leader>lt - Show a window with a table of contents of your document (also shows labels, references, TODOs).
   --
   -- Motions and text objects
