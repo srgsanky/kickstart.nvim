@@ -2974,6 +2974,20 @@ require('lazy').setup({
     config = function() end, -- dummy config function for vimscript plugins
   },
 
+  -- Align tables based on symbols
+  -- For e.g. this is useful in aligning tables in Latex. Select the table visually in neovim and hit ga& to align based on & as the cell
+  -- delimiter.
+  {
+    'junegunn/vim-easy-align',
+    config = function()
+      -- Start interactive EasyAlign in visual mode
+      vim.api.nvim_set_keymap('x', 'ga', '<Plug>(EasyAlign)', {})
+
+      -- Start interactive EasyAlign for a motion/text object
+      vim.api.nvim_set_keymap('n', 'ga', '<Plug>(EasyAlign)', {})
+    end,
+  },
+
   -- Works on treesitter objects
   --
   -- :Twilight toggles twilight
