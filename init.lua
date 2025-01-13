@@ -2976,7 +2976,10 @@ require('lazy').setup({
 
   -- Align tables based on symbols
   -- For e.g. this is useful in aligning tables in Latex. Select the table visually in neovim and hit ga& to align based on & as the cell
-  -- delimiter.
+  -- delimiter. This will align on the first & (so it aligns only the first two columns).
+  -- ga*& Aligns all columns (* is for all).
+  -- ga2& Aligns around second column (2 is for second).
+  --
   {
     'junegunn/vim-easy-align',
     config = function()
