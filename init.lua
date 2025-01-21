@@ -2988,6 +2988,35 @@ require('lazy').setup({
 
       -- Start interactive EasyAlign for a motion/text object
       vim.api.nvim_set_keymap('n', 'ga', '<Plug>(EasyAlign)', {})
+
+      -- Defaults delimiters are defined in
+      -- <https://github.com/junegunn/vim-easy-align/blob/master/autoload/easy_align.vim>
+      --
+      -- I tried adding % as a delimiter, but was not successful.
+
+      -- local easy_align_delimiters_default = {
+      --   [' '] = { pattern = ' ', left_margin = 0, right_margin = 0, stick_to_left = 0 },
+      --   ['='] = {
+      --     pattern = '===\\|<=>\\|\\(&&\\|||\\|<<\\|>>\\)=\\|=\\~[#?]?\\|=>\\|[:+/*!%^=><&|.-]?=[#?]?',
+      --     left_margin = 1,
+      --     right_margin = 1,
+      --     stick_to_left = 0,
+      --   },
+      --   [':'] = { pattern = ':', left_margin = 0, right_margin = 1, stick_to_left = 1 },
+      --   [','] = { pattern = ',', left_margin = 0, right_margin = 1, stick_to_left = 1 },
+      --   ['|'] = { pattern = '|', left_margin = 1, right_margin = 1, stick_to_left = 0 },
+      --   ['.'] = { pattern = '\\.', left_margin = 0, right_margin = 0, stick_to_left = 0 },
+      --   ['#'] = { pattern = '#\\+', delimiter_align = 'l', ignore_groups = { '!Comment' } },
+      --   ['&'] = { pattern = '\\\\@<!&\\|\\\\', left_margin = 1, right_margin = 1, stick_to_left = 0 },
+      --   ['{'] = { pattern = '(\\@<!{', left_margin = 1, right_margin = 1, stick_to_left = 0 },
+      --   ['}'] = { pattern = '}', left_margin = 1, right_margin = 0, stick_to_left = 0 },
+      --
+      --   -- Add the custom delimiter for %
+      --   ['%'] = { pattern = '%', left_margin = 0, right_margin = 1, stick_to_left = 1 },
+      -- }
+      --
+      -- -- Use this table to configure easy-align if needed
+      -- vim.g.easy_align_delimiters = easy_align_delimiters_default
     end,
   },
 
