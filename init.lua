@@ -135,6 +135,11 @@ vim.opt.number = true
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = false
 
+-- Auto reload the file in neovim if it is modified externally as long as you have not made any changes to the file in neovim (i.e. the
+-- buffer is not modified).
+-- Note: .o and .opt are the same
+vim.o.autoread = true
+
 -- Ignore white spaces in diff
 -- :windo set diffopt+=iwhite | diffthis
 -- The following is the equivalent of set diffopt+=iwhite
