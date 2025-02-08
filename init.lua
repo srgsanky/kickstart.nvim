@@ -2097,25 +2097,27 @@ require('lazy').setup({
         end, { noremap = true, silent = true, desc = '[F]lip [T]ests in rust' })
       end
 
-      -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#ruff_lsp
-      if vim.fn.executable 'ruff-lsp' == 1 then
-        require('lspconfig').ruff_lsp.setup {
-          init_options = {
-            settings = {
-              -- Any extra CLI arguments for `ruff` go here.
-              args = {},
-            },
-          },
-          capabilities = capabilities,
-          on_attach = function(client, _)
-            -- Disable hover in favor of Pyright
-            client.server_capabilities.hoverProvider = false
-            -- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/
-            client.server_capabilities.documentSymbolProvider = false
-          end,
-          handlers = get_lsp_handlers_with_border(),
-        }
-      end
+      -- ruff_lsp is deprecated, use ruff instead. Feature will be removed in lspconfig 0.2.1
+      --
+      -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#ruff_lsp
+      -- if vim.fn.executable 'ruff-lsp' == 1 then
+      --   require('lspconfig').ruff_lsp.setup {
+      --     init_options = {
+      --       settings = {
+      --         -- Any extra CLI arguments for `ruff` go here.
+      --         args = {},
+      --       },
+      --     },
+      --     capabilities = capabilities,
+      --     on_attach = function(client, _)
+      --       -- Disable hover in favor of Pyright
+      --       client.server_capabilities.hoverProvider = false
+      --       -- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/
+      --       client.server_capabilities.documentSymbolProvider = false
+      --     end,
+      --     handlers = get_lsp_handlers_with_border(),
+      --   }
+      -- end
 
       -- Enable debug logs for lsp
       -- vim.lsp.set_log_level 'debug'
