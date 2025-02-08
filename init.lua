@@ -1251,6 +1251,7 @@ require('lazy').setup({
       },
     },
     config = function()
+      local actions = require 'telescope.actions'
       -- Telescope is a fuzzy finder that comes with a lot of different things that
       -- it can fuzzy find! It's more than just a "file finder", it can search
       -- many different aspects of Neovim, your workspace, LSP, and more!
@@ -1298,7 +1299,21 @@ require('lazy').setup({
             -- ALT + SPACE: Open Alfred
             -- CMD + SPACE: Open Alfred/spotlight
             --
-            i = { ['<A-ENTER>'] = 'to_fuzzy_refine' },
+            i = {
+              ['<A-ENTER>'] = 'to_fuzzy_refine',
+
+              -- Use C-n/C-p to scroll the search results by one result at a time
+
+              -- Use C-f/C-b to scroll the search results by a page
+              ['<C-f>'] = actions.results_scrolling_down,
+              ['<C-b>'] = actions.results_scrolling_up,
+
+              -- Use C-d/C-u to scroll the preview pane by a page
+            },
+            n = {
+              ['<C-f>'] = actions.results_scrolling_down,
+              ['<C-b>'] = actions.results_scrolling_up,
+            },
           },
 
           -- Default scroll_strategy is cycle which will go to the first result when you try to go
