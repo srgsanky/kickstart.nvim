@@ -902,6 +902,9 @@ RUST_ANALYZER_OPTIONS = {
     -- When <https://github.com/rust-lang/rust-analyzer/pull/18085> is merged, this config
     -- is necessary to unset tests. This will prevent rust analyzer from showing test
     -- references and will also dim the test code.
+    --
+    -- true will unset tests, disabling them.
+    -- false will set tests, enabling them.
     ['setTest'] = false,
   },
   checkOnSave = {
