@@ -3290,6 +3290,34 @@ require('lazy').setup({
         require('vim.treesitter.query').set('c', 'folds', folds_query)
       end
 
+      -- Inject Markdown parsing for Rust doc comments - this highlights rust code in rust doc comments
+      require('vim.treesitter.query').set(
+        'rust',
+        'injections',
+        [[
+; Capture doc comments as markdown
+((line_comment) @markdown
+  (#match? @markdown "^///"))
+
+((line_comment) @markdown
+  (#match? @markdown "^//!"))
+
+((block_comment) @markdown
+  (#match? @markdown "^/[*][*!]"))
+
+; Capture rust code blocks in doc comments
+((line_comment) @rust
+  (#match? @rust "^/// ```rust"))
+
+((line_comment) @rust
+  (#match? @rust "^//! ```rust"))
+
+; Regular block comments
+((block_comment) @rust
+  (#match? @rust "^/[*]$"))
+      ]]
+      )
+
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
       --
