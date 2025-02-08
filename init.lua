@@ -1330,6 +1330,8 @@ require('lazy').setup({
       map_telescope_using_dropdown_theme('n', '<leader>sf', function(opts)
         opts = opts or {}
         opts.hidden = true -- show hidden files as well
+        -- Use fd and ignore specific directories that contain build artifacts
+        opts.find_command = { 'fd', '--type', 'f', '--strip-cwd-prefix', '--exclude', 'node_modules', '--exclude', 'target' }
         builtin.find_files(opts)
       end, { desc = '[S]earch [F]iles' })
       map_telescope_using_dropdown_theme('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
