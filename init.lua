@@ -4945,6 +4945,11 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter', 'FocusGained' }, {
   end,
 })
 
+-- keybinding to copy current file path to clipboard
+vim.keymap.set('n', '<leader>yf', function()
+  vim.fn.setreg('+', vim.fn.expand '%:p')
+end, { desc = 'Copy current file path to clipboard' })
+
 -- Allow CMD + v to paste in neovide. Taken from <https://neovide.dev/faq.html>
 if vim.g.neovide then
   vim.keymap.set('n', '<D-s>', ':w<CR>') -- Save
