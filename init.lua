@@ -1880,6 +1880,14 @@ require('lazy').setup({
             },
           },
         },
+        ltex = {
+          -- Enable grammar checks on specific file types only. For e.g. do not enable it rust files
+          filetypes = { 'latex', 'tex', 'bib', 'markdown', 'gitcommit', 'text' },
+          enabled = false, -- Temporarily disabling this as it is very noisy
+          settings = {
+            language = 'en-US',
+          },
+        },
       }
 
       -- pyright is written in typescript and requires npm to be installed.
