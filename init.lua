@@ -2149,6 +2149,19 @@ require('lazy').setup({
 
       -- Enable debug logs for lsp
       -- vim.lsp.set_log_level 'debug'
+
+      -- Setup for java
+      require('lspconfig').jdtls.setup {}
+    end,
+  },
+
+  -- LSP for java
+  {
+    'nvim-java/nvim-java',
+    config = function()
+      -- https://github.com/nvim-java/nvim-java
+      -- This apparantly has to be invoked LSP is attached.
+      require('java').setup()
     end,
   },
 
