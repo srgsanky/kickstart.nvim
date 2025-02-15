@@ -4819,10 +4819,34 @@ require('lazy').setup({
   {
     -- I manually cloned it using
     -- git clone git@github.com:3rd/image.nvim.git  /Users/sanka/.local/share/nvim/lazy/image
+    -- brew install imagemagick
     '3rd/image.nvim',
     -- Enable only when using kitty term. Even though wezterm support kitty protocol (https://github.com/wezterm/wezterm/issues/986), the
     -- render is not perfect and is slow.
     enabled = vim.env.TERM == 'xterm-kitty',
+    build = false, -- so that it doesn't build the rock https://github.com/3rd/image.nvim/issues/91#issuecomment-2453430239
+    dependencies = {
+      -- https://github.com/3rd/image.nvim/issues/91
+      --
+      -- This is required to avoid the following error on startup
+      -- image.nvim: magick rock not found, please install it and restart your editor. Error: "module 'magick' not found:
+      --     no field package.preload['magick']
+      -- cache_loader: module magick not found
+      -- cache_loader_lib: module magick not found
+      --     no file './magick.lua'
+      --     no file '/opt/homebrew/share/luajit-2.1/magick.lua'
+      --     no file '/usr/local/share/lua/5.1/magick.lua'
+      --     no file '/usr/local/share/lua/5.1/magick/init.lua'
+      --     no file '/opt/homebrew/share/lua/5.1/magick.lua'
+      --     no file '/opt/homebrew/share/lua/5.1/magick/init.lua'
+      {
+        'vhyrro/luarocks.nvim',
+        -- priority = 1001, -- this plugin needs to run before anything else
+        opts = {
+          rocks = { 'magick' },
+        },
+      },
+    },
     config = function()
       -- Only setup if we're in Kitty terminal
       if vim.env.TERM == 'xterm-kitty' then
