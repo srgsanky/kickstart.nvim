@@ -2882,7 +2882,7 @@ require('lazy').setup({
         pattern = 'qf',
         callback = function()
           -- Use false to use the default behavior of showing quickfix at the bottom
-          local show_qf_on_the_right = true
+          local show_qf_on_the_right = false
 
           if show_qf_on_the_right then
             -- Move the quickfix window to the right
