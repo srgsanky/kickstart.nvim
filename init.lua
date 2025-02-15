@@ -5081,5 +5081,10 @@ vim.api.nvim_set_keymap('i', '<C-t>', '<Nop>', { noremap = true, silent = true }
 vim.api.nvim_set_keymap('v', '<C-t>', '<Nop>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<C-t>', '<Nop>', { noremap = true, silent = true })
 
+-- My custom highlight groups for rust
+vim.api.nvim_set_hl(0, 'ASYNC', { fg = '#ff5555', bg = 'white', bold = true })
+vim.cmd 'hi link @keyword.async ASYNC'
+vim.cmd 'hi link @keyword.await ASYNC'
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
