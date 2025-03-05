@@ -908,6 +908,8 @@ RUST_ANALYZER_OPTIONS = {
     ['setTest'] = false,
   },
   checkOnSave = {
+    -- Running "cargo clippy --fix" from command line will fix all warning automatically. The following option will do the same when the file is
+    -- saved. To see the warning without applying the fix, use "cargo clippy -- -D warning".
     command = 'clippy',
     -- I need the allow-no-vcs when I use a dummy cargo workspace at the top in a multi-package workspace. This dummy workspace does not have a VCS.
     extraArgs = { '--fix', '--allow-dirty', '--allow-staged', '--allow-no-vcs' },
