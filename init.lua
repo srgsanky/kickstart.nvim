@@ -1562,7 +1562,7 @@ require('lazy').setup({
           },
           lualine_z = {
             {
-            'location',
+              'location',
               -- Custom formatter to also show the total lines in the current buffer
               fmt = function(location_str)
                 -- :h line()
@@ -1826,7 +1826,9 @@ require('lazy').setup({
             -- <https://neovim.io/doc/user/lsp.html#_lua-module:-vim.lsp.inlay_hint>
             -- Native inlay shows up only on edit i.e. after inserting any char. Similar question
             -- <https://www.reddit.com/r/neovim/comments/1fklbks/inlay_hints_only_appear_after_re_enabling_them/>
-            vim.lsp.inlay_hint.enable(true)
+            -- Related <https://github.com/neovim/neovim/pull/28627>
+            -- See <https://github.com/neovim/neovim/issues/28625> and <https://github.com/neovim/neovim/issues/28624>
+            vim.lsp.inlay_hint.enable(true, { bufnr = 0 })
           else
             -- lsp-inlayhints is archived as of Feb 2024
             require('lsp-inlayhints').on_attach(client, bufnr)
@@ -1990,7 +1992,7 @@ require('lazy').setup({
         'texlab',
 
         -- Offline grammar and spell-checking using language tool - <https://valentjn.github.io/ltex/>
-        'ltex-ls',
+        -- 'ltex-ls',
       })
       -- mason tool installer's ensure installed doesn't support version
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -4371,18 +4373,25 @@ require('lazy').setup({
       provider = 'claude', -- Recommend using Claude
       -- Since auto-suggestions are a high-frequency operation and therefore expensive, it is recommended to specify an inexpensive provider or even a free provider: copilot
       auto_suggestions_provider = 'claude',
-      claude = {
-        endpoint = 'https://api.anthropic.com',
-        -- Find the latest model from https://console.anthropic.com/settings/limits
-        model = 'claude-3-5-sonnet-20241022',
-        temperature = 0,
-        max_tokens = 4096,
-      },
-      openai = {
-        endpoint = 'https://api.openai.com/v1/',
-        model = 'gpt-4o',
-        temperature = 0,
-        max_tokens = 4096,
+      -- https://github.com/yetone/avante.nvim/wiki/Provider-configuration-migration-guide
+      providers = {
+        claude = {
+          endpoint = 'https://api.anthropic.com',
+          -- Find the latest model from https://console.anthropic.com/settings/limits
+          model = 'claude-3-5-sonnet-20241022',
+          extra_request_body = {
+            temperature = 0,
+            max_tokens = 4096,
+          },
+        },
+        openai = {
+          endpoint = 'https://api.openai.com/v1/',
+          model = 'gpt-4o',
+          extra_request_body = {
+            temperature = 0,
+            max_tokens = 4096,
+          },
+        },
       },
       behaviour = {
         auto_suggestions = false, -- Experimental stage
