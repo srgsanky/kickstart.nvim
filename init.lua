@@ -4383,8 +4383,10 @@ require('lazy').setup({
       providers = {
         claude = {
           endpoint = 'https://api.anthropic.com',
-          -- Find the latest model from https://console.anthropic.com/settings/limits
-          model = 'claude-3-5-sonnet-20241022',
+          -- Find the latest model name from https://docs.claude.com/en/docs/about-claude/models/overview
+          -- https://console.anthropic.com/settings/limits
+          -- model = 'claude-3-5-sonnet-20241022',
+          model = 'claude-sonnet-4-5-20250929',
           extra_request_body = {
             temperature = 0,
             max_tokens = 4096,
