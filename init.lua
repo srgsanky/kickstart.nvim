@@ -1926,12 +1926,18 @@ require('lazy').setup({
       end
 
       if is_mac then
-        require('lspconfig').sourcekit.setup {
-          -- Invoke the wrapper script that won't throw error when trying to use --version
-          cmd = { vim.fn.stdpath 'config' .. '/start_sourcekit_lsp.sh' },
-          filetypes = { 'swift', 'objc', 'objcpp', 'c', 'cpp' },
-          root_dir = require('lspconfig.util').root_pattern('*.xcodeproj', '*.swift'),
-        }
+        -- TODO: This requires some work.
+        -- https://github.com/search?q=vim.lsp.config.sourcekit&type=code
+        vim.lsp.enable 'sourcekit'
+        -- xcrun --find sourcekit-lsp
+        if vim.lsp.config.sourcekit ~= nil and vim.lsp.config.sourcekit.setup ~= nil then
+          vim.lsp.config.sourcekit.setup {
+            -- Invoke the wrapper script that won't throw error when trying to use --version
+            cmd = { vim.fn.stdpath 'config' .. '/start_sourcekit_lsp.sh' },
+            filetypes = { 'swift', 'objc', 'objcpp', 'c', 'cpp' },
+            root_dir = require('lspconfig.util').root_pattern('*.xcodeproj', '*.swift'),
+          }
+        end
       end
 
       -- Ensure the servers and tools above are installed
