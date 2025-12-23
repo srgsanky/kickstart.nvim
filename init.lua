@@ -1883,15 +1883,7 @@ require('lazy').setup({
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
-        },
-        ltex = {
-          -- Enable grammar checks on specific file types only. For e.g. do not enable it rust files
-          filetypes = { 'latex', 'tex', 'bib', 'markdown', 'gitcommit', 'text' },
-          enabled = false, -- Temporarily disabling this as it is very noisy
-          settings = {
-            language = 'en-US',
-          },
-        },
+        }
       }
 
       -- pyright is written in typescript and requires npm to be installed.
@@ -1998,7 +1990,7 @@ require('lazy').setup({
         'texlab',
 
         -- Offline grammar and spell-checking using language tool - <https://valentjn.github.io/ltex/>
-        -- 'ltex-ls',
+        'ltex-ls',
       })
       -- mason tool installer's ensure installed doesn't support version
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -2162,6 +2154,17 @@ require('lazy').setup({
 
       -- Setup for java
       require('lspconfig').jdtls.setup {}
+
+      -- Dictionary spell check
+      local enable_ltex = false
+      require('lspconfig').ltex.setup({
+        -- Enable grammar checks on specific file types only. For e.g. do not enable it rust files
+        filetypes = { 'latex', 'tex', 'bib', 'markdown', 'gitcommit', 'text' },
+        settings = {
+          enabled = enable_ltex,
+          language = 'en-US',
+        },
+      })
     end,
   },
 
