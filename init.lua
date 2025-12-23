@@ -4464,7 +4464,10 @@ require('lazy').setup({
         },
       },
       -- Whether to show the keybinding hint in visual mode? <https://github.com/yetone/avante.nvim/issues/682>
-      hints = { enabled = false },
+      selection = {
+        enabled = false,
+        hint_display = "delayed",
+      },
       windows = {
         ---@type "right" | "left" | "top" | "bottom"
         position = 'right', -- the position of the sidebar
