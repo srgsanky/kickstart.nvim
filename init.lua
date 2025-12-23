@@ -1990,7 +1990,9 @@ require('lazy').setup({
         'texlab',
 
         -- Offline grammar and spell-checking using language tool - <https://valentjn.github.io/ltex/>
-        'ltex-ls',
+        -- Disabling this as I couldn't find a way to toggle it on demand. It is always getting enabled.
+        -- If ltex-ls is already installed, open mason using :Mason and uninstall it by pressing X over ltex-ls.
+        -- 'ltex-ls',
       })
       -- mason tool installer's ensure installed doesn't support version
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -2156,15 +2158,17 @@ require('lazy').setup({
       require('lspconfig').jdtls.setup {}
 
       -- Dictionary spell check
-      local enable_ltex = false
-      require('lspconfig').ltex.setup({
-        -- Enable grammar checks on specific file types only. For e.g. do not enable it rust files
-        filetypes = { 'latex', 'tex', 'bib', 'markdown', 'gitcommit', 'text' },
-        settings = {
-          enabled = enable_ltex,
-          language = 'en-US',
-        },
-      })
+      -- This config is not effective. ltex-ls is always enabled.
+      --
+      -- local enable_ltex = false
+      -- require('lspconfig').ltex.setup({
+      --   -- Enable grammar checks on specific file types only. For e.g. do not enable it rust files
+      --   filetypes = { 'latex', 'tex', 'bib', 'markdown', 'gitcommit', 'text' },
+      --   settings = {
+      --     enabled = enable_ltex,
+      --     language = 'en-US',
+      --   },
+      -- })
     end,
   },
 
