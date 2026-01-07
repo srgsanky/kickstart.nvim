@@ -1883,7 +1883,7 @@ require('lazy').setup({
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
-        }
+        },
       }
 
       -- pyright is written in typescript and requires npm to be installed.
@@ -1951,15 +1951,20 @@ require('lazy').setup({
           package:install { version = lua_ls_version }
         else
           -- If lua_ls got updated accidentally (say using the :Mason UI), downgrade it
-          package:get_installed_version(function(success, version_or_err)
-            if success then
-              local version = version_or_err
-              if version ~= lua_ls_version then
-                package:uninstall()
-                package:install { version = lua_ls_version }
-              end
-            end
+          --
+          -- Capture the version synchronously
+          local success, installed_version = pcall(function()
+            return package:get_installed_version()
           end)
+
+          if success and installed_version ~= lua_ls_version then
+            -- Notify the user so they aren't confused why it's uninstalling
+            vim.notify('Downgrading lua-language-server to ' .. lua_ls_version .. ' for glibc compatibility...')
+
+            package:uninstall():once('closed', function()
+              package:install { version = lua_ls_version }
+            end)
+          end
         end
       end
 
@@ -3252,6 +3257,7 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master', -- Stick to master branch. The default branch (main) has breaking changes that needs a config update on this file.
     build = ':TSUpdate',
     opts = {
       ensure_installed = {
@@ -4470,7 +4476,7 @@ require('lazy').setup({
       -- Whether to show the keybinding hint in visual mode? <https://github.com/yetone/avante.nvim/issues/682>
       selection = {
         enabled = false,
-        hint_display = "delayed",
+        hint_display = 'delayed',
       },
       windows = {
         ---@type "right" | "left" | "top" | "bottom"
