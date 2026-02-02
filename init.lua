@@ -4925,6 +4925,25 @@ require('lazy').setup({
       end
     end,
   },
+
+  -- My custom plugin to handle header-source pair as a single entity
+  {
+    'srgsanky/header-source-pair',
+    dependencies = {
+      'nvim-telescope/telescope.nvim', -- Telescope integration for fuzzy finding
+    },
+    config = function()
+      require('header-source-pair').setup {
+        split = 'vertical',
+        header_percent = 35,
+      }
+
+      vim.keymap.set('n', '<leader>hc', '<cmd>HeaderSourcePairCursor<cr>', { desc = 'open [h]eader/source pair under [c]ursor' })
+
+      vim.keymap.set('n', '<leader>fp', '<cmd>Telescope header_source_pair<cr>', { desc = '[f]ind [p]airs' })
+      vim.keymap.set('n', '<leader>fr', '<cmd>Telescope header_source_pair recent<cr>', { desc = '[f]ind [r]ecent pairs' })
+    end,
+  },
 }, {
   config = function()
     -- Logic to run after lazy is setup
