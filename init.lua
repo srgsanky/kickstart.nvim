@@ -1921,13 +1921,12 @@ require('lazy').setup({
       if is_mac then
         -- TODO: This requires some work.
         -- https://github.com/search?q=vim.lsp.config.sourcekit&type=code
-        vim.lsp.enable 'sourcekit'
         -- xcrun --find sourcekit-lsp
         if vim.lsp.config.sourcekit ~= nil and vim.lsp.config.sourcekit.setup ~= nil then
           vim.lsp.config.sourcekit.setup {
             -- Invoke the wrapper script that won't throw error when trying to use --version
             cmd = { vim.fn.stdpath 'config' .. '/start_sourcekit_lsp.sh' },
-            filetypes = { 'swift', 'objc', 'objcpp', 'c', 'cpp' },
+            filetypes = { 'swift' },
             root_dir = require('lspconfig.util').root_pattern('*.xcodeproj', '*.swift'),
           }
         end
@@ -2039,7 +2038,7 @@ require('lazy').setup({
         },
       }
       -- Use ccls only in linux. clangd is available in Mac which makes things easier
-      if is_linux or not use_clangd_in_mac then
+      if is_linux then
         local function find_path_to_file(filename)
           -- Find needs an absolute path if you want it to output absolute paths
           local cwd = vim.fn.getcwd()
