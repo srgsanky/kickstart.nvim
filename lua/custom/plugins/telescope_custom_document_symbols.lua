@@ -109,7 +109,7 @@ exported_symbols.custom_document_symbols = function(opts)
       return
     end
 
-    if not result or vim.tbl_isempty(result) then
+    if not result or result == vim.NIL or vim.tbl_isempty(result) then
       utils.notify('builtin.lsp_document_symbols', {
         msg = 'No results from textDocument/documentSymbol',
         level = 'INFO',
@@ -117,7 +117,7 @@ exported_symbols.custom_document_symbols = function(opts)
       return
     end
 
-    local locations = vim.lsp.util.symbols_to_items(result or {}, opts.bufnr) or {}
+    local locations = vim.lsp.util.symbols_to_items(result, opts.bufnr) or {}
     locations = utils.filter_symbols(locations, opts, symbols_sorter)
     if locations == nil then
       -- error message already printed in `utils.filter_symbols`
