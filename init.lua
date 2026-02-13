@@ -138,6 +138,7 @@ vim.opt.relativenumber = false
 -- Auto reload the file in neovim if it is modified externally as long as you have not made any changes to the file in neovim (i.e. the
 -- buffer is not modified).
 -- Note: .o and .opt are the same
+-- This is equivalent to manually triggering the command :edit
 vim.o.autoread = true
 
 -- Ignore white spaces in diff
@@ -2458,14 +2459,6 @@ require('lazy').setup({
         },
       })
     end,
-  },
-
-  -- Show inlay hints using LSP server. This shows the parameter name on the right which is helpful while reading.
-  -- This is archived as of Feb 2024. Neovim 0.10 natively supports inlay hints.
-  {
-    'lvimuser/lsp-inlayhints.nvim',
-    opts = {},
-    enabled = not use_native_inlay_hints,
   },
 
   -- Show signature of the method as you type the invocation. This is helpful while invoking the function.
@@ -4942,6 +4935,9 @@ require('lazy').setup({
 
       vim.keymap.set('n', '<leader>fp', '<cmd>Telescope header_source_pair<cr>', { desc = '[f]ind [p]airs' })
       vim.keymap.set('n', '<leader>fr', '<cmd>Telescope header_source_pair recent<cr>', { desc = '[f]ind [r]ecent pairs' })
+
+      -- Open unit test file in third window
+      vim.keymap.set('n', '<leader>fu', '<cmd>HeaderSourcePairTest<cr>', { desc = '[f]ind [u]nit test' })
     end,
   },
 }, {
