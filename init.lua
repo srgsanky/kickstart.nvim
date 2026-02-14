@@ -4939,6 +4939,12 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>fu', '<cmd>HeaderSourcePairTest<cr>', { desc = '[f]ind [u]nit test' })
     end,
   },
+
+  -- Format markdown table
+  -- :VimwikiTableAlignQ or :VimwikiTableAlignW
+  {
+    'vimwiki/vimwiki',
+  },
 }, {
   config = function()
     -- Logic to run after lazy is setup
