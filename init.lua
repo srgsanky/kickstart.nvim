@@ -4942,9 +4942,9 @@ require('lazy').setup({
 
   -- Format markdown table
   -- :VimwikiTableAlignQ or :VimwikiTableAlignW
-  {
-    'vimwiki/vimwiki',
-  },
+  -- {
+  --   'vimwiki/vimwiki',
+  -- },
 }, {
   config = function()
     -- Logic to run after lazy is setup
