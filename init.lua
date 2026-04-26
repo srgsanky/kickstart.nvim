@@ -610,6 +610,20 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- jq expects a filter, so the . is important. Otherwise it just outputs the jq help text.
 vim.cmd [[autocmd! FileType json setlocal formatprg=jq\ .]]
 
+-- Markdown-only: visual-mode wrappers for emphasis.
+--   <leader>b -> **bold**   (works around vim-surround's `S**` limitation; S only takes one char)
+--   <leader>i -> *italic*   (vim-surround's `S*` also works; this is just for symmetry with <leader>b)
+-- Mechanic: c deletes the selection into the unnamed register ", types the opening
+-- markers, <C-r>" pastes the deleted text back, closes the markers, <Esc> exits insert.
+-- Scoped to markdown buffers so they don't claim <leader>b/<leader>i globally.
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
+  callback = function(args)
+    vim.keymap.set('v', '<leader>b', 'c**<C-r>"**<Esc>', { buffer = args.buf, desc = 'Markdown: [B]old selection' })
+    vim.keymap.set('v', '<leader>i', 'c*<C-r>"*<Esc>', { buffer = args.buf, desc = 'Markdown: [I]talic selection' })
+  end,
+})
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
