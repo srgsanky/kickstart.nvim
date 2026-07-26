@@ -152,6 +152,33 @@ vim.opt.diffopt:append 'iwhite'
 -- Fixed after the stable release by https://github.com/wezterm/wezterm/commit/03407cae99a2
 -- Use a current WezTerm nightly or Ghostty if the problem persists.
 
+-- Cycle native diff highlighting between character, word, and whole-line changes.
+-- This applies to native diff windows, Diffview, and Gitsigns diffthis views.
+local diff_granularities = { 'char', 'word', 'none' }
+
+local function cycle_diff_granularity()
+  local options = vim.opt.diffopt:get()
+  local current
+
+  for i = #options, 1, -1 do
+    local mode = options[i]:match '^inline:(.+)$'
+    if mode then
+      current = mode
+      table.remove(options, i)
+    end
+  end
+
+  local current_index = vim.fn.index(diff_granularities, current)
+  local next_mode = diff_granularities[(current_index + 1) % #diff_granularities + 1]
+
+  table.insert(options, 'inline:' .. next_mode)
+  vim.opt.diffopt = options
+  vim.cmd.diffupdate()
+  vim.notify('Diff granularity: ' .. (next_mode == 'none' and 'line' or next_mode))
+end
+
+vim.keymap.set('n', '<leader>hg', cycle_diff_granularity, { desc = 'Cycle diff [g]ranularity' })
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 -- If mouse is not working when using iTerm, check
 -- https://stackoverflow.com/questions/77560255/set-mouse-a-not-working-on-vim-neovim-in-iterm2
