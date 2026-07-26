@@ -3280,7 +3280,9 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    branch = 'master', -- Stick to master branch. The default branch (main) has breaking changes that needs a config update on this file.
+    branch = 'main',
+    lazy = false,
+    -- The main branch requires tree-sitter-cli >= 0.26.1 (`brew install tree-sitter-cli`).
     build = ':TSUpdate',
     opts = {
       ensure_installed = {
@@ -3288,10 +3290,16 @@ require('lazy').setup({
         'bash',
         'c',
         'cpp',
+        'css',
         'csv',
         'diff',
+        'dockerfile',
         'dot',
+        'git_config',
+        'gitcommit',
+        'gitignore',
         'html',
+        'ini',
         'java',
         'javascript',
         'json',
@@ -3299,146 +3307,74 @@ require('lazy').setup({
         'make',
         'markdown',
         'markdown_inline',
+        'nginx',
         'python',
         'query',
         'ruby',
         'rust',
         'sql',
         'ssh_config',
+        'terraform',
         'tlaplus',
-        'tmux',
         'toml',
+        'tsv',
+        'tsx',
+        'typescript',
         'vim',
         'vimdoc',
         'xml',
+        'yaml',
       },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
     },
     config = function(_, opts)
       if vim.fn.executable 'swift' == 1 and vim.fn.executable 'tree-sitter' == 1 then
-        -- Ensure that swift is installed only when swift cli is present. It also requires
-        -- tree-sitter cli.
-        --
-        -- Follow <https://www.swift.org/install/linux/tarball/> to install swift.
-        -- Install tree-sitter using
-        -- cargo install tree-sitter-cli
         table.insert(opts.ensure_installed, 'swift')
       end
 
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+      local treesitter = require 'nvim-treesitter'
+      treesitter.setup()
+      treesitter.install(opts.ensure_installed)
 
-      -- Use syntax highlighting for latex using VimTex. See :h vimtex-faq-treesitter
-      -- Latex syntax has lots of quirks and VimTex is better prepared to handle this compared to treesitter.
-      opts.ignore_install = { 'latex' }
-      opts.highlight = {
-        enable = true,
-        disable = { 'latex' },
-      }
-
-      ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
-
-      -- https://github.com/nvim-treesitter/nvim-treesitter/discussions/1513
-      -- I want to override else_if_statement and else_statement so that the individual blocks can be folded, but this
-      -- doesn't work. Need to find a way to fold individual blocks.
-      if require('nvim-treesitter.parsers').has_parser 'c' then
-        -- Copied from https://github.com/nvim-treesitter/nvim-treesitter/blob/master/queries/c/folds.scm
-        local folds_query = [[
-[
-  (for_statement)
-  (if_statement)
-  (while_statement)
-  (do_statement)
-  (switch_statement)
-  (case_statement)
-  (function_definition)
-  (struct_specifier)
-  (enum_specifier)
-  (comment)
-  (preproc_if)
-  (preproc_elif)
-  (preproc_else)
-  (preproc_ifdef)
-  (preproc_function_def)
-  (initializer_list)
-  (gnu_asm_expression)
-] @fold
-
-(compound_statement
-  (compound_statement) @fold)
-    ]]
-        require('vim.treesitter.query').set('c', 'folds', folds_query)
+      local enabled_parsers = {}
+      for _, language in ipairs(opts.ensure_installed) do
+        enabled_parsers[language] = true
       end
 
-      -- Inject Markdown parsing for Rust doc comments - this highlights rust code in rust doc comments
-      require('vim.treesitter.query').set(
-        'rust',
-        'injections',
-        [[
-; Capture doc comments as markdown
-((line_comment) @markdown
-  (#match? @markdown "^///"))
+      local treesitter_group = vim.api.nvim_create_augroup('kickstart-treesitter', { clear = true })
+      vim.api.nvim_create_autocmd('FileType', {
+        group = treesitter_group,
+        pattern = '*',
+        callback = function(args)
+          local language = vim.treesitter.language.get_lang(args.match) or args.match
+          if not enabled_parsers[language] then
+            return
+          end
 
-((line_comment) @markdown
-  (#match? @markdown "^//!"))
+          if not pcall(vim.treesitter.start, args.buf, language) then
+            return
+          end
 
-((block_comment) @markdown
-  (#match? @markdown "^/[*][*!]"))
-
-; Capture rust code blocks in doc comments
-((line_comment) @rust
-  (#match? @rust "^/// ```rust"))
-
-((line_comment) @rust
-  (#match? @rust "^//! ```rust"))
-
-; Regular block comments
-((block_comment) @rust
-  (#match? @rust "^/[*]$"))
-      ]]
-      )
-
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+          -- Ruby still relies on Vim's regex syntax, and its Treesitter indentation is unreliable.
+          if language == 'ruby' then
+            vim.bo[args.buf].syntax = 'ruby'
+          else
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
     end,
   },
 
-  -- To show preview of full definitions without having to jump to the definition
   {
     'nvim-treesitter/nvim-treesitter-textobjects',
+    branch = 'main',
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
     },
-    config = function(_, opts)
-      -- Peek definition
-      opts = opts or {}
-      opts.textobjects = {
-        lsp_interop = {
-          enable = true,
-          border = rounded_border,
-          floating_preview_opts = {},
-          peek_definition_code = {
-            ['<leader>df'] = '@function.outer',
-            ['<leader>dF'] = '@class.outer',
-          },
-        },
-      }
-      require('nvim-treesitter.configs').setup(opts)
-    end,
     opts = {},
+    config = function(_, opts)
+      require('nvim-treesitter-textobjects').setup(opts)
+    end,
   },
 
   -- Treesitter context for showing current method name as you scroll down
@@ -3901,37 +3837,6 @@ require('lazy').setup({
       vim.keymap.set('n', 's', function()
         require('leap').leap { target_windows = { vim.api.nvim_get_current_win() } }
       end)
-    end,
-  },
-
-  -- Go to next occurrence of symbol, ignoring symbol in comments
-  {
-    'nvim-treesitter/nvim-treesitter-refactor',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-    },
-    opts = {},
-    config = function()
-      require('nvim-treesitter.configs').setup {
-        refactor = {
-          highlight_definitions = {
-            enable = false,
-            -- Set to false if you have an `updatetime` of ~100.
-            clear_on_cursor_move = true,
-          },
-          highlight_current_scope = { enable = false },
-          navigation = {
-            enable = true,
-            keymaps = {
-              -- goto_definition = "gnd",
-              -- list_definitions = "gnD",
-              -- list_definitions_toc = "gO",
-              goto_next_usage = '<a-j>', -- alt + j
-              goto_previous_usage = '<a-k>', -- alt + k
-            },
-          },
-        },
-      }
     end,
   },
 
