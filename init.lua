@@ -146,6 +146,12 @@ vim.o.autoread = true
 -- The following is the equivalent of set diffopt+=iwhite
 vim.opt.diffopt:append 'iwhite'
 
+-- WezTerm 20240203 can visually tear adjacent vertical panes while scrolling.
+-- This is a WezTerm bug, not a Neovim diff setting:
+-- https://github.com/wezterm/wezterm/issues/5750
+-- Fixed after the stable release by https://github.com/wezterm/wezterm/commit/03407cae99a2
+-- Use a current WezTerm nightly or Ghostty if the problem persists.
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 -- If mouse is not working when using iTerm, check
 -- https://stackoverflow.com/questions/77560255/set-mouse-a-not-working-on-vim-neovim-in-iterm2
@@ -852,14 +858,6 @@ local rounded_border = {
   { '╰', 'FloatBorder' },
   { '│', 'FloatBorder' },
 }
-local function get_lsp_handlers_with_border()
-  -- LSP settings (for overriding per client)
-  return {
-    ['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = rounded_border }), -- single, double
-    ['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = rounded_border }), -- single, double
-  }
-end
-
 -- true will use neovim's navtive inlay hints. Otherwise, it uses the now archived plugin lvimuser/lsp-inlayhints.nvim
 local use_native_inlay_hints = true
 
@@ -1782,7 +1780,9 @@ require('lazy').setup({
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
-          map_no_dropdown('K', vim.lsp.buf.hover, 'Hover Documentation')
+          map_no_dropdown('K', function()
+            vim.lsp.buf.hover { border = rounded_border }
+          end, 'Hover Documentation')
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
@@ -1936,14 +1936,16 @@ require('lazy').setup({
         -- TODO: This requires some work.
         -- https://github.com/search?q=vim.lsp.config.sourcekit&type=code
         -- xcrun --find sourcekit-lsp
-        if vim.lsp.config.sourcekit ~= nil and vim.lsp.config.sourcekit.setup ~= nil then
-          vim.lsp.config.sourcekit.setup {
-            -- Invoke the wrapper script that won't throw error when trying to use --version
-            cmd = { vim.fn.stdpath 'config' .. '/start_sourcekit_lsp.sh' },
-            filetypes = { 'swift' },
-            root_dir = require('lspconfig.util').root_pattern('*.xcodeproj', '*.swift'),
-          }
-        end
+        vim.lsp.config('sourcekit', {
+          -- Invoke the wrapper script that won't throw error when trying to use --version
+          cmd = { vim.fn.stdpath 'config' .. '/start_sourcekit_lsp.sh' },
+          filetypes = { 'swift' },
+          root_dir = function(bufnr, on_dir)
+            local filename = vim.api.nvim_buf_get_name(bufnr)
+            on_dir(require('lspconfig.util').root_pattern('*.xcodeproj', '*.swift')(filename))
+          end,
+        })
+        vim.lsp.enable 'sourcekit'
       end
 
       -- Ensure the servers and tools above are installed
@@ -2031,25 +2033,20 @@ require('lazy').setup({
       )
       vim.cmd(sql_formatter_command)
 
+      for server_name, server in pairs(servers) do
+        -- This handles overriding only values explicitly passed
+        -- by the server configuration above. Useful when disabling
+        -- certain features of an LSP (for example, turning off formatting for tsserver)
+        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        vim.lsp.config(server_name, server)
+        vim.lsp.enable(server_name)
+      end
+
       require('mason-lspconfig').setup {
         -- This ensure installed supports version
         ensure_installed = { 'lua_ls@3.7.4' },
-        handlers = {
-          function(server_name)
-            -- Mason auto load clangd if it is installed in the system
-            if server_name == 'clangd' and not use_clangd_in_mac then
-              return
-            end
-
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            server.handlers = get_lsp_handlers_with_border()
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        -- Servers are explicitly configured and enabled above.
+        automatic_enable = false,
       }
       -- Use ccls only in linux. clangd is available in Mac which makes things easier
       if is_linux then
@@ -2069,9 +2066,8 @@ require('lazy').setup({
         -- Note that ccls expects the absolute path. If you give a relative path like ., it won't work.
         local compile_commands_json_dir = find_path_to_file 'compile_commands.json'
 
-        local lspconfig = require 'lspconfig'
         -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#ccls
-        lspconfig.ccls.setup {
+        vim.lsp.config('ccls', {
           -- See https://github.com/MaskRay/ccls/wiki/Customization for options.
           -- The only way to set the log file location is via the command line argument
           cmd = { 'ccls', '--log-file=' .. vim.fn.expand '$HOME/ccls-log.log', '-v=1' },
@@ -2096,8 +2092,8 @@ require('lazy').setup({
             },
             offset_encoding = 'utf-8',
           },
-          handlers = get_lsp_handlers_with_border(),
-        }
+        })
+        vim.lsp.enable 'ccls'
       end
 
       if use_vanilla_rust_analyzer then
@@ -2107,7 +2103,6 @@ require('lazy').setup({
             ['rust-analyzer'] = RUST_ANALYZER_OPTIONS,
           },
           capabilities = capabilities,
-          handlers = get_lsp_handlers_with_border(),
         }
 
         -- Look for Config.toml in the cwd (not the currrent buffer's directory)
@@ -2116,13 +2111,14 @@ require('lazy').setup({
           -- This is important when ra-multiplexer is used. Otherwise it tries to autodetect the
           -- root_dir based on the current file which is not what I want in workspace based
           -- projects.
-          rust_analyzer_setup_options['root_dir'] = function()
-            return vim.fn.getcwd()
+          rust_analyzer_setup_options['root_dir'] = function(_, on_dir)
+            on_dir(vim.fn.getcwd())
           end
         end
 
         -- LSP config for rust. Use rust-analyzer from the rustup toolchain.
-        require('lspconfig').rust_analyzer.setup(rust_analyzer_setup_options)
+        vim.lsp.config('rust_analyzer', rust_analyzer_setup_options)
+        vim.lsp.enable 'rust_analyzer'
 
         -- Keymap to toggle tests in rust
         vim.keymap.set('n', '<leader>ft', function()
@@ -2140,9 +2136,9 @@ require('lazy').setup({
               end
 
               -- Restart LSP with the new configuration
-              vim.lsp.stop_client(client.id, true) -- second param is for force shutdown
               rust_analyzer_setup_options.settings = client.config.settings
-              require('lspconfig').rust_analyzer.setup(rust_analyzer_setup_options)
+              vim.lsp.config('rust_analyzer', rust_analyzer_setup_options)
+              vim.cmd('lsp restart ' .. client.name)
             end
           end
         end, { noremap = true, silent = true, desc = '[F]lip [T]ests in rust' })
@@ -2173,9 +2169,6 @@ require('lazy').setup({
       -- Enable debug logs for lsp
       -- vim.lsp.set_log_level 'debug'
 
-      -- Setup for java
-      require('lspconfig').jdtls.setup {}
-
       -- Dictionary spell check
       -- This config is not effective. ltex-ls is always enabled.
       --
@@ -2198,6 +2191,7 @@ require('lazy').setup({
       -- https://github.com/nvim-java/nvim-java
       -- This apparantly has to be invoked LSP is attached.
       require('java').setup()
+      vim.lsp.enable 'jdtls'
     end,
   },
 
