@@ -1906,6 +1906,7 @@ require('lazy').setup({
         -- tsserver = {},
         --
         marksman = {}, -- Markdown
+        taplo = {}, -- TOML
 
         lua_ls = {
           -- cmd = {...},
@@ -2021,9 +2022,6 @@ require('lazy').setup({
         'flake8', -- linter - checks for errors, styling issues and complexity
         'mypy', -- static type checker for python
         'pylint', -- static code analyzer
-
-        --toml
-        'taplo',
 
         -- sql specific
         -- Web UI: <https://sql-formatter-org.github.io/sql-formatter/>
