@@ -2015,7 +2015,6 @@ require('lazy').setup({
 
         -- python specific
         'ruff', -- extremely fast python linter. Replacement for black https://docs.astral.sh/ruff/
-        'ruff-lsp', -- Python linter lsp based on ruff
         'black', -- formatter
         'debugpy', -- debugging
         'isort', -- sort imports
@@ -3330,7 +3329,7 @@ require('lazy').setup({
 
       local treesitter = require 'nvim-treesitter'
       treesitter.setup()
-      treesitter.install(opts.ensure_installed)
+      -- treesitter.install(opts.ensure_installed)
 
       local enabled_parsers = {}
       for _, language in ipairs(opts.ensure_installed) do
