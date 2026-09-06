@@ -4041,7 +4041,7 @@ require('lazy').setup({
         -- deno is installed
         require('highlight-undo').setup {}
       else
-        print 'deno is not available. Follow https://github.com/denoland/deno/ to install it'
+        vim.notify('deno is not available. Follow https://github.com/denoland/deno/ to install it', vim.log.levels.WARN)
         -- For Mac/Linux, this is
         --
         -- curl -fsSL https://deno.land/install.sh | sh

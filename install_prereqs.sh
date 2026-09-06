@@ -27,6 +27,7 @@ fi
 # diffutils: Required for GNU diff (better-whitespace)
 # node: Required for npm (pyright, etc.)
 # make: Required for building some plugins (fzf-native, luasnip)
+# deno: Required for denops.vim and plugins like highlight-undo.nvim
 PACKAGES=(
     "tree-sitter"
     "ripgrep"
@@ -35,6 +36,7 @@ PACKAGES=(
     "diffutils"
     "node"
     "make"
+    "deno"
 )
 
 for package in "${PACKAGES[@]}"; do
