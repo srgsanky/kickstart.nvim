@@ -810,7 +810,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
         -- We don't care about aux windows.
         if not is_aux_window(loaded_buf_file_type) then
           -- We only care about buffers that are listed
-          if loaded_buf_listed then
+          if loaded_buf_listed or (loaded_buf_file_type == 'netrw' and is_buffer_used_by_any_window(loaded_buf_number)) then
             if debug then
               print(
                 'BufEnter: '
